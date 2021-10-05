@@ -2,7 +2,7 @@
 
 namespace Spaghetti_labeling
 {
-    class Main
+    class Spaghetti
     {
         static void Main(string[] args)
         {
