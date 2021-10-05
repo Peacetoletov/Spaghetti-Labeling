@@ -1,0 +1,12 @@
+*.json
+*.dll
+*.exe
+*.pdb
+*.txt
+*.cache
+*.csproj
+obj/Debug/net5.0/.NETCoreApp,Version=v5.0.AssemblyAttributes.cs
+obj/Debug/net5.0/Spaghetti-Labeling.AssemblyInfo.cs
+obj/Debug/net5.0/Spaghetti-Labeling.GeneratedMSBuildEditorConfig.editorconfig
+obj/Spaghetti-Labeling.csproj.nuget.g.props
+obj/Spaghetti-Labeling.csproj.nuget.g.targets
