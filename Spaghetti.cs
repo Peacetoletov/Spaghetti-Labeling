@@ -8,7 +8,8 @@ namespace Spaghetti_Labeling
         {
             Console.WriteLine("Hello Bolelli!");
             
-            ODTree tree = new ODTree();            
+            Node treeRoot = new ODTree().GetRoot();
+            treeRoot.InfoDFS();    
         }
     }
 }

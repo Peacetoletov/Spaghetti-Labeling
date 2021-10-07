@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Spaghetti_Labeling
@@ -24,11 +25,7 @@ namespace Spaghetti_Labeling
         }
 
         public override void InfoDFS() {
-
-        }
-
-        public override void InfoInorder() {
-
+            Console.WriteLine("Leaf node " + GetName() + " with actions {" + string.Join(", ", actions) + "}");
         }
     }
 }

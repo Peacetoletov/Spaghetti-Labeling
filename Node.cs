@@ -42,13 +42,17 @@ namespace Spaghetti_Labeling
         }
 
         public override void InfoDFS() {
-
-        }
-
-        public override void InfoInorder() {
-            left.InfoInorder();
-            Console.WriteLine("Internal node. Condition: " + condition);
-            right.InfoInorder();
+            // TODO: remove the ifs after the whole tree is implemented!!!
+            Console.WriteLine("Going through node " + GetName() + " (" + condition + ") into the left subtree");
+            if (left != null) {
+                left.InfoDFS();
+            }
+            
+            Console.WriteLine("Back in node " + GetName() + " (" + condition + "). Going into the right subtree");
+            if (left != null) {
+                right.InfoDFS();
+            }
+            Console.WriteLine("Back in node " + GetName() + " (" + condition + "). Returning");
         }
     }
 }

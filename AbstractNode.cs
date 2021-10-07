@@ -11,11 +11,8 @@ namespace Spaghetti_Labeling
         }
 
 
-        // Prints out information about the tree through DFS (only for testing)
+        // Prints out information about the tree through DFS traversal (only for testing)
         public abstract void InfoDFS();
-
-        // Prints out information about the tree through inorder traversal (only for testing)
-        public abstract void InfoInorder();
         
         public string GetName() {
             return name;
