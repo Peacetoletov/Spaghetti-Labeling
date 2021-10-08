@@ -42,6 +42,7 @@ namespace Spaghetti_Labeling
         }
 
         public override void InfoDFS() {
+            /*
             // TODO: remove the ifs after the whole tree is implemented!!!
             Console.WriteLine("Going through node " + GetName() + " (" + condition + ") into the left subtree");
             if (left != null) {
@@ -52,6 +53,15 @@ namespace Spaghetti_Labeling
             if (left != null) {
                 right.InfoDFS();
             }
+            Console.WriteLine("Back in node " + GetName() + " (" + condition + "). Returning");
+            */
+
+            Console.WriteLine("Going through node " + GetName() + " (" + condition + ") into the left subtree");
+            left.InfoDFS();
+            
+            Console.WriteLine("Back in node " + GetName() + " (" + condition + "). Going into the right subtree");
+            right.InfoDFS();
+            
             Console.WriteLine("Back in node " + GetName() + " (" + condition + "). Returning");
         }
     }

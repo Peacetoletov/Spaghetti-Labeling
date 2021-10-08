@@ -408,6 +408,167 @@ namespace Spaghetti_Labeling
             // Depth 10
             Node lrrlrllrrl = new Node('g');
             Leaf lrrlrllrrr = new Leaf(new HashSet<int> {3, 4, 6});
+            lrrlrllrr.SetChildren(lrrlrllrrl, lrrlrllrrr);
+
+            Leaf lrrlrlrlrl = new Leaf(new HashSet<int> {16});
+            Node lrrlrlrlrr = new Node('h');
+            lrrlrlrlr.SetChildren(lrrlrlrlrl, lrrlrlrlrr);
+
+            Node lrrlrlrrrl = new Node('g');
+            Node lrrlrlrrrr = new Node('i');
+            lrrlrlrrr.SetChildren(lrrlrlrrrl, lrrlrlrrrr);
+
+            Leaf lrrlrrrlrl = new Leaf(new HashSet<int> {7, 11});
+            Node lrrlrrrlrr = new Node('i');
+            lrrlrrrlr.SetChildren(lrrlrrrlrl, lrrlrrrlrr);
+
+            Leaf lrrlrrrrll = new Leaf(new HashSet<int> {7, 11});
+            Leaf lrrlrrrrlr = new Leaf(new HashSet<int> {3, 4, 6});
+            lrrlrrrrl.SetChildren(lrrlrrrrll, lrrlrrrrlr);
+
+            Node lrrrlrrlrl = new Node('g');
+            Leaf lrrrlrrlrr = new Leaf(new HashSet<int> {3, 4, 5, 6});
+            lrrrlrrlr.SetChildren(lrrrlrrlrl, lrrrlrrlrr);
+
+            Leaf lrrrrlrlrl = new Leaf(new HashSet<int> {7, 11});
+            Leaf lrrrrlrlrr = new Leaf(new HashSet<int> {3, 4, 6});
+            lrrrrlrlr.SetChildren(lrrrrlrlrl, lrrrrlrlrr);
+
+            Leaf rlllrrlrrl = new Leaf(new HashSet<int> {7, 8});
+            Leaf rlllrrlrrr = new Leaf(new HashSet<int> {3, 4, 5});
+            rlllrrlrr.SetChildren(rlllrrlrrl, rlllrrlrrr);
+
+            Leaf rlrlllrrrl = new Leaf(new HashSet<int> {7, 11});
+            Leaf rlrlllrrrr = new Leaf(new HashSet<int> {3, 4, 6});
+            rlrlllrrr.SetChildren(rlrlllrrrl, rlrlllrrrr);
+
+            Leaf rlrlrllrrl = new Leaf(new HashSet<int> {11});
+            Node rlrlrllrrr = new Node('b');
+            rlrlrllrr.SetChildren(rlrlrllrrl, rlrlrllrrr);
+
+            Leaf rlrlrrllrl = new Leaf(new HashSet<int> {15});
+            Node rlrlrrllrr = new Node('c');
+            rlrlrrllr.SetChildren(rlrlrrllrl, rlrlrrllrr);
+
+            Leaf rlrlrrrlll = new Leaf(new HashSet<int> {12});
+            Node rlrlrrrllr = new Node('g');
+            rlrlrrrll.SetChildren(rlrlrrrlll, rlrlrrrllr);
+
+            Leaf rlrlrrrlrl = new Leaf(new HashSet<int> {11, 12});
+            Node rlrlrrrlrr = new Node('b');
+            rlrlrrrlr.SetChildren(rlrlrrrlrl, rlrlrrrlrr);
+
+            Node rlrlrrrrrl = new Node('c');
+            Leaf rlrlrrrrrr = new Leaf(new HashSet<int> {3, 4, 5, 6});
+            rlrlrrrrr.SetChildren(rlrlrrrrrl, rlrlrrrrrr);
+
+            Leaf rlrrrlrrll = new Leaf(new HashSet<int> {7, 11});
+            Leaf rlrrrlrrlr = new Leaf(new HashSet<int> {3, 4, 6});
+            rlrrrlrrl.SetChildren(rlrrrlrrll, rlrrrlrrlr);
+
+            Leaf rrlrrrlrll = new Leaf(new HashSet<int> {11, 12});
+            Node rrlrrrlrlr = new Node('b');
+            rrlrrrlrl.SetChildren(rrlrrrlrll, rrlrrrlrlr);
+
+            // Depth 11
+            Leaf lrrlrllrrll = new Leaf(new HashSet<int> {11});
+            Node lrrlrllrrlr = new Node('b');
+            lrrlrllrrl.SetChildren(lrrlrllrrll, lrrlrllrrlr);
+
+            Node lrrlrlrlrrl = new Node('g');
+            Leaf lrrlrlrlrrr = new Leaf(new HashSet<int> {8, 10, 12});
+            lrrlrlrlrr.SetChildren(lrrlrlrlrrl, lrrlrlrlrrr);
+
+            Leaf lrrlrlrrrll = new Leaf(new HashSet<int> {11, 12});
+            Node lrrlrlrrrlr = new Node('b');
+            lrrlrlrrrl.SetChildren(lrrlrlrrrll, lrrlrlrrrlr);
+
+            Node lrrlrlrrrrl = new Node('c');
+            Leaf lrrlrlrrrrr = new Leaf(new HashSet<int> {3, 4, 5, 6});
+            lrrlrlrrrr.SetChildren(lrrlrlrrrrl, lrrlrlrrrrr);
+
+            Node lrrlrrrlrrl = new Node('c');
+            Leaf lrrlrrrlrrr = new Leaf(new HashSet<int> {3, 4, 6});
+            lrrlrrrlrr.SetChildren(lrrlrrrlrrl, lrrlrrrlrrr);
+
+            Leaf lrrrlrrlrll = new Leaf(new HashSet<int> {11, 12});
+            Node lrrrlrrlrlr = new Node('b');
+            lrrrlrrlrl.SetChildren(lrrrlrrlrll, lrrrlrrlrlr);
+
+            Leaf rlrlrllrrrl = new Leaf(new HashSet<int> {7, 11});
+            Leaf rlrlrllrrrr = new Leaf(new HashSet<int> {3, 4, 6});
+            rlrlrllrrr.SetChildren(rlrlrllrrrl, rlrlrllrrrr);
+
+            Leaf rlrlrrllrrl = new Leaf(new HashSet<int> {14, 15});
+            Leaf rlrlrrllrrr = new Leaf(new HashSet<int> {9, 11, 12});
+            rlrlrrllrr.SetChildren(rlrlrrllrrl, rlrlrrllrrr);
+
+            Leaf rlrlrrrllrl = new Leaf(new HashSet<int> {16});
+            Node rlrlrrrllrr = new Node('b');
+            rlrlrrrllr.SetChildren(rlrlrrrllrl, rlrlrrrllrr);
+
+            Leaf rlrlrrrlrrl = new Leaf(new HashSet<int> {7, 8, 11, 12});
+            Node rlrlrrrlrrr = new Node('i');
+            rlrlrrrlrr.SetChildren(rlrlrrrlrrl, rlrlrrrlrrr);
+
+            Leaf rlrlrrrrrll = new Leaf(new HashSet<int> {7, 8, 11, 12});
+            Leaf rlrlrrrrrlr = new Leaf(new HashSet<int> {3, 4, 5, 6});
+            rlrlrrrrrl.SetChildren(rlrlrrrrrll, rlrlrrrrrlr);
+
+            Leaf rrlrrrlrlrl = new Leaf(new HashSet<int> {7, 8, 11, 12});
+            Leaf rrlrrrlrlrr = new Leaf(new HashSet<int> {3, 4, 5, 6});
+            rrlrrrlrlr.SetChildren(rrlrrrlrlrl, rrlrrrlrlrr);
+
+            // Depth 12
+            Leaf lrrlrllrrlrl = new Leaf(new HashSet<int> {7, 11});
+            Leaf lrrlrllrrlrr = new Leaf(new HashSet<int> {3, 4, 6});
+            lrrlrllrrlr.SetChildren(lrrlrllrrlrl, lrrlrllrrlrr);
+
+            Leaf lrrlrlrlrrll = new Leaf(new HashSet<int> {16});
+            Node lrrlrlrlrrlr = new Node('b');
+            lrrlrlrlrrl.SetChildren(lrrlrlrlrrll, lrrlrlrlrrlr);
+
+            Leaf lrrlrlrrrlrl = new Leaf(new HashSet<int> {7, 8, 11, 12});
+            Node lrrlrlrrrlrr = new Node('i');
+            lrrlrlrrrlr.SetChildren(lrrlrlrrrlrl, lrrlrlrrrlrr);
+
+            Leaf lrrlrlrrrrll = new Leaf(new HashSet<int> {7, 8, 11, 12});
+            Leaf lrrlrlrrrrlr = new Leaf(new HashSet<int> {3, 4, 5, 6});
+            lrrlrlrrrrl.SetChildren(lrrlrlrrrrll, lrrlrlrrrrlr);
+
+            Leaf lrrlrrrlrrll = new Leaf(new HashSet<int> {7, 11});
+            Leaf lrrlrrrlrrlr = new Leaf(new HashSet<int> {3, 4, 6});
+            lrrlrrrlrrl.SetChildren(lrrlrrrlrrll, lrrlrrrlrrlr);
+
+            Leaf lrrrlrrlrlrl = new Leaf(new HashSet<int> {7, 8, 11, 12});
+            Leaf lrrrlrrlrlrr = new Leaf(new HashSet<int> {3, 4, 5, 6});
+            lrrrlrrlrlr.SetChildren(lrrrlrrlrlrl, lrrrlrrlrlrr);
+
+            Leaf rlrlrrrllrrl = new Leaf(new HashSet<int> {13, 16});
+            Leaf rlrlrrrllrrr = new Leaf(new HashSet<int> {8, 10, 12});
+            rlrlrrrllrr.SetChildren(rlrlrrrllrrl, rlrlrrrllrrr);
+
+            Node rlrlrrrlrrrl = new Node('c');
+            Leaf rlrlrrrlrrrr = new Leaf(new HashSet<int> {3, 4, 5, 6});
+            rlrlrrrlrrr.SetChildren(rlrlrrrlrrrl, rlrlrrrlrrrr);
+
+            // Depth 13
+            Leaf lrrlrlrlrrlrl = new Leaf(new HashSet<int> {13, 16});
+            Leaf lrrlrlrlrrlrr = new Leaf(new HashSet<int> {8, 10, 12});
+            lrrlrlrlrrlr.SetChildren(lrrlrlrlrrlrl, lrrlrlrlrrlrr);
+
+            Node lrrlrlrrrlrrl = new Node('c');
+            Leaf lrrlrlrrrlrrr = new Leaf(new HashSet<int> {3, 4, 5, 6});
+            lrrlrlrrrlrr.SetChildren(lrrlrlrrrlrrl, lrrlrlrrrlrrr);
+
+            Leaf rlrlrrrlrrrll = new Leaf(new HashSet<int> {7, 8, 11, 12});
+            Leaf rlrlrrrlrrrlr = new Leaf(new HashSet<int> {3, 4, 5, 6});
+            rlrlrrrlrrrl.SetChildren(rlrlrrrlrrrll, rlrlrrrlrrrlr);
+
+            // Depth 14
+            Leaf lrrlrlrrrlrrll = new Leaf(new HashSet<int> {7, 8, 11, 12});
+            Leaf lrrlrlrrrlrrlr = new Leaf(new HashSet<int> {3, 4, 5, 6});
+            lrrlrlrrrlrrl.SetChildren(lrrlrlrrrlrrll, lrrlrlrrrlrrlr);
 
         }
 
