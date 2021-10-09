@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 
 namespace Spaghetti_Labeling
 {
@@ -41,28 +42,59 @@ namespace Spaghetti_Labeling
             this.right.SetParent(this);
         }
 
-        public override void InfoDFS() {
-            /*
-            // TODO: remove the ifs after the whole tree is implemented!!!
-            Console.WriteLine("Going through node " + GetName() + " (" + condition + ") into the left subtree");
-            if (left != null) {
-                left.InfoDFS();
-            }
-            
-            Console.WriteLine("Back in node " + GetName() + " (" + condition + "). Going into the right subtree");
-            if (left != null) {
-                right.InfoDFS();
-            }
-            Console.WriteLine("Back in node " + GetName() + " (" + condition + "). Returning");
-            */
+        public char GetCondition() {
+            return condition;
+        }
 
+        public AbstractNode GetLeft() {
+            return left;
+        }
+
+        public AbstractNode GetRight() {
+            return right;
+        }
+
+        public void MergeIdenticalBranches() {
+            // If both subtrees are identical, this node is replaced by one of them
+
+            // TODO: this, utilizing the IsTreeEqual function. Remember to write tests covering this function
+        }
+
+        public override bool IsTreeEqual(AbstractNode abstractRoot) {
+            // Determines whether this tree and another tree are equal
+            
+            if (!(abstractRoot is Node)) {
+                return false;
+            }
+            Node root = (Node) abstractRoot;
+
+            if (this.condition != root.GetCondition()) {
+                return false;
+            }
+
+            return left.IsTreeEqual(root.GetLeft()) && right.IsTreeEqual(root.GetRight());
+        }
+
+        public override void InfoDFS() {
             Console.WriteLine("Going through node " + GetName() + " (" + condition + ") into the left subtree");
             left.InfoDFS();
-            
             Console.WriteLine("Back in node " + GetName() + " (" + condition + "). Going into the right subtree");
             right.InfoDFS();
-            
             Console.WriteLine("Back in node " + GetName() + " (" + condition + "). Returning");
+        }
+
+
+        public static class NodeTests {
+            public static void Run() {
+                TestIsTreeEqual();
+            }
+
+            private static void TestIsTreeEqual() {
+                Node tree1 = TestTrees.Tree1();
+                
+                Debug.Assert(!tree1.IsTreeEqual(tree1.GetLeft()));
+                Debug.Assert(tree1.GetLeft().IsTreeEqual(tree1.GetRight()));
+            }
         }
     }
 }

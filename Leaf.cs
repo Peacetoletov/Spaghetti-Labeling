@@ -24,6 +24,21 @@ namespace Spaghetti_Labeling
             this.actions = actions;
         }
 
+        public HashSet<int> GetActions() {
+            return actions;
+        }
+
+        public override bool IsTreeEqual(AbstractNode abstractRoot) {
+            // Determines whether this tree and another tree are equal
+
+            if (!(abstractRoot is Leaf)) {
+                return false;
+            }
+            Leaf root = (Leaf) abstractRoot;
+
+            return actions.SetEquals(root.GetActions());
+        }
+
         public override void InfoDFS() {
             Console.WriteLine("Leaf node " + GetName() + " with actions {" + string.Join(", ", actions) + "}");
         }

@@ -9,6 +9,7 @@ namespace Spaghetti_Labeling
 
 
         public ODTree() {
+            // The tree was manually checked using DFS to make sure there were no mistakes
             // Root
             this.root = new Node('o');
             

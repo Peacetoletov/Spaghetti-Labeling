@@ -11,6 +11,10 @@ namespace Spaghetti_Labeling
         }
 
 
+        // Determines whether this tree and another tree are equal
+        public abstract bool IsTreeEqual(AbstractNode abstractRoot);
+
+
         // Prints out information about the tree through DFS traversal (only for testing)
         public abstract void InfoDFS();
         
