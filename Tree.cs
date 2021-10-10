@@ -19,5 +19,20 @@ namespace Spaghetti_Labeling
             // A tree's root can change when branches merge
             this.root = root;
         }
+
+        // override object.Equals
+        public override bool Equals(object obj) {
+            if (obj == null || GetType() != obj.GetType()) {
+                return false;
+            }
+
+            Tree anotherTree = (Tree) obj;            
+            return root.Equals(anotherTree.GetRoot());
+        }
+        
+        // override object.GetHashCode
+        public override int GetHashCode() {
+            return base.GetHashCode();
+        }
     }
 }

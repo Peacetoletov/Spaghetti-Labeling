@@ -8,6 +8,8 @@ namespace Spaghetti_Labeling
         private Tree tree;
         private bool isLeft = false;        // if this node has a parent, is it the left child?
         private string name = "";    // only for testing
+        // Note that the name only corresponds to the tree structure at the creation of the tree, it
+        // may or may not correspond after modifications of the tree are made
 
         public void SetTree(Tree tree) {
             // Pointer to the Tree structure is only set on parentless nodes
@@ -22,6 +24,9 @@ namespace Spaghetti_Labeling
 
         // Prints out information about the tree through DFS traversal (only for testing)
         public abstract void InfoDFS();
+
+        // Merges identical branches of this node and all subtrees
+        public abstract void MergeIdenticalBranches();
         
         public string GetName() {
             return name;

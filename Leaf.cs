@@ -16,7 +16,7 @@ namespace Spaghetti_Labeling
         */
 
         // Pointer to the root of the next tree
-        private AbstractNode nextTree;
+        private Tree nextTree;
 
         public Leaf(HashSet<int> actions, Tree tree) {
             this.actions = actions;
@@ -45,6 +45,10 @@ namespace Spaghetti_Labeling
 
         public override void InfoDFS() {
             Console.WriteLine("Leaf node " + GetName() + " with actions {" + string.Join(", ", actions) + "}");
+        }
+
+        public override void MergeIdenticalBranches() {
+            return;
         }
     }
 }

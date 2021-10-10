@@ -39,7 +39,7 @@ namespace Spaghetti_Labeling
             this.right = right;
             this.right.SetName(GetName() + "r");
             this.right.SetParent(this);
-            this.left.SetIsLeft(false);
+            this.right.SetIsLeft(false);
         }
 
         public char GetCondition() {
@@ -54,12 +54,21 @@ namespace Spaghetti_Labeling
             return right;
         }
 
-        public void MergeIdenticalBranches() {
+        public override void MergeIdenticalBranches() {
+            // Merges identical branches of this node and all subtrees.
             // If both subtrees are identical, this node is replaced by one of them
 
             // TODO: write tests covering this function
 
+            //Console.WriteLine("In node " + GetName());
+
+            left.MergeIdenticalBranches();
+            //Console.WriteLine("Returned from left subtree to node " + GetName() + ". Going into the right subtree");
+            right.MergeIdenticalBranches();
+            //Console.WriteLine("Returned from right subtree to node " + GetName() + ". Checking subtree equality");
+
             if (left.Equals(right)) {
+                //Console.WriteLine("Left subtree of node " + GetName() + " is equal to the right subtree");
                 AbstractNode replacement = left;        // arbitarily chosen child 
                 Node parent = GetParent();
                 if (parent != null) {
@@ -67,8 +76,10 @@ namespace Spaghetti_Labeling
                     replacement.SetParent(parent);
                     if (IsLeft()) {
                         parent.SetLeft(replacement);
+                        //Console.WriteLine("Setting node " + GetName() + " as the left subtree of node " + GetParent().GetName());
                     } else {
                         parent.SetRight(replacement);
+                        //Console.WriteLine("Setting node " + GetName() + " as the right subtree of node " + GetParent().GetName());
                     }
                 } 
                 else {
@@ -77,6 +88,9 @@ namespace Spaghetti_Labeling
                     GetTree().SetRoot(replacement);
                 }
             }
+            else {
+                //Console.WriteLine("Left subtree of node " + GetName() + " is NOT equal to the right subtree");
+            }
         }
 
         public override bool Equals(object obj) {
@@ -84,12 +98,12 @@ namespace Spaghetti_Labeling
                 return false;
             }
             
-            Node root = (Node) obj;
-            if (this.condition != root.GetCondition()) {
+            Node otherNode = (Node) obj;
+            if (this.condition != otherNode.GetCondition()) {
                 return false;
             }
 
-            return left.Equals(root.GetLeft()) && right.Equals(root.GetRight());
+            return left.Equals(otherNode.GetLeft()) && right.Equals(otherNode.GetRight());
         }
         
         public override int GetHashCode() {
@@ -121,11 +135,36 @@ namespace Spaghetti_Labeling
                 AbstractNode leaf2 = TestTrees.TreeLeaf2().GetRoot();
                 Debug.Assert(leaf1.Equals(leaf1));
                 Debug.Assert(!leaf1.Equals(leaf2));
+
+                Node node4 = (Node) TestTrees.Tree4().GetRoot();
+                Debug.Assert(node4.Equals(node4));
             }
 
             private static void TestMergeIdenticalBranches() {
                 // TODO: write tests
-                Debug.Assert(false);
+                Tree tree2 = TestTrees.Tree2();
+                ((Node) tree2.GetRoot()).MergeIdenticalBranches();
+                Tree treeLeaf2 = TestTrees.TreeLeaf2();
+                Tree treeLeaf3 = TestTrees.TreeLeaf3();
+                Debug.Assert(!tree2.Equals(treeLeaf2));
+                Debug.Assert(tree2.Equals(treeLeaf3));
+                
+                Tree tree3 = TestTrees.Tree3();
+                tree2 = TestTrees.Tree2();
+                ((Node) tree3.GetRoot()).MergeIdenticalBranches();
+                //Console.WriteLine("DFS on tree3 after merging:");
+                //tree3.GetRoot().InfoDFS();
+                ((Node) tree2.GetRoot()).MergeIdenticalBranches();
+                //Console.WriteLine("DFS on tree2 after merging:");
+                //tree2.GetRoot().InfoDFS();
+                //((Node) tree2.GetRoot()).MergeIdenticalBranches();
+                Debug.Assert(tree3.Equals(tree2));
+                
+
+            }
+
+            private static bool CheckTreeEqualityAndRootCorrectness(Tree t1, Tree t2) {
+                return t1.Equals(t2) && t1.GetRoot().GetTree() == t1 && t2.GetRoot().GetTree() == t2;
             }
         }
     }
