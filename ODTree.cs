@@ -5,18 +5,19 @@ namespace Spaghetti_Labeling
     // Class for the optimal decision tree
     public class ODTree
     {
-        private Node root;
+        private Tree tree;
 
 
         public ODTree() {
             // The tree was manually checked using DFS to make sure there were no mistakes
             // Root
-            this.root = new Node('o');
+            Node root = new Node('o');
+            this.tree = new Tree(root);
             
             // Depth 1
             Node l = new Node('s');
             Node r = new Node('n');
-            this.root.SetChildren(l, r);
+            root.SetChildren(l, r);
 
             // Depth 2
             Node ll = new Node('p');
@@ -573,8 +574,8 @@ namespace Spaghetti_Labeling
 
         }
 
-        public Node GetRoot() {
-            return root;
+        public Tree GetTree() {
+            return tree;
         }
     }
 }

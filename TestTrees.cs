@@ -7,7 +7,7 @@ namespace Spaghetti_Labeling
     public static class TestTrees
     {
 
-        public static Node Tree1() {
+        public static Tree Tree1() {
             /*
                    a
                  /   \
@@ -16,6 +16,7 @@ namespace Spaghetti_Labeling
               1   2 1   2
             */
             Node root = new Node('a');
+            Tree tree = new Tree(root);
 
             Node l = new Node('b');
             Node r = new Node('b');
@@ -29,7 +30,23 @@ namespace Spaghetti_Labeling
             Leaf rr = new Leaf(new HashSet<int> {2});
             r.SetChildren(rl, rr);
 
-            return root;
+            return tree;
+        }
+
+        public static Tree TreeLeaf1() {
+            /*
+                {1, 2, 3}
+            */
+            Leaf root = new Leaf(new HashSet<int> {1, 2, 3});
+            return new Tree(root);
+        }
+
+        public static Tree TreeLeaf2() {
+            /*
+                {2, 4}
+            */
+            Leaf root = new Leaf(new HashSet<int> {2, 4});
+            return new Tree(root);
         }
     }
 }

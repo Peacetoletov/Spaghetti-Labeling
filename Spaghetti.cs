@@ -22,6 +22,7 @@ namespace Spaghetti_Labeling
 
         private static void RunTests() {
             Node.NodeTests.Run();
+            Console.WriteLine("All tests passed!");
         }
     }
 }

@@ -6,7 +6,6 @@ namespace Spaghetti_Labeling
     // Class for leaf nodes
     public class Leaf : AbstractNode
     {
-        private AbstractNode parent;
 
         // Set of possible actions
         private HashSet<int> actions;
@@ -19,6 +18,9 @@ namespace Spaghetti_Labeling
         // Pointer to the root of the next tree
         private AbstractNode nextTree;
 
+        public Leaf(HashSet<int> actions, Tree tree) {
+            this.actions = actions;
+        }
         
         public Leaf(HashSet<int> actions) {
             this.actions = actions;
@@ -28,15 +30,17 @@ namespace Spaghetti_Labeling
             return actions;
         }
 
-        public override bool IsTreeEqual(AbstractNode abstractRoot) {
-            // Determines whether this tree and another tree are equal
-
-            if (!(abstractRoot is Leaf)) {
+        public override bool Equals(object obj) {
+            if (obj == null || GetType() != obj.GetType()) {
                 return false;
             }
-            Leaf root = (Leaf) abstractRoot;
-
+            
+            Leaf root = (Leaf) obj;
             return actions.SetEquals(root.GetActions());
+        }
+        
+        public override int GetHashCode() {
+            return base.GetHashCode();
         }
 
         public override void InfoDFS() {
