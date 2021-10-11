@@ -4,6 +4,7 @@ using System.Collections.Generic;
 namespace Spaghetti_Labeling
 {
     // Pre-built trees used for testing
+    // Note: never modify existing trees, create a new tree instead.
     public static class TestTrees
     {
 
@@ -111,6 +112,33 @@ namespace Spaghetti_Labeling
             Leaf ll = new Leaf(new HashSet<int> {1});
             Leaf lr = new Leaf(new HashSet<int> {2});
             l.SetChildren(ll, lr);
+
+            return tree;
+        }
+
+        public static Tree Tree5() {
+            /*
+                    a
+                 /     \
+                b       c
+               / \     / \      
+              1   2   3   3
+            */
+
+            Node root = new Node('a');
+            Tree tree = new Tree(root);
+
+            Node l = new Node('b');
+            Node r = new Node('c');
+            root.SetChildren(l, r);
+
+            Leaf ll = new Leaf(new HashSet<int> {1});
+            Leaf lr = new Leaf(new HashSet<int> {2});
+            l.SetChildren(ll, lr);
+
+            Leaf rl = new Leaf(new HashSet<int> {3});
+            Leaf rr = new Leaf(new HashSet<int> {3});
+            r.SetChildren(rl, rr);
 
             return tree;
         }

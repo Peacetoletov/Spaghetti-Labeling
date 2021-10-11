@@ -57,9 +57,7 @@ namespace Spaghetti_Labeling
         public override void MergeIdenticalBranches() {
             // Merges identical branches of this node and all subtrees.
             // If both subtrees are identical, this node is replaced by one of them
-
-            // TODO: write tests covering this function
-
+            
             //Console.WriteLine("In node " + GetName());
 
             left.MergeIdenticalBranches();
@@ -81,11 +79,15 @@ namespace Spaghetti_Labeling
                         parent.SetRight(replacement);
                         //Console.WriteLine("Setting node " + GetName() + " as the right subtree of node " + GetParent().GetName());
                     }
+                    //Console.WriteLine("Has parent.");
                 } 
                 else {
                     // This node doesn't have a parent
                     replacement.SetParent(null);
-                    GetTree().SetRoot(replacement);
+                    //Console.WriteLine("No parent, setting new root to the tree.");
+                    Tree tree = GetTree();
+                    tree.SetRoot(replacement);
+                    replacement.SetTree(tree);
                 }
             }
             else {
@@ -141,26 +143,23 @@ namespace Spaghetti_Labeling
             }
 
             private static void TestMergeIdenticalBranches() {
-                // TODO: write tests
                 Tree tree2 = TestTrees.Tree2();
                 ((Node) tree2.GetRoot()).MergeIdenticalBranches();
                 Tree treeLeaf2 = TestTrees.TreeLeaf2();
                 Tree treeLeaf3 = TestTrees.TreeLeaf3();
-                Debug.Assert(!tree2.Equals(treeLeaf2));
-                Debug.Assert(tree2.Equals(treeLeaf3));
+                Debug.Assert(!CheckTreeEqualityAndRootCorrectness(tree2, treeLeaf2));
+                Debug.Assert(CheckTreeEqualityAndRootCorrectness(tree2, treeLeaf3));
                 
                 Tree tree3 = TestTrees.Tree3();
                 tree2 = TestTrees.Tree2();
                 ((Node) tree3.GetRoot()).MergeIdenticalBranches();
-                //Console.WriteLine("DFS on tree3 after merging:");
-                //tree3.GetRoot().InfoDFS();
                 ((Node) tree2.GetRoot()).MergeIdenticalBranches();
-                //Console.WriteLine("DFS on tree2 after merging:");
-                //tree2.GetRoot().InfoDFS();
-                //((Node) tree2.GetRoot()).MergeIdenticalBranches();
-                Debug.Assert(tree3.Equals(tree2));
+                Debug.Assert(CheckTreeEqualityAndRootCorrectness(tree3, tree2));
                 
-
+                Tree tree4 = TestTrees.Tree4();
+                Tree tree5 = TestTrees.Tree5();
+                ((Node) tree5.GetRoot()).MergeIdenticalBranches();
+                Debug.Assert(CheckTreeEqualityAndRootCorrectness(tree4, tree5));
             }
 
             private static bool CheckTreeEqualityAndRootCorrectness(Tree t1, Tree t2) {
