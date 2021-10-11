@@ -6,7 +6,7 @@ namespace Spaghetti_Labeling
     {
         /* TODO
         1) Create a forest of reduced trees.
-        2) Merge identical branches of each tree.
+        2) Merge identical branches of each tree. (method for merging DONE)
         3) Remove duplicates trees.
         4) ...
         */

@@ -27,7 +27,8 @@ namespace Spaghetti_Labeling
             }
 
             Tree anotherTree = (Tree) obj;            
-            return root.Equals(anotherTree.GetRoot());
+            return root.Equals(anotherTree.GetRoot()) && root.GetTree() == this && 
+                   anotherTree.GetRoot().GetTree() == anotherTree;
         }
         
         // override object.GetHashCode

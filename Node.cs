@@ -57,7 +57,7 @@ namespace Spaghetti_Labeling
         public override void MergeIdenticalBranches() {
             // Merges identical branches of this node and all subtrees.
             // If both subtrees are identical, this node is replaced by one of them
-            
+
             //Console.WriteLine("In node " + GetName());
 
             left.MergeIdenticalBranches();
@@ -121,7 +121,8 @@ namespace Spaghetti_Labeling
         }
 
 
-        public static class NodeTests {
+        public static class NodeTests 
+        {
             public static void Run() {
                 TestEquals();
                 TestMergeIdenticalBranches();
@@ -147,24 +148,30 @@ namespace Spaghetti_Labeling
                 ((Node) tree2.GetRoot()).MergeIdenticalBranches();
                 Tree treeLeaf2 = TestTrees.TreeLeaf2();
                 Tree treeLeaf3 = TestTrees.TreeLeaf3();
-                Debug.Assert(!CheckTreeEqualityAndRootCorrectness(tree2, treeLeaf2));
-                Debug.Assert(CheckTreeEqualityAndRootCorrectness(tree2, treeLeaf3));
+                //Debug.Assert(!CheckTreeEqualityAndRootCorrectness(tree2, treeLeaf2));
+                Debug.Assert(!tree2.Equals(treeLeaf2));
+                //Debug.Assert(CheckTreeEqualityAndRootCorrectness(tree2, treeLeaf3));
+                Debug.Assert(tree2.Equals(treeLeaf3));
                 
                 Tree tree3 = TestTrees.Tree3();
                 tree2 = TestTrees.Tree2();
                 ((Node) tree3.GetRoot()).MergeIdenticalBranches();
                 ((Node) tree2.GetRoot()).MergeIdenticalBranches();
-                Debug.Assert(CheckTreeEqualityAndRootCorrectness(tree3, tree2));
+                //Debug.Assert(CheckTreeEqualityAndRootCorrectness(tree3, tree2));
+                Debug.Assert(tree3.Equals(tree2));
                 
                 Tree tree4 = TestTrees.Tree4();
                 Tree tree5 = TestTrees.Tree5();
                 ((Node) tree5.GetRoot()).MergeIdenticalBranches();
-                Debug.Assert(CheckTreeEqualityAndRootCorrectness(tree4, tree5));
+                //Debug.Assert(CheckTreeEqualityAndRootCorrectness(tree4, tree5));
+                Debug.Assert(tree4.Equals(tree5));
             }
 
+            /*
             private static bool CheckTreeEqualityAndRootCorrectness(Tree t1, Tree t2) {
-                return t1.Equals(t2) && t1.GetRoot().GetTree() == t1 && t2.GetRoot().GetTree() == t2;
+                //return t1.Equals(t2) && t1.GetRoot().GetTree() == t1 && t2.GetRoot().GetTree() == t2;
             }
+            */
         }
     }
 }
