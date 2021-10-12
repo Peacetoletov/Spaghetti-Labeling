@@ -121,7 +121,7 @@ namespace Spaghetti_Labeling
         }
 
 
-        public static class NodeTests 
+        public static class Tests 
         {
             public static void Run() {
                 TestEquals();

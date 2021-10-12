@@ -7,6 +7,8 @@ namespace Spaghetti_Labeling
     // Class for converting the ODTree into a forest of reduced trees
     public class ForestManager
     {
+        // TODO: I will need to add a pointer to the next tree to each reduced tree. I'm still unsure
+        // where, when and how this will be done.
         
         public ForestManager() {
 
@@ -18,30 +20,69 @@ namespace Spaghetti_Labeling
                 tree = new ODTree().GetTree();
             }
 
-            List<HashSet<(char, bool)>> constraints = new List<HashSet<(char, bool)>>();
-            GatherConstraints(tree.GetRoot(), new HashSet<(char, bool)>(), out constraints);
+            List<HashSet<(char, bool)>> constraintsList = new List<HashSet<(char, bool)>>();
+            GatherConstraints(tree.GetRoot(), new HashSet<(char, bool)>(), constraintsList);
+
+            //foreach (HashSet<(char, bool)> set in constraintsList) {
+            for (int i = 0; i < constraintsList.Count; i++) {
+                HashSet<(char, bool)> set = constraintsList[i];
+                Console.WriteLine("Set number " + i);
+                foreach ((char condition, bool value) in set) {
+                    Console.WriteLine("Condition " + condition + " " + value);
+                }
+            }
 
             return null;
         }
 
-        private void GatherConstraints(AbstractNode node, HashSet<(char, bool)> constraints,
-                                       out List<HashSet<(char, bool)>> constraintsList) {
+
+        private void GatherConstraints(AbstractNode abstractNode, HashSet<(char, bool)> constraints,
+                                       List<HashSet<(char, bool)>> constraintsList) {
             // Recursively traverse the tree and gather constraints on the way down, then append them to
             // a list of constraints upon reaching a leaf
-
-            // TODO continue here
-            if (node is Node) {
-                
+            if (abstractNode is Node) {
+                GatherConstraints((Node) abstractNode, constraints, constraintsList);
+            } else {
+                GatherConstraints((Leaf) abstractNode, constraints, constraintsList);
             }
-
-            return null;
         } 
+
+        private void GatherConstraints(Node node, HashSet<(char, bool)> constraints,
+                                       List<HashSet<(char, bool)>> constraintsList) {
+            // Recursively traverse the tree and gather constraints on the way down
+            char condition = node.GetCondition();
+
+            // The original constraints set is passed to the left subtree, a copy is passed to the right subtree
+            HashSet<(char, bool)> constraintsCopy = new HashSet<(char, bool)>(constraints);
+            char conditionShifted = ShiftCondition(condition);
+            if (conditionShifted != condition) {
+                constraints.Add((conditionShifted, false));
+                constraintsCopy.Add((conditionShifted, true));
+            }
+            GatherConstraints(node.GetLeft(), constraints, constraintsList);
+            GatherConstraints(node.GetRight(), constraintsCopy, constraintsList);
+        }
+
+        private void GatherConstraints(HashSet<(char, bool)> constraints,
+                                       List<HashSet<(char, bool)>> constraintsList) {
+            // Append constraints to a list of constraints upon reaching a leaf
+            constraintsList.Add(constraints);
+        }
+
+        private char ShiftCondition(char condition) {
+            // Returns the shifted condition if applicable, return the same condition otherwise
+            List<int> unshiftable = new List<int> {'a', 'b', 'g', 'h', 'm', 'n', 'q', 'r'};
+            if (unshiftable.Contains(condition)) {
+                return condition;
+            }
+            return (char) (condition - 2);
+        }
 
         private Tree ReduceTree() {
             return null;
         }
 
-        public static class ForestManagerTests 
+        public static class Tests 
         {
             public static void Run() {
                 // TODO: add a test with the tree from the paper on apge 5
@@ -54,6 +95,7 @@ namespace Spaghetti_Labeling
                 Tree tree9 = TestTrees.Tree9();
                 Tree tree10 = TestTrees.Tree10();
 
+                /*
                 Debug.Assert(forest.Count == 6);
                 Debug.Assert(forest[0].Equals(tree7));
                 Debug.Assert(forest[1].Equals(tree7));
@@ -61,6 +103,7 @@ namespace Spaghetti_Labeling
                 Debug.Assert(forest[3].Equals(tree8));
                 Debug.Assert(forest[4].Equals(tree9));
                 Debug.Assert(forest[5].Equals(tree10));
+                */
             }
         }        
     }
