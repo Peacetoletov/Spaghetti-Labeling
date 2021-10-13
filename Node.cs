@@ -67,31 +67,44 @@ namespace Spaghetti_Labeling
 
             if (left.Equals(right)) {
                 //Console.WriteLine("Left subtree of node " + GetName() + " is equal to the right subtree");
-                AbstractNode replacement = left;        // arbitarily chosen child 
-                Node parent = GetParent();
-                if (parent != null) {
-                    // This node has a parent
-                    replacement.SetParent(parent);
-                    if (IsLeft()) {
-                        parent.SetLeft(replacement);
-                        //Console.WriteLine("Setting node " + GetName() + " as the left subtree of node " + GetParent().GetName());
-                    } else {
-                        parent.SetRight(replacement);
-                        //Console.WriteLine("Setting node " + GetName() + " as the right subtree of node " + GetParent().GetName());
-                    }
-                    //Console.WriteLine("Has parent.");
-                } 
-                else {
-                    // This node doesn't have a parent
-                    replacement.SetParent(null);
-                    //Console.WriteLine("No parent, setting new root to the tree.");
-                    Tree tree = GetTree();
-                    tree.SetRoot(replacement);
-                    replacement.SetTree(tree);
-                }
+                ReplaceByLeft();            // arbitarily chosen child 
+                //Console.WriteLine("Merging!");
             }
             else {
                 //Console.WriteLine("Left subtree of node " + GetName() + " is NOT equal to the right subtree");
+            }
+        }
+
+        public void ReplaceByLeft() {
+            ReplaceByChild(left);
+        }
+
+        public void ReplaceByRight() {
+            ReplaceByChild(right);
+        }
+
+        private void ReplaceByChild(AbstractNode child) {
+            AbstractNode replacement = child;
+            Node parent = GetParent();
+            if (parent != null) {
+                // This node has a parent
+                replacement.SetParent(parent);
+                if (IsLeft()) {
+                    parent.SetLeft(replacement);
+                    //Console.WriteLine("Setting node " + GetName() + " as the left subtree of node " + GetParent().GetName());
+                } else {
+                    parent.SetRight(replacement);
+                    //Console.WriteLine("Setting node " + GetName() + " as the right subtree of node " + GetParent().GetName());
+                }
+                //Console.WriteLine("Has parent.");
+            } 
+            else {
+                // This node doesn't have a parent
+                replacement.SetParent(null);
+                //Console.WriteLine("No parent, setting new root to the tree.");
+                Tree tree = GetTree();
+                tree.SetRoot(replacement);
+                replacement.SetTree(tree);
             }
         }
 

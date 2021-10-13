@@ -175,6 +175,7 @@ namespace Spaghetti_Labeling
 
             Leaf lrl = new Leaf(new HashSet<int> {3});
             Leaf lrr = new Leaf(new HashSet<int> {4});
+            lr.SetChildren(lrl, lrr);
 
             return tree;
         }
@@ -301,7 +302,90 @@ namespace Spaghetti_Labeling
             return tree;
         }
 
-        // TODO: add another post-reduction tree, identical to the one in the paper on page 5
+        public static Tree Tree11() {
+            /*
+                                     o
+                             /               \
+                           s                  j
+                      /         \            / \
+                     p           p          p  4,6
+                  /     \       / \        / \
+                 t       j     6   j      6   k
+                / \     / \        / \        / \
+               1   2   k   4      k  4,6     6   d
+                      / \        / \            / \
+                     4   d      6   d         12  4,5,6
+                        / \        / \
+                      10  4,5    12  4,5,6
+            */
+            // Tree from page 5 of Spaghetti paper, excluding next tree indices
+
+            Node root = new Node('o');
+            Tree tree = new Tree(root);
+
+            
+            Node l = new Node('s');
+            Node r = new Node('j');
+            root.SetChildren(l, r);
+            
+            Node ll = new Node('p');
+            Node lr = new Node('p');
+            l.SetChildren(ll, lr);
+            
+            Node rl = new Node('p');
+            Leaf rr = new Leaf(new HashSet<int> {4, 6});
+            r.SetChildren(rl, rr);
+
+            Node lll = new Node('t');
+            Node llr = new Node('j');
+            ll.SetChildren(lll, llr);
+
+            Leaf lrl = new Leaf(new HashSet<int> {6});
+            Node lrr = new Node('j');
+            lr.SetChildren(lrl, lrr);
+
+            Leaf rll = new Leaf(new HashSet<int> {6});
+            Node rlr = new Node('k');
+            rl.SetChildren(rll, rlr);
+
+            Leaf llll = new Leaf(new HashSet<int> {1});
+            Leaf lllr = new Leaf(new HashSet<int> {2});
+            lll.SetChildren(llll, lllr);
+
+            Node llrl = new Node('k');
+            Leaf llrr = new Leaf(new HashSet<int> {4});
+            llr.SetChildren(llrl, llrr);
+
+            Node lrrl = new Node('k');
+            Leaf lrrr = new Leaf(new HashSet<int> {4, 6});
+            lrr.SetChildren(lrrl, lrrr);
+
+            Leaf rlrl = new Leaf(new HashSet<int> {6});
+            Node rlrr = new Node('d');
+            rlr.SetChildren(rlrl, rlrr);
+
+            Leaf llrll = new Leaf(new HashSet<int> {4});
+            Node llrlr = new Node('d');
+            llrl.SetChildren(llrll, llrlr);
+
+            Leaf lrrll = new Leaf(new HashSet<int> {6});
+            Node lrrlr = new Node('d');
+            lrrl.SetChildren(lrrll, lrrlr);
+
+            Leaf rlrrl = new Leaf(new HashSet<int> {12});
+            Leaf rlrrr = new Leaf(new HashSet<int> {4, 5, 6});
+            rlrr.SetChildren(rlrrl, rlrrr);
+
+            Leaf llrlrl = new Leaf(new HashSet<int> {10});
+            Leaf llrlrr = new Leaf(new HashSet<int> {4, 5});
+            llrlr.SetChildren(llrlrl, llrlrr);
+
+            Leaf lrrlrl = new Leaf(new HashSet<int> {12});
+            Leaf lrrlrr = new Leaf(new HashSet<int> {4, 5, 6});
+            lrrlr.SetChildren(lrrlrl, lrrlrr);
+
+            return tree;
+        }
 
         public static Tree TreeLeaf1() {
             /*
