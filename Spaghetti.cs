@@ -14,7 +14,7 @@ namespace Spaghetti_Labeling
         {
             Console.WriteLine("Hello Bolelli!");
             
-            Node treeRoot = (Node) (new ODTree().GetTree().GetRoot());
+            Node treeRoot = (Node) (ODTree.GetTree().GetRoot());
             //treeRoot.InfoDFS();
 
             RunTests();

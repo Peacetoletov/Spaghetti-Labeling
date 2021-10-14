@@ -3,16 +3,13 @@ using System.Collections.Generic;
 namespace Spaghetti_Labeling
 {
     // Class for the optimal decision tree
-    public class ODTree
+    public static class ODTree
     {
-        private Tree tree;
-
-
-        public ODTree() {
+        public static Tree GetTree() {
             // The tree was manually checked using DFS to make sure there were no mistakes
             // Root
             Node root = new Node('o');
-            this.tree = new Tree(root);
+            Tree tree = new Tree(root);
             
             // Depth 1
             Node l = new Node('s');
@@ -572,9 +569,7 @@ namespace Spaghetti_Labeling
             Leaf lrrlrlrrrlrrlr = new Leaf(new HashSet<int> {3, 4, 5, 6});
             lrrlrlrrrlrrl.SetChildren(lrrlrlrrrlrrll, lrrlrlrrrlrrlr);
 
-        }
 
-        public Tree GetTree() {
             return tree;
         }
     }

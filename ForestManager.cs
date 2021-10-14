@@ -145,7 +145,7 @@ namespace Spaghetti_Labeling
                 HashSet<(char, bool)> constraints = new HashSet<(char, bool)> 
                     {('h', false), ('n', true), ('i', true)};
                 ForestManager fm = new ForestManager();
-                Tree reduced = new ODTree().GetTree();
+                Tree reduced = ODTree.GetTree();
                 fm.ReduceTree(reduced, constraints);
                 List<Tree> tmp = new List<Tree> {reduced};
                 fm.MergeIdenticalBranches(tmp);
@@ -174,7 +174,7 @@ namespace Spaghetti_Labeling
 
             private static void TestFinalForest() {
                 ForestManager fm = new ForestManager();
-                fm.FinalForest(new ODTree().GetTree);
+                fm.FinalForest(ODTree.GetTree);
 
                 // TODO: actual tests
             }
