@@ -23,6 +23,7 @@ namespace Spaghetti_Labeling
         private static void RunTests() {
             Node.Tests.Run();
             ForestManager.Tests.Run();
+            Tree.Tests.Run();
             Console.WriteLine("All tests passed!");
         }
     }

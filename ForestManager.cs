@@ -11,21 +11,60 @@ namespace Spaghetti_Labeling
         // where, when and how this will be done.
 
         // TODO: After creating a forest of reduced trees, look for duplicates and remove those.
+        // TODO: Then, add a special tree for the beginning of rows.
         
         public ForestManager() {
 
         }
 
+        public List<Tree> FinalForest(Func<Tree> newTree) {
+            // Creates a forest of reduced trees with merged identical branches, removes duplicate trees
+            // and assigns an index of the next tree to each leaf of each tree.
+
+            // TODO: create tests in Tree for initial next node indices DONE
+
+            // TODO: implement this and write tests for the RemoveDuplicateTrees method and a test for 
+            // this whole method (with a simplified ODTree) 
+            List<Tree> forest = CreateForestOfReducedTrees(newTree);
+            MergeIdenticalBranches(forest);
+            RemoveDuplicateTrees(forest);
+            
+            return null;
+        }
+
+        private void MergeIdenticalBranches(List<Tree> forest) {
+            foreach (Tree tree in forest) {
+                tree.GetRoot().MergeIdenticalBranches();
+            }
+        }
+
+        private void RemoveDuplicateTrees(List<Tree> forest) {
+            // TODO: this
+            // TODO: add index -1 to each leaf when it's created, then change it to [1-(number_of_leaves_in_ODTree)],
+            // then change the indices accordingly when removing duplicate trees
+
+            for (int i = 0; i < forest.Count - 1; i++) {
+                for (int j = i + 1; j < forest.Count; j++) {
+                    // something is terribly wrong, all trees are supposedly equal
+                    if (forest[i].Equals(forest[j])) {
+                        Console.WriteLine("Reduced trees " + i + " and " + j + " are equal.");
+                    }
+                }
+            }
+        }
+
         public List<Tree> CreateForestOfReducedTrees(Func<Tree> newTree) {
-            // Creates a reduced tree for each leaf of the ODTree and merges identical branches 
+            // Creates a reduced tree for each leaf of the ODTree 
 
             List<HashSet<(char, bool)>> constraintsList = new List<HashSet<(char, bool)>>();
             GatherConstraints(newTree().GetRoot(), new HashSet<(char, bool)>(), constraintsList);
 
             List<Tree> forest = new List<Tree>();
             foreach (HashSet<(char, bool)> constraints in constraintsList) {
-                Tree reduced = ReduceTree(newTree(), constraints);
-                forest.Add(reduced);
+                Tree tree = newTree();
+                tree.InitNextTreeIndices();
+                ReduceTree(tree, constraints);
+                forest.Add(tree);
             }
 
             return forest;
@@ -74,11 +113,9 @@ namespace Spaghetti_Labeling
             return (char) (condition - 2);
         }
 
-        private Tree ReduceTree(Tree tree, HashSet<(char, bool)> constraints) {
-            // Returns a reduced tree with identical branches merged
+        private void ReduceTree(Tree tree, HashSet<(char, bool)> constraints) {
+            // Returns a reduced tree
             ReduceSubtree(tree.GetRoot(), constraints);
-            tree.GetRoot().MergeIdenticalBranches();
-            return tree;
         }
 
         private void ReduceSubtree(AbstractNode abstractNode, HashSet<(char, bool)> constraints) {
@@ -92,7 +129,6 @@ namespace Spaghetti_Labeling
                     node.ReplaceByLeft();
                 } else if (constraints.Contains((condition, true))) {
                     node.ReplaceByRight();
-                } else {
                 }
             }            
         }
@@ -101,16 +137,21 @@ namespace Spaghetti_Labeling
         {
             public static void Run() {
                 TestCreateForestOfReducedTrees();
-                TestReduceTree();
+                TestReduceTreeAndMergeBranches();
+                TestFinalForest();
             }
 
-            private static void TestReduceTree() {
+            private static void TestReduceTreeAndMergeBranches() {
                 HashSet<(char, bool)> constraints = new HashSet<(char, bool)> 
                     {('h', false), ('n', true), ('i', true)};
                 ForestManager fm = new ForestManager();
-                Tree reduced = fm.ReduceTree(new ODTree().GetTree(), constraints);
-                Tree reference =  TestTrees.Tree11();
+                Tree reduced = new ODTree().GetTree();
+                fm.ReduceTree(reduced, constraints);
+                List<Tree> tmp = new List<Tree> {reduced};
+                fm.MergeIdenticalBranches(tmp);
+                reduced = tmp[0];
 
+                Tree reference =  TestTrees.Tree11();
                 Debug.Assert(reduced.Equals(reference));
             }
 
@@ -123,12 +164,19 @@ namespace Spaghetti_Labeling
                 Tree tree10 = TestTrees.Tree10();
                 
                 Debug.Assert(forest.Count == 6);
-                Debug.Assert(forest[0].Equals(tree7));
-                Debug.Assert(forest[1].Equals(tree7));
-                Debug.Assert(forest[2].Equals(tree8));
-                Debug.Assert(forest[3].Equals(tree8));
-                Debug.Assert(forest[4].Equals(tree9));
-                Debug.Assert(forest[5].Equals(tree10));   
+                Debug.Assert(forest[0].EqualsIgnoreLeafIndices(tree7));
+                Debug.Assert(forest[1].EqualsIgnoreLeafIndices(tree7));
+                Debug.Assert(forest[2].EqualsIgnoreLeafIndices(tree8));
+                Debug.Assert(forest[3].EqualsIgnoreLeafIndices(tree8));
+                Debug.Assert(forest[4].EqualsIgnoreLeafIndices(tree9));
+                Debug.Assert(forest[5].EqualsIgnoreLeafIndices(tree10));   
+            }
+
+            private static void TestFinalForest() {
+                ForestManager fm = new ForestManager();
+                fm.FinalForest(new ODTree().GetTree);
+
+                // TODO: actual tests
             }
         }        
     }

@@ -27,7 +27,14 @@ namespace Spaghetti_Labeling
 
         // Merges identical branches of this node and all subtrees
         public abstract void MergeIdenticalBranches();
-        
+
+        // Sets an initial index from 1 to numberOfLeaves to each leaf in ascending order starting
+        // from the left-most leaf. Each index represents the next tree to be used
+        public abstract int InitNextTreeIndex(int index);
+
+        public abstract bool EqualsIgnoreLeafIndices(object obj);
+            
+
         public string GetName() {
             return name;
         }

@@ -10,13 +10,13 @@ namespace Spaghetti_Labeling
         // Set of possible actions
         private HashSet<int> actions;
 
-        /*
+        
         // Index of the next tree
-        //private int nextTree;           // I might need to use a list (or nested lists), still unsure if an int suffices
-        */
+        private int nextTreeIndex = -1;         // -1 represents no tree
+        
 
         // Pointer to the root of the next tree
-        private Tree nextTree;
+        //private Tree nextTree;
 
         public Leaf(HashSet<int> actions, Tree tree) {
             this.actions = actions;
@@ -35,16 +35,41 @@ namespace Spaghetti_Labeling
                 return false;
             }
             
-            Leaf root = (Leaf) obj;
-            return actions.SetEquals(root.GetActions());
+            Leaf anotherLeaf = (Leaf) obj;
+            return actions.SetEquals(anotherLeaf.GetActions()) &&
+                   nextTreeIndex == anotherLeaf.GetNextTreeIndex();
         }
         
         public override int GetHashCode() {
             return base.GetHashCode();
         }
 
+        public override bool EqualsIgnoreLeafIndices(object obj) {
+            if (obj == null || GetType() != obj.GetType()) {
+                return false;
+            }
+            
+            Leaf anotherLeaf = (Leaf) obj;
+            return actions.SetEquals(anotherLeaf.GetActions());                   
+        }
+
         public override void InfoDFS() {
             Console.WriteLine("Leaf node " + GetName() + " with actions {" + string.Join(", ", actions) + "}");
+        }
+
+        public override int InitNextTreeIndex(int index) {
+            // Sets an initial index from 1 to numberOfLeaves to each leaf in ascending order starting
+            // from the left-most leaf. Each index represents the next tree to be used
+            this.nextTreeIndex = index;
+            return index + 1;
+        }
+
+        public int GetNextTreeIndex() {
+            return nextTreeIndex;
+        }
+
+        public void SetNextTreeIndex(int index) {
+            this.nextTreeIndex = index;
         }
 
         public override void MergeIdenticalBranches() {

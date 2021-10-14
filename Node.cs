@@ -125,6 +125,19 @@ namespace Spaghetti_Labeling
             return base.GetHashCode();
         }
 
+        public override bool EqualsIgnoreLeafIndices(object obj) {
+            if (obj == null || GetType() != obj.GetType()) {
+                return false;
+            }
+            
+            Node otherNode = (Node) obj;
+            if (this.condition != otherNode.GetCondition()) {
+                return false;
+            }
+
+            return left.EqualsIgnoreLeafIndices(otherNode.GetLeft()) && right.EqualsIgnoreLeafIndices(otherNode.GetRight());
+        }
+
         public override void InfoDFS() {
             Console.WriteLine("Going through node " + GetName() + " (" + condition + ") into the left subtree");
             left.InfoDFS();
@@ -133,6 +146,12 @@ namespace Spaghetti_Labeling
             Console.WriteLine("Back in node " + GetName() + " (" + condition + "). Returning");
         }
 
+        public override int InitNextTreeIndex(int index) {
+            // Sets an initial index from 1 to numberOfLeaves to each leaf in ascending order starting
+            // from the left-most leaf. Each index represents the next tree to be used
+            index = left.InitNextTreeIndex(index);
+            return right.InitNextTreeIndex(index);
+        }
 
         public static class Tests 
         {
