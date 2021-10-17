@@ -153,6 +153,11 @@ namespace Spaghetti_Labeling
             return right.InitNextTreeIndex(index);
         }
 
+        public override void AdjustNextTreeIndicesAfterDeletion(int indexOfEqualTree, int indexOfDeletedTree) {
+            left.AdjustNextTreeIndicesAfterDeletion(indexOfEqualTree, indexOfDeletedTree);
+            right.AdjustNextTreeIndicesAfterDeletion(indexOfEqualTree, indexOfDeletedTree);
+        }
+
         public static class Tests 
         {
             public static void Run() {

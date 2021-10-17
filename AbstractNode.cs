@@ -33,6 +33,8 @@ namespace Spaghetti_Labeling
         public abstract int InitNextTreeIndex(int index);
 
         public abstract bool EqualsIgnoreLeafIndices(object obj);
+
+        public abstract void AdjustNextTreeIndicesAfterDeletion(int indexOfEqualTree, int indexOfDeletedTree);
             
 
         public string GetName() {

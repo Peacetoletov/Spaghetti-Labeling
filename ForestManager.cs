@@ -39,15 +39,19 @@ namespace Spaghetti_Labeling
         }
 
         private void RemoveDuplicateTrees(List<Tree> forest) {
-            // TODO: this
-            // TODO: add index -1 to each leaf when it's created, then change it to [1-(number_of_leaves_in_ODTree)],
-            // then change the indices accordingly when removing duplicate trees
+            // TODO: Create another test tree and associated reduced test trees to be used in tests
 
             for (int i = 0; i < forest.Count - 1; i++) {
                 for (int j = i + 1; j < forest.Count; j++) {
-                    // something is terribly wrong, all trees are supposedly equal
                     if (forest[i].Equals(forest[j])) {
-                        Console.WriteLine("Reduced trees " + i + " and " + j + " are equal.");
+                        //Console.WriteLine("Reduced trees " + i + " and " + j + " are equal.");
+                        foreach (Tree tree in forest) {
+                            tree.GetRoot().AdjustNextTreeIndicesAfterDeletion(i + 1, j + 1);
+                            // Arguments need to be incremented by 1 because these nested loops start indexing from 0,
+                            // but next tree indices in leaves start indexing from 1 (to stay consistent with the Spaghetti paper)
+                        }
+                        forest.RemoveAt(j);
+                        j--;        // Decrement j to counterbalance removing a tree, otherwise one tree would be skipped
                     }
                 }
             }
@@ -138,6 +142,7 @@ namespace Spaghetti_Labeling
             public static void Run() {
                 TestCreateForestOfReducedTrees();
                 TestReduceTreeAndMergeBranches();
+                TestRemoveDuplicateTrees();
                 TestFinalForest();
             }
 
@@ -172,9 +177,24 @@ namespace Spaghetti_Labeling
                 Debug.Assert(forest[5].EqualsIgnoreLeafIndices(tree10));   
             }
 
+            private static void TestRemoveDuplicateTrees() {
+                ForestManager fm = new ForestManager();
+                List<Tree> forest = fm.CreateForestOfReducedTrees(TestTrees.Tree12);
+                fm.RemoveDuplicateTrees(forest);
+
+                Tree ref0 = TestTrees.Tree13();
+                Tree ref1 = TestTrees.Tree14();
+
+                Debug.Assert(forest.Count == 2);
+                Debug.Assert(forest[0].Equals(ref0));
+                Debug.Assert(forest[1].Equals(ref1));
+
+                // TODO: one more test tree here
+            }
+
             private static void TestFinalForest() {
                 ForestManager fm = new ForestManager();
-                fm.FinalForest(ODTree.GetTree);
+                //fm.FinalForest(ODTree.GetTree);
 
                 // TODO: actual tests
             }

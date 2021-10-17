@@ -54,7 +54,7 @@ namespace Spaghetti_Labeling
         }
 
         public override void InfoDFS() {
-            Console.WriteLine("Leaf node " + GetName() + " with actions {" + string.Join(", ", actions) + "}");
+            Console.WriteLine("Leaf node " + GetName() + ": {" + string.Join(", ", actions) + "} - " + nextTreeIndex);
         }
 
         public override int InitNextTreeIndex(int index) {
@@ -62,6 +62,16 @@ namespace Spaghetti_Labeling
             // from the left-most leaf. Each index represents the next tree to be used
             this.nextTreeIndex = index;
             return index + 1;
+        }
+
+        public override void AdjustNextTreeIndicesAfterDeletion(int indexOfEqualTree, int indexOfDeletedTree) {
+            if (nextTreeIndex == indexOfDeletedTree) {
+                this.nextTreeIndex = indexOfEqualTree;
+            }
+            else if (nextTreeIndex > indexOfDeletedTree) {
+                this.nextTreeIndex--;
+            }
+            // Do nothing if nextTreeIndex < indexOfDeletedTree
         }
 
         public int GetNextTreeIndex() {

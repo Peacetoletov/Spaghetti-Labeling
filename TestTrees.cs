@@ -387,6 +387,127 @@ namespace Spaghetti_Labeling
             return tree;
         }
 
+        public static Tree Tree12() {
+            /*
+                                    o
+                         /                     \
+                        i                       i
+                   /         \             /         \
+                 1-1           g           n          6-6
+                             /   \       /   \
+                           2-2   3-3   4-4   5-5
+            */
+            
+            // Tree with initial next node indices            
+            
+            Node root = new Node('o');
+            Tree tree = new Tree(root);
+
+            Node l = new Node('i');
+            Node r = new Node('i');
+            root.SetChildren(l, r);
+
+            Leaf ll = new Leaf(new HashSet<int> {1});
+            Node lr = new Node('g');
+            l.SetChildren(ll, lr);
+
+            Node rl = new Node('n');
+            Leaf rr = new Leaf(new HashSet<int> {6});
+            r.SetChildren(rl, rr);
+
+            Leaf lrl = new Leaf(new HashSet<int> {2});
+            Leaf lrr = new Leaf(new HashSet<int> {3});
+            lr.SetChildren(lrl, lrr);
+
+            Leaf rll = new Leaf(new HashSet<int> {4});
+            Leaf rlr = new Leaf(new HashSet<int> {5});
+            rl.SetChildren(rll, rlr);
+
+            tree.InitNextTreeIndices();
+
+            return tree;
+        }
+
+        public static Tree Tree13() {
+            /*
+                                    o
+                         /                     \
+                        i                       i
+                   /         \             /         \
+                 1-1         2-2          n          6-2   
+                                        /   \
+                                      4-1   5-1
+            */
+            
+            // 1st tree in a forest of reduced trees created from Tree12 after removing duplicates
+
+            Node root = new Node('o');
+            Tree tree = new Tree(root);
+
+            Node l = new Node('i');
+            Node r = new Node('i');
+            root.SetChildren(l, r);
+
+            Leaf ll = new Leaf(new HashSet<int> {1});
+            ll.SetNextTreeIndex(1);
+            Leaf lr = new Leaf(new HashSet<int> {2});
+            lr.SetNextTreeIndex(2);
+            l.SetChildren(ll, lr);
+
+            Node rl = new Node('n');
+            Leaf rr = new Leaf(new HashSet<int> {6});
+            rr.SetNextTreeIndex(2);
+            r.SetChildren(rl, rr);
+
+            Leaf rll = new Leaf(new HashSet<int> {4});
+            rll.SetNextTreeIndex(1);
+            Leaf rlr = new Leaf(new HashSet<int> {5});
+            rlr.SetNextTreeIndex(1);
+            rl.SetChildren(rll, rlr);
+
+            return tree;
+        }
+
+        public static Tree Tree14() {
+            /*
+                                    o
+                         /                     \
+                        i                       i
+                   /         \             /         \
+                 1-1         3-2          n          6-2      
+                                        /   \
+                                      4-1   5-1
+            */
+
+            // 2nd and final tree in a forest of reduced trees created from Tree12 after removing duplicates
+            
+            Node root = new Node('o');
+            Tree tree = new Tree(root);
+
+            Node l = new Node('i');
+            Node r = new Node('i');
+            root.SetChildren(l, r);
+
+            Leaf ll = new Leaf(new HashSet<int> {1});
+            ll.SetNextTreeIndex(1);
+            Leaf lr = new Leaf(new HashSet<int> {3});
+            lr.SetNextTreeIndex(2);
+            l.SetChildren(ll, lr);
+
+            Node rl = new Node('n');
+            Leaf rr = new Leaf(new HashSet<int> {6});
+            rr.SetNextTreeIndex(2);
+            r.SetChildren(rl, rr);
+
+            Leaf rll = new Leaf(new HashSet<int> {4});
+            rll.SetNextTreeIndex(1);
+            Leaf rlr = new Leaf(new HashSet<int> {5});
+            rlr.SetNextTreeIndex(1);
+            rl.SetChildren(rll, rlr);
+
+            return tree;
+        }
+
         public static Tree TreeLeaf1() {
             /*
                 1,2,3
