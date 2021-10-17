@@ -508,6 +508,109 @@ namespace Spaghetti_Labeling
             return tree;
         }
 
+        public static Tree Tree15() {
+            /*
+                                    k
+                         /                     \
+                        g                       i
+                   /         \             /         \
+                 1-1         2-2        3-3         4-4
+            */
+            
+            // Tree with initial next node indices     
+
+            Node root = new Node('k');
+            Tree tree = new Tree(root);
+
+            Node l = new Node('g');
+            Node r = new Node('i');
+            root.SetChildren(l, r);
+
+            Leaf ll = new Leaf(new HashSet<int> {1});
+            Leaf lr = new Leaf(new HashSet<int> {2});
+            l.SetChildren(ll, lr);
+
+            Leaf rl = new Leaf(new HashSet<int> {3});
+            Leaf rr = new Leaf(new HashSet<int> {4});
+            r.SetChildren(rl, rr);
+
+            tree.InitNextTreeIndices();
+
+            return tree;
+        }
+
+        public static Tree Tree16() {
+            /*
+                                    k
+                         /                     \
+                        g                      3-2
+                   /         \   
+                 1-1         2-1 
+            */
+            
+            // 1st tree in a forest of reduced trees created from Tree15 after removing duplicates
+
+            Node root = new Node('k');
+            Tree tree = new Tree(root);
+
+            Node l = new Node('g');
+            Leaf r = new Leaf(new HashSet<int> {3});
+            r.SetNextTreeIndex(2);
+            root.SetChildren(l, r);
+
+            Leaf ll = new Leaf(new HashSet<int> {1});
+            ll.SetNextTreeIndex(1);
+            Leaf lr = new Leaf(new HashSet<int> {2});
+            lr.SetNextTreeIndex(1);
+            l.SetChildren(ll, lr);
+
+            return tree;
+        } 
+
+        public static Tree Tree17() {
+            /*
+                                    k
+                         /                     \
+                       1-1                     4-3
+            */
+            
+            // 2nd tree in a forest of reduced trees created from Tree15 after removing duplicates
+
+            Node root = new Node('k');
+            Tree tree = new Tree(root);
+
+            Leaf l = new Leaf(new HashSet<int> {1});
+            l.SetNextTreeIndex(1);
+            Leaf r = new Leaf(new HashSet<int> {4});
+            r.SetNextTreeIndex(3);
+            root.SetChildren(l, r);
+
+            return tree;
+        }
+
+        public static Tree Tree18() {
+            /*
+                                    k
+                         /                     \
+                       2-1                     4-3
+            */
+            
+            // 3rd and final tree in a forest of reduced trees created from Tree15 after removing duplicates
+
+            Node root = new Node('k');
+            Tree tree = new Tree(root);
+
+            Leaf l = new Leaf(new HashSet<int> {2});
+            l.SetNextTreeIndex(1);
+            Leaf r = new Leaf(new HashSet<int> {4});
+            r.SetNextTreeIndex(3);
+            root.SetChildren(l, r);
+
+            return tree;
+        }
+
+          
+
         public static Tree TreeLeaf1() {
             /*
                 1,2,3

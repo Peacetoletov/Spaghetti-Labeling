@@ -189,7 +189,18 @@ namespace Spaghetti_Labeling
                 Debug.Assert(forest[0].Equals(ref0));
                 Debug.Assert(forest[1].Equals(ref1));
 
-                // TODO: one more test tree here
+                
+                forest = fm.CreateForestOfReducedTrees(TestTrees.Tree15);
+                fm.RemoveDuplicateTrees(forest);
+
+                ref0 = TestTrees.Tree16();
+                ref1 = TestTrees.Tree17();
+                Tree ref2 = TestTrees.Tree18();
+
+                Debug.Assert(forest.Count == 3);
+                Debug.Assert(forest[0].Equals(ref0));
+                Debug.Assert(forest[1].Equals(ref1));
+                Debug.Assert(forest[2].Equals(ref2));
             }
 
             private static void TestFinalForest() {
