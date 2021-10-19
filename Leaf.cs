@@ -30,26 +30,26 @@ namespace Spaghetti_Labeling
             return actions;
         }
 
-        public override bool Equals(object obj) {
-            if (obj == null || GetType() != obj.GetType()) {
+        public override bool IsEqual(AbstractNode abstractNode, bool showDebugInfo) {
+            if (abstractNode == null || GetType() != abstractNode.GetType()) {
                 return false;
             }
             
-            Leaf anotherLeaf = (Leaf) obj;
+            if (showDebugInfo) {
+                Console.WriteLine("In leaf " + GetName());
+            }
+
+            Leaf anotherLeaf = (Leaf) abstractNode;
             return actions.SetEquals(anotherLeaf.GetActions()) &&
                    nextTreeIndex == anotherLeaf.GetNextTreeIndex();
         }
         
-        public override int GetHashCode() {
-            return base.GetHashCode();
-        }
-
-        public override bool EqualsIgnoreLeafIndices(object obj) {
-            if (obj == null || GetType() != obj.GetType()) {
+        public override bool IsEqualIgnoringLeafIndices(AbstractNode abstractNode, bool showDebugInfo=false) {
+            if (abstractNode == null || GetType() != abstractNode.GetType()) {
                 return false;
             }
             
-            Leaf anotherLeaf = (Leaf) obj;
+            Leaf anotherLeaf = (Leaf) abstractNode;
             return actions.SetEquals(anotherLeaf.GetActions());                   
         }
 
@@ -84,6 +84,10 @@ namespace Spaghetti_Labeling
 
         public override void MergeIdenticalBranches() {
             return;
+        }
+
+        public override void UpdateName(string newName) {
+            SetName(newName);
         }
     }
 }

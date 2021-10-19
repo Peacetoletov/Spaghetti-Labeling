@@ -21,6 +21,15 @@ namespace Spaghetti_Labeling
             return tree;
         }
 
+        // Returns true if two AbstractNodes are equal.
+        // I cannot override the standard Equals() method because I need to pass additional arguments
+        public abstract bool IsEqual(AbstractNode abstractNode, bool showDebugInfo=false);
+
+        /*
+        public virtual bool IsEqual(AbstractNode abstractNode) {
+            return IsEqual(abstractNode, false);
+        }
+        */
 
         // Prints out information about the tree through DFS traversal (only for testing)
         public abstract void InfoDFS();
@@ -32,10 +41,11 @@ namespace Spaghetti_Labeling
         // from the left-most leaf. Each index represents the next tree to be used
         public abstract int InitNextTreeIndex(int index);
 
-        public abstract bool EqualsIgnoreLeafIndices(object obj);
+        public abstract bool IsEqualIgnoringLeafIndices(AbstractNode abstractNode, bool showDebugInfo=false);
 
         public abstract void AdjustNextTreeIndicesAfterDeletion(int indexOfEqualTree, int indexOfDeletedTree);
             
+        public abstract void UpdateName(string newName);
 
         public string GetName() {
             return name;

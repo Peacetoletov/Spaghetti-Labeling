@@ -304,21 +304,22 @@ namespace Spaghetti_Labeling
 
         public static Tree Tree11() {
             /*
-                                     o
-                             /               \
-                           s                  j
-                      /         \            / \
-                     p           p          p  4,6
-                  /     \       / \        / \
-                 t       j     6   j      6   k
-                / \     / \        / \        / \
-               1   2   k   4      k  4,6     6   d
-                      / \        / \            / \
-                     4   d      6   d         12  4,5,6
-                        / \        / \
-                      10  4,5    12  4,5,6
+                                            o
+                              /                           \
+                             s                             j
+                     /               \                   /   \
+                    p                 p                 p     4,6-11
+                /       \         /       \          /     \
+               t          j     6-7        j      6-12      k
+             /   \      /   \             / \             /   \
+           1-1   2-2   k    4-6          k   4,6-6     6-8     d
+                     /   \             /   \                 /   \
+                   4-4    d         6-8     d             12-5   4,5,6
+                        /   \             /   \
+                     10-5   4,5-5      12-5   4,5,6-5
             */
-            // Tree from page 5 of Spaghetti paper, excluding next tree indices
+
+            // Tree from page 5 of Spaghetti paper
 
             Node root = new Node('o');
             Tree tree = new Tree(root);
@@ -334,6 +335,7 @@ namespace Spaghetti_Labeling
             
             Node rl = new Node('p');
             Leaf rr = new Leaf(new HashSet<int> {4, 6});
+            rr.SetNextTreeIndex(11);
             r.SetChildren(rl, rr);
 
             Node lll = new Node('t');
@@ -341,47 +343,62 @@ namespace Spaghetti_Labeling
             ll.SetChildren(lll, llr);
 
             Leaf lrl = new Leaf(new HashSet<int> {6});
+            lrl.SetNextTreeIndex(7);
             Node lrr = new Node('j');
             lr.SetChildren(lrl, lrr);
 
             Leaf rll = new Leaf(new HashSet<int> {6});
+            rll.SetNextTreeIndex(12);
             Node rlr = new Node('k');
             rl.SetChildren(rll, rlr);
 
             Leaf llll = new Leaf(new HashSet<int> {1});
+            llll.SetNextTreeIndex(1);
             Leaf lllr = new Leaf(new HashSet<int> {2});
+            lllr.SetNextTreeIndex(2);
             lll.SetChildren(llll, lllr);
 
             Node llrl = new Node('k');
             Leaf llrr = new Leaf(new HashSet<int> {4});
+            llrr.SetNextTreeIndex(6);
             llr.SetChildren(llrl, llrr);
 
             Node lrrl = new Node('k');
             Leaf lrrr = new Leaf(new HashSet<int> {4, 6});
+            lrrr.SetNextTreeIndex(6);
             lrr.SetChildren(lrrl, lrrr);
 
             Leaf rlrl = new Leaf(new HashSet<int> {6});
+            rlrl.SetNextTreeIndex(8);
             Node rlrr = new Node('d');
             rlr.SetChildren(rlrl, rlrr);
 
             Leaf llrll = new Leaf(new HashSet<int> {4});
+            llrll.SetNextTreeIndex(4);
             Node llrlr = new Node('d');
             llrl.SetChildren(llrll, llrlr);
 
             Leaf lrrll = new Leaf(new HashSet<int> {6});
+            lrrll.SetNextTreeIndex(8);
             Node lrrlr = new Node('d');
             lrrl.SetChildren(lrrll, lrrlr);
 
             Leaf rlrrl = new Leaf(new HashSet<int> {12});
+            rlrrl.SetNextTreeIndex(5);
             Leaf rlrrr = new Leaf(new HashSet<int> {4, 5, 6});
+            rlrrr.SetNextTreeIndex(5);
             rlrr.SetChildren(rlrrl, rlrrr);
 
             Leaf llrlrl = new Leaf(new HashSet<int> {10});
+            llrlrl.SetNextTreeIndex(5);
             Leaf llrlrr = new Leaf(new HashSet<int> {4, 5});
+            llrlrr.SetNextTreeIndex(5);
             llrlr.SetChildren(llrlrl, llrlrr);
 
             Leaf lrrlrl = new Leaf(new HashSet<int> {12});
+            lrrlrl.SetNextTreeIndex(5);
             Leaf lrrlrr = new Leaf(new HashSet<int> {4, 5, 6});
+            lrrlrr.SetNextTreeIndex(5);
             lrrlr.SetChildren(lrrlrl, lrrlrr);
 
             return tree;

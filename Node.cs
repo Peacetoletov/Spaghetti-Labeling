@@ -65,10 +65,10 @@ namespace Spaghetti_Labeling
             right.MergeIdenticalBranches();
             //Console.WriteLine("Returned from right subtree to node " + GetName() + ". Checking subtree equality");
 
-            if (left.Equals(right)) {
-                //Console.WriteLine("Left subtree of node " + GetName() + " is equal to the right subtree");
+            //if (left.Equals(right)) {
+            if (left.IsEqualIgnoringLeafIndices(right)) {
                 ReplaceByLeft();            // arbitarily chosen child 
-                //Console.WriteLine("Merging!");
+                //Console.WriteLine("Merging! node " + GetName());
             }
             else {
                 //Console.WriteLine("Left subtree of node " + GetName() + " is NOT equal to the right subtree");
@@ -108,34 +108,43 @@ namespace Spaghetti_Labeling
             }
         }
 
-        public override bool Equals(object obj) {
-            if (obj == null || GetType() != obj.GetType()) {
+        public override bool IsEqual(AbstractNode abstractNode, bool showDebugInfo=false) {
+            // Returns true if two AbstractNodes are equal.
+            // I cannot override the standard Equals() method because I need to pass additional arguments
+            if (abstractNode == null || GetType() != abstractNode.GetType()) {
                 return false;
             }
             
-            Node otherNode = (Node) obj;
+            Node otherNode = (Node) abstractNode;
             if (this.condition != otherNode.GetCondition()) {
                 return false;
             }
 
-            return left.Equals(otherNode.GetLeft()) && right.Equals(otherNode.GetRight());
+            bool leftEquals = left.IsEqual(otherNode.GetLeft(), showDebugInfo);
+            bool rightEquals = right.IsEqual(otherNode.GetRight(), showDebugInfo);
+            if (showDebugInfo) {
+                Console.WriteLine("Node " + GetName() + ". Left equals? " + leftEquals + 
+                                  ". Right equals? " + rightEquals);
+            }
+            return leftEquals && rightEquals;
         }
         
         public override int GetHashCode() {
             return base.GetHashCode();
         }
 
-        public override bool EqualsIgnoreLeafIndices(object obj) {
-            if (obj == null || GetType() != obj.GetType()) {
+        public override bool IsEqualIgnoringLeafIndices(AbstractNode abstractNode, bool showDebugInfo=false) {
+            if (abstractNode == null || GetType() != abstractNode.GetType()) {
                 return false;
             }
             
-            Node otherNode = (Node) obj;
+            Node otherNode = (Node) abstractNode;
             if (this.condition != otherNode.GetCondition()) {
                 return false;
             }
 
-            return left.EqualsIgnoreLeafIndices(otherNode.GetLeft()) && right.EqualsIgnoreLeafIndices(otherNode.GetRight());
+            return left.IsEqualIgnoringLeafIndices(otherNode.GetLeft(), showDebugInfo) && 
+                   right.IsEqualIgnoringLeafIndices(otherNode.GetRight(), showDebugInfo);
         }
 
         public override void InfoDFS() {
@@ -158,26 +167,33 @@ namespace Spaghetti_Labeling
             right.AdjustNextTreeIndicesAfterDeletion(indexOfEqualTree, indexOfDeletedTree);
         }
 
+        public override void UpdateName(string newName) {
+            SetName(newName);
+            left.UpdateName(newName + "l");
+            right.UpdateName(newName + "r");
+        }
+
         public static class Tests 
         {
             public static void Run() {
-                TestEquals();
+                TestIsEqual();
                 TestMergeIdenticalBranches();
             }
 
-            private static void TestEquals() {
+            private static void TestIsEqual() {
                 Node node1 = (Node) TestTrees.Tree1().GetRoot();
-                Debug.Assert(!node1.Equals(node1.GetLeft()));
-                Debug.Assert(node1.GetLeft().Equals(node1.GetRight()));
-                Debug.Assert(node1.Equals(node1));
+                Debug.Assert(!node1.IsEqual(node1.GetLeft()));
+                
+                Debug.Assert(node1.GetLeft().IsEqual(node1.GetRight()));
+                Debug.Assert(node1.IsEqual(node1));
 
                 AbstractNode leaf1 = TestTrees.TreeLeaf1().GetRoot();
                 AbstractNode leaf2 = TestTrees.TreeLeaf2().GetRoot();
-                Debug.Assert(leaf1.Equals(leaf1));
-                Debug.Assert(!leaf1.Equals(leaf2));
+                Debug.Assert(leaf1.IsEqual(leaf1));
+                Debug.Assert(!leaf1.IsEqual(leaf2));
 
                 Node node4 = (Node) TestTrees.Tree4().GetRoot();
-                Debug.Assert(node4.Equals(node4));
+                Debug.Assert(node4.IsEqual(node4));
             }
 
             private static void TestMergeIdenticalBranches() {
@@ -186,29 +202,23 @@ namespace Spaghetti_Labeling
                 Tree treeLeaf2 = TestTrees.TreeLeaf2();
                 Tree treeLeaf3 = TestTrees.TreeLeaf3();
                 //Debug.Assert(!CheckTreeEqualityAndRootCorrectness(tree2, treeLeaf2));
-                Debug.Assert(!tree2.Equals(treeLeaf2));
+                Debug.Assert(!tree2.IsEqual(treeLeaf2));
                 //Debug.Assert(CheckTreeEqualityAndRootCorrectness(tree2, treeLeaf3));
-                Debug.Assert(tree2.Equals(treeLeaf3));
+                Debug.Assert(tree2.IsEqual(treeLeaf3));
                 
                 Tree tree3 = TestTrees.Tree3();
                 tree2 = TestTrees.Tree2();
                 ((Node) tree3.GetRoot()).MergeIdenticalBranches();
                 ((Node) tree2.GetRoot()).MergeIdenticalBranches();
                 //Debug.Assert(CheckTreeEqualityAndRootCorrectness(tree3, tree2));
-                Debug.Assert(tree3.Equals(tree2));
+                Debug.Assert(tree3.IsEqual(tree2));
                 
                 Tree tree4 = TestTrees.Tree4();
                 Tree tree5 = TestTrees.Tree5();
                 ((Node) tree5.GetRoot()).MergeIdenticalBranches();
                 //Debug.Assert(CheckTreeEqualityAndRootCorrectness(tree4, tree5));
-                Debug.Assert(tree4.Equals(tree5));
+                Debug.Assert(tree4.IsEqual(tree5));
             }
-
-            /*
-            private static bool CheckTreeEqualityAndRootCorrectness(Tree t1, Tree t2) {
-                //return t1.Equals(t2) && t1.GetRoot().GetTree() == t1 && t2.GetRoot().GetTree() == t2;
-            }
-            */
         }
     }
 }

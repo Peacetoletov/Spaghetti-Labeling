@@ -21,29 +21,31 @@ namespace Spaghetti_Labeling
             this.root = root;
         }
 
-        // override object.Equals
-        public override bool Equals(object obj) {
-            if (obj == null || GetType() != obj.GetType()) {
+        public bool IsEqual(Tree anotherTree, bool showDebugInfo=false) {
+            if (anotherTree == null) {
                 return false;
             }
-    
-            Tree anotherTree = (Tree) obj;            
-            return root.Equals(anotherTree.GetRoot()) && root.GetTree() == this && 
+          
+            return root.IsEqual(anotherTree.GetRoot(), showDebugInfo) && root.GetTree() == this && 
                    anotherTree.GetRoot().GetTree() == anotherTree;
         }
-        
-        // override object.GetHashCode
-        public override int GetHashCode() {
-            return base.GetHashCode();
-        }
 
-        public bool EqualsIgnoreLeafIndices(Tree anotherTree) {
-        return root.EqualsIgnoreLeafIndices(anotherTree.GetRoot()) && root.GetTree() == this && 
-               anotherTree.GetRoot().GetTree() == anotherTree;
+        public bool IsEqualIgnoringLeafIndices(Tree anotherTree, bool showDebugInfo=false) {
+        return root.IsEqualIgnoringLeafIndices(anotherTree.GetRoot(), showDebugInfo) && 
+               root.GetTree() == this && anotherTree.GetRoot().GetTree() == anotherTree;
         }
 
         public void InitNextTreeIndices() {
             root.InitNextTreeIndex(1);
+        }
+
+        public void UpdateNames() {
+            // Updates the name of each node, as they become outdated when the tree structure is changed
+            root.SetName("");
+            if (root is Node) {
+                ((Node) root).GetLeft().UpdateName("l");
+                ((Node) root).GetRight().UpdateName("r");
+            }
         }
 
         public static class Tests
