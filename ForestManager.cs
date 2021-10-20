@@ -7,46 +7,22 @@ namespace Spaghetti_Labeling
     // Class for converting the ODTree into a forest of reduced trees
     public class ForestManager
     {
-        /* TODO: Something if off with the creation of a reduced forest. I should be able to get
-        the tree from page 5, but I never get it (judging by the lack of equal branch merging).
-        One way of getting the tree is from this leaf in the ODTree: llrlrl. There are some more
-        constraints in addition to those mentioned on page 5, but those are irrelevant in this case.
-        The conditions are as follows: {('m', false), ('q', false), ('n', true), ('h', false),
-                                        ('i', true), ('g', false)}
-        Figure out the problem and fix it.
-
-        Maybe the problem was that I was calling Equals() in MergeIdenticalBranches?
-        Yes, this was the case. TODO: Find a solution.
-
-        DONE
-        */
-
-        // TODO: write a test that confirms that the each leaf of each tree in the forest of reduced trees
-        // created from the ODTree has a nextNodeIndex in the viable range and also each index is represented
-        // in at least one leaf (there are no "dangling" trees with no pointers to them).
-
-        // TODO: write a test that checks if my tree at index 4 in the list (== tree pointed to with index 5)
-        // is equal to the tree on page 5, including next tree indices 
-
-        // TODO: Then, add a special tree for the beginning of rows.
-        
+                
         public ForestManager() {
-
+            // Sad empty constructor. Possibly make this class static later on
         }
 
         public List<Tree> FinalForest(Func<Tree> newTree) {
             // Creates a forest of reduced trees with merged identical branches, removes duplicate trees
             // and assigns an index of the next tree to each leaf of each tree.
 
-            // TODO: implement this and write tests for the RemoveDuplicateTrees method and a test for 
-            // this whole method (with a simplified ODTree) 
             List<Tree> forest = CreateForestOfReducedTrees(newTree);
-            
+            forest.Add(CreateRowBeginningTree(newTree));
             MergeIdenticalBranches(forest);
             RemoveDuplicateTrees(forest);
 
             /*
-            if (forest.Count == 12) {
+            if (forest.Count == 13) {
                 for (int i = 0; i < forest.Count; i++) {
                     Console.WriteLine("\n\n\ntree at " + i + ":");
                     forest[i].UpdateNames();
@@ -58,16 +34,29 @@ namespace Spaghetti_Labeling
             return forest;
         }
 
+        private Tree CreateRowBeginningTree(Func<Tree> newTree) {
+            HashSet<(char, bool)> constraints = new HashSet<(char, bool)> {
+                ('a', false), ('b', false), ('g', false), ('h', false),
+                ('m', false), ('n', false), ('q', false), ('r', false)
+            };
+            return InitIndicesAndReduce(newTree, constraints);
+        }
+
+        private Tree InitIndicesAndReduce(Func<Tree> newTree, HashSet<(char, bool)> constraints) {
+            Tree tree = newTree();
+            tree.InitNextTreeIndices();
+            ReduceTree(tree, constraints);
+            return tree;
+        }
+
         private void MergeIdenticalBranches(List<Tree> forest) {
-            int test = 0;
             foreach (Tree tree in forest) {
-                test++;
                 tree.GetRoot().MergeIdenticalBranches();
             }
         }
 
         private void RemoveDuplicateTrees(List<Tree> forest) {
-            Console.WriteLine("Number of trees before the removal of duplicates: " + forest.Count);
+            //Console.WriteLine("Number of trees before the removal of duplicates: " + forest.Count);
             for (int i = 0; i < forest.Count - 1; i++) {
                 for (int j = i + 1; j < forest.Count; j++) {
                     if (forest[i].IsEqual(forest[j])) {
@@ -82,31 +71,17 @@ namespace Spaghetti_Labeling
                     }
                 }
             }
-            Console.WriteLine("Number of trees after the removal of duplicates: " + forest.Count);
+            //Console.WriteLine("Number of trees after the removal of duplicates: " + forest.Count);
         }
 
         public List<Tree> CreateForestOfReducedTrees(Func<Tree> newTree) {
             // Creates a reduced tree for each leaf of the ODTree 
-
             List<HashSet<(char, bool)>> constraintsList = new List<HashSet<(char, bool)>>();
             GatherConstraints(newTree().GetRoot(), new HashSet<(char, bool)>(), constraintsList);
 
-            //int test = 0;
             List<Tree> forest = new List<Tree>();
             foreach (HashSet<(char, bool)> constraints in constraintsList) {
-                Tree tree = newTree();
-                tree.InitNextTreeIndices();
-                ReduceTree(tree, constraints);
-                forest.Add(tree);
-
-                /*
-                Console.Write("Constrain set " + test + ": ");
-                foreach ((char condition, bool value) in constraints) {
-                    Console.Write(condition + "=" + value + "; ");
-                }
-                Console.WriteLine();
-                test++;*/
-                // Apparently, the constraints for leaf llrlrl are gathered correctly.
+                forest.Add(InitIndicesAndReduce(newTree, constraints));
             }
 
             return forest;
@@ -244,11 +219,14 @@ namespace Spaghetti_Labeling
             }
 
             private static void TestFinalForest() {
+                /*
                 ForestManager fm = new ForestManager();
                 Console.WriteLine("ODTree test");
                 fm.FinalForest(ODTree.GetTree);
 
                 // TODO: actual tests
+                // UPDATE: this can wait, as manual testing was good enough for now
+                */
             }
 
             private static void TestRangeOfNextTreeIndicesInReducedTrees() {
@@ -258,7 +236,37 @@ namespace Spaghetti_Labeling
                 least one leaf, meaning there are no "dangling" trees that cannot be reached
                 from any leaf.
                 */
-                // TODO: this
+
+                ForestManager fm = new ForestManager();
+                List<Tree> forest = fm.FinalForest(ODTree.GetTree);
+
+                HashSet<int> unusedIncides = new HashSet<int>();
+                for (int i = 1; i < forest.Count; i++) {
+                    unusedIncides.Add(i);
+                }
+
+                foreach (Tree tree in forest) {
+                    TestRangeOfNextTreeIndicesInReducedTreesHelper(tree.GetRoot(), unusedIncides, forest.Count);
+                }
+                
+                Debug.Assert(unusedIncides.Count == 0);
+            }
+
+            private static void TestRangeOfNextTreeIndicesInReducedTreesHelper(
+                    AbstractNode abstractNode, HashSet<int> unusedIncides, int forestCount) {
+
+                if (abstractNode is Node) {
+                    Node node = (Node) abstractNode;
+                    TestRangeOfNextTreeIndicesInReducedTreesHelper(node.GetLeft(), unusedIncides, forestCount);
+                    TestRangeOfNextTreeIndicesInReducedTreesHelper(node.GetRight(), unusedIncides, forestCount);
+                } else {
+                    int nextTreeIndex = ((Leaf) abstractNode).GetNextTreeIndex();
+                    if (unusedIncides.Contains(nextTreeIndex)) {
+                        unusedIncides.Remove(nextTreeIndex);
+                    }
+                    Debug.Assert(nextTreeIndex >= 1);
+                    Debug.Assert(nextTreeIndex <= forestCount);
+                }
             }
 
             private static void TestPage5Tree() {
