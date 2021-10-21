@@ -173,6 +173,12 @@ namespace Spaghetti_Labeling
             right.UpdateName(newName + "r");
         }
 
+        public override AbstractNode DeepCopy() { 
+            Node newNode = new Node(condition);
+            newNode.SetChildren(left.DeepCopy(), right.DeepCopy());
+            return newNode;
+        } 
+
         public static class Tests 
         {
             public static void Run() {

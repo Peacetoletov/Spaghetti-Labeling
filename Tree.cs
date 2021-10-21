@@ -9,7 +9,13 @@ namespace Spaghetti_Labeling
 
         public Tree(AbstractNode root) {
             this.root = root;
-            root.SetTree(this);
+            this.root.SetTree(this);
+        }
+
+        public Tree(Tree anotherTree) {
+            // Creates a deep copy of the provided tree
+            this.root = anotherTree.GetRoot().DeepCopy();
+            this.root.SetTree(this);
         }
 
         public AbstractNode GetRoot() {
@@ -52,6 +58,7 @@ namespace Spaghetti_Labeling
         {
             public static void Run() {
                 TestInitNextTreeIndices();
+                TestTreeCopying();
             }
 
             private static void TestInitNextTreeIndices() {
@@ -83,6 +90,25 @@ namespace Spaghetti_Labeling
                 Debug.Assert(lrr.GetNextTreeIndex() == 4);
                 Debug.Assert(rl.GetNextTreeIndex() == 5);
                 Debug.Assert(rr.GetNextTreeIndex() == 6);
+            }
+
+            private static void TestTreeCopying() {
+                // Tests whether a tree is correctly copied
+                Tree original = ODTree.GetTree();
+                Tree copy = new Tree(original);
+
+                Debug.Assert(original.IsEqual(copy));
+                TestTreeCopyingRec(original.GetRoot(), copy.GetRoot());
+            }
+
+            private static void TestTreeCopyingRec(AbstractNode n1, AbstractNode n2) {
+                // Tests whether nodes are actually different objects and not just different
+                // references to the same object
+                if (n1 is Node && n2 is Node) {
+                    TestTreeCopyingRec(((Node) n1).GetLeft(), ((Node) n2).GetLeft());
+                    TestTreeCopyingRec(((Node) n1).GetRight(), ((Node) n2).GetRight());
+                }
+                Debug.Assert(n1 != n2);
             }
         }
     }

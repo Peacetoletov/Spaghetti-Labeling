@@ -17,11 +17,8 @@ namespace Spaghetti_Labeling
 
         // Pointer to the root of the next tree
         //private Tree nextTree;
-
-        public Leaf(HashSet<int> actions, Tree tree) {
-            this.actions = actions;
-        }
         
+
         public Leaf(HashSet<int> actions) {
             this.actions = actions;
         }
@@ -88,6 +85,10 @@ namespace Spaghetti_Labeling
 
         public override void UpdateName(string newName) {
             SetName(newName);
+        }
+
+        public override AbstractNode DeepCopy() {
+            return new Leaf(new HashSet<int>(actions));
         }
     }
 }

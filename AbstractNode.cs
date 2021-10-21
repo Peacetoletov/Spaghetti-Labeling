@@ -47,6 +47,8 @@ namespace Spaghetti_Labeling
             
         public abstract void UpdateName(string newName);
 
+        public abstract AbstractNode DeepCopy();
+
         public string GetName() {
             return name;
         }
