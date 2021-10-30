@@ -27,7 +27,7 @@ namespace Spaghetti_Labeling
             return actions;
         }
 
-        public override bool IsEqual(AbstractNode abstractNode, bool showDebugInfo) {
+        public override bool IsEqual(AbstractNode abstractNode, bool showDebugInfo=false) {
             if (abstractNode == null || GetType() != abstractNode.GetType()) {
                 return false;
             }

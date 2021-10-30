@@ -5,19 +5,12 @@ using System.Diagnostics;
 namespace Spaghetti_Labeling
 {
     // Class for converting the ODTree into a forest of reduced trees
-    public class ForestManager
+    public static class ForestCreator
     {
-        // TODO: end forest even DONE
-        // TODO: end forest odd - needs testing
-
         // Observations: Main forest is reduced to just 13 trees. End forest even also constains 13 trees, 
         // end forest odd is further reduced to 9 trees. Odd trees also have a very small number of nodes (17 at most).
 
-        public ForestManager() {
-            // Sad empty constructor. Possibly make this class static later on
-        }
-
-        public List<Tree> MainForest(Func<Tree> newTree) {
+        public static List<Tree> MainForest(Func<Tree> newTree) {
             // Creates a forest of reduced trees with merged identical branches, removes duplicate trees
             // and assigns an index of the next tree to each leaf of each tree.
 
@@ -25,21 +18,11 @@ namespace Spaghetti_Labeling
             List<Tree> forest = CreateForestOfReducedTrees(newTree, constraintsList);
             MergeIdenticalBranches(forest);
             RemoveDuplicateMainTrees(forest);
-
-            /*
-            if (forest.Count == 13) {
-                for (int i = 0; i < forest.Count; i++) {
-                    Console.WriteLine("\n\n\ntree at " + i + ":");
-                    forest[i].UpdateNames();
-                    forest[i].GetRoot().InfoDFS();
-                }
-            }
-            */
             
             return forest;
         }
 
-        public List<(Tree, List<int>)> EndForest(List<Tree> mainForest, bool even) {
+        public static List<(Tree, List<int>)> EndForest(List<Tree> mainForest, bool even) {
             // Returns a list of end trees together with indices of all main trees that each 
             // end tree is associated with.
             // Parameter even determined the type of end forest to be created (even/odd).
@@ -74,95 +57,20 @@ namespace Spaghetti_Labeling
             return endTreesWithMainTreeIndices;
         }
 
-        /*
-        public List<(Tree, List<int>)> EndForestEven(List<Tree> mainForest) {
-            // Returns a list of even end trees together with indices of the main tree that each 
-            // end tree is associated with 
-            
-            1) Copy main forest.
-            2) Perform further reduction and branch merging, put all newly reduced trees into 
-               a list together with a list containing the index of the associated main tree.
-            3) Delete duplicate trees, add the deleted tree's index to the list of the other 
-               tree (the one that is equal but wasn't deleted).
-               UPDATE - turns out that all trees are different and therefore none can be deleted.
-
-            List<Tree> endForest = copyForest(mainForest);
-            HashSet<(char, bool)> constraintsList = EndEvenConstraints();
-            foreach (Tree tree in endForest) {
-                ReduceTree(tree, constraintsList);
-            }
-            MergeIdenticalBranches(endForest);
-
-               Each end tree is associated with a main tree. Whenever an end tree is removed due to
-               being a duplicate, the associated main tree's end tree index must be updated. 
-               One main tree has only one end tree of each parity, but one end tree can be associated
-               with multiple main trees. 
-               This list stores the end trees with their assocaited main trees. 
-            List<(Tree, List<int>)> endTreesWithMainTreeIndices = new List<(Tree, List<int>)>();
-            for (int i = 0; i < endForest.Count; i++) {
-                endTreesWithMainTreeIndices.Add((endForest[i], new List<int> {i + 1}));
-            }
-            RemoveDuplicateEndTrees(endTreesWithMainTreeIndices);
-
-            return endTreesWithMainTreeIndices;
-        }
-
-        // TODO: Possibly merge EndForestEven and EndForestOdd methods
-        public List<(Tree, List<int>)> EndForestOdd(List<Tree> mainForest) {
-            // Returns a list of even end trees together with indices of the main tree that each 
-            // end tree is associated with 
-            
-            // Same algorithm as with even trees, except using more constraints
-            // Unlike even constraints, odd constraints actually result in 4 trees becoming duplicates.
-
-            List<Tree> endForest = copyForest(mainForest);
-            HashSet<(char, bool)> constraintsList = EndOddConstraints();
-            foreach (Tree tree in endForest) {
-                ReduceTree(tree, constraintsList);
-            }
-            MergeIdenticalBranches(endForest);
-
-               Each end tree is associated with a main tree. Whenever an end tree is removed due to
-               being a duplicate, the associated main tree's end tree index must be updated. 
-               One main tree has only one end tree of each parity, but one end tree can be associated
-               with multiple main trees. 
-               This list stores the end trees with their assocaited main trees. 
-            
-            List<(Tree, List<int>)> endTreesWithMainTreeIndices = new List<(Tree, List<int>)>();
-            for (int i = 0; i < endForest.Count; i++) {
-                endTreesWithMainTreeIndices.Add((endForest[i], new List<int> {i + 1}));
-            }
-            RemoveDuplicateEndTrees(endTreesWithMainTreeIndices);
-
-            // testing
-            
-            for (int i = 0; i < endTreesWithMainTreeIndices.Count; i++) {
-                Console.Write("Tree " + i + " is used in the following main trees: ");
-                foreach (int index in endTreesWithMainTreeIndices[i].Item2) {
-                    Console.Write(index + " ");
-                }
-                Console.WriteLine();
-            }
-            
-
-            return endTreesWithMainTreeIndices;
-        }
-        */
-
-        private HashSet<(char, bool)> EndEvenConstraints() {
+        private static HashSet<(char, bool)> EndEvenConstraints() {
             return new HashSet<(char, bool)> {
                 ('e', false), ('f', false), ('k', false), ('l', false),
             };
         }
 
-        private HashSet<(char, bool)> EndOddConstraints() {
+        private static HashSet<(char, bool)> EndOddConstraints() {
             return new HashSet<(char, bool)> {
                 ('e', false), ('f', false), ('k', false), ('l', false),
                 ('d', false), ('j', false), ('p', false), ('t', false),
             };
         }
         
-        private List<Tree> copyForest(List<Tree> forest) {
+        private static List<Tree> copyForest(List<Tree> forest) {
             List<Tree> copy = new List<Tree>();
             foreach (Tree tree in forest) {
                 copy.Add(new Tree(tree));
@@ -170,34 +78,34 @@ namespace Spaghetti_Labeling
             return copy;
         }
 
-        private List<HashSet<(char, bool)>> MainTreesConstraints(Func<Tree> newTree) {
+        private static List<HashSet<(char, bool)>> MainTreesConstraints(Func<Tree> newTree) {
             List<HashSet<(char, bool)>> constraintsList = new List<HashSet<(char, bool)>>();
             GatherConstraints(newTree().GetRoot(), new HashSet<(char, bool)>(), constraintsList);
             constraintsList.Add(RowBeginningConstraints());
             return constraintsList;
         }
 
-        private HashSet<(char, bool)> RowBeginningConstraints() {
+        private static HashSet<(char, bool)> RowBeginningConstraints() {
             return new HashSet<(char, bool)> {
                 ('a', false), ('b', false), ('g', false), ('h', false),
                 ('m', false), ('n', false), ('q', false), ('r', false)
             };
         }   
 
-        private Tree InitIndicesAndReduce(Func<Tree> newTree, HashSet<(char, bool)> constraints) {
+        private static Tree InitIndicesAndReduce(Func<Tree> newTree, HashSet<(char, bool)> constraints) {
             Tree tree = newTree();
             tree.InitNextTreeIndices();
             ReduceTree(tree, constraints);
             return tree;
         }
 
-        private void MergeIdenticalBranches(List<Tree> forest) {
+        private static void MergeIdenticalBranches(List<Tree> forest) {
             foreach (Tree tree in forest) {
                 tree.GetRoot().MergeIdenticalBranches();
             }
         }
 
-        private void RemoveDuplicateMainTrees(List<Tree> forest) {
+        private static void RemoveDuplicateMainTrees(List<Tree> forest) {
             //Console.WriteLine("Number of trees before the removal of duplicates: " + forest.Count);
             for (int i = 0; i < forest.Count - 1; i++) {
                 for (int j = i + 1; j < forest.Count; j++) {
@@ -216,8 +124,8 @@ namespace Spaghetti_Labeling
             //Console.WriteLine("Number of trees after the removal of duplicates: " + forest.Count);
         }
 
-        private void RemoveDuplicateEndTrees(List<(Tree, List<int>)> endTreesWithMainTreeIndices) {
-            Console.WriteLine("Number of trees before the removal of duplicates: " + endTreesWithMainTreeIndices.Count);
+        private static void RemoveDuplicateEndTrees(List<(Tree, List<int>)> endTreesWithMainTreeIndices) {
+            //Console.WriteLine("Number of trees before the removal of duplicates: " + endTreesWithMainTreeIndices.Count);
             for (int i = 0; i < endTreesWithMainTreeIndices.Count - 1; i++) {
                 Tree tree1 = endTreesWithMainTreeIndices[i].Item1;
                 //Console.WriteLine("Tree " + i + " has " + tree1.GetRoot().CountNodes() + " nodes.");
@@ -236,27 +144,21 @@ namespace Spaghetti_Labeling
                 }
             }
             //Console.WriteLine("Tree " + (endTreesWithMainTreeIndices.Count - 1) + " has " + endTreesWithMainTreeIndices[endTreesWithMainTreeIndices.Count - 1].Item1.GetRoot().CountNodes() + " nodes.");
-            Console.WriteLine("Number of trees after the removal of duplicates: " + endTreesWithMainTreeIndices.Count);
+            //Console.WriteLine("Number of trees after the removal of duplicates: " + endTreesWithMainTreeIndices.Count);
         }
 
-        public List<Tree> CreateForestOfReducedTrees(Func<Tree> newTree, 
+        private static List<Tree> CreateForestOfReducedTrees(Func<Tree> newTree, 
                                                      List<HashSet<(char, bool)>> constraintsList) {
             // Creates a reduced tree for each leaf of the ODTree 
-            /*
-            List<HashSet<(char, bool)>> constraintsList = new List<HashSet<(char, bool)>>();
-            GatherConstraints(newTree().GetRoot(), new HashSet<(char, bool)>(), constraintsList);
-            */  
-
             List<Tree> forest = new List<Tree>();
             foreach (HashSet<(char, bool)> constraints in constraintsList) {
                 forest.Add(InitIndicesAndReduce(newTree, constraints));
             }
-
             return forest;
         }
 
 
-        private void GatherConstraints(AbstractNode abstractNode, HashSet<(char, bool)> constraints,
+        private static void GatherConstraints(AbstractNode abstractNode, HashSet<(char, bool)> constraints,
                                        List<HashSet<(char, bool)>> constraintsList) {
             // Recursively traverse the tree and gather constraints on the way down, then append them to
             // a list of constraints upon reaching a leaf
@@ -267,7 +169,7 @@ namespace Spaghetti_Labeling
             }
         } 
 
-        private void GatherConstraints(Node node, HashSet<(char, bool)> constraints,
+        private static void GatherConstraints(Node node, HashSet<(char, bool)> constraints,
                                        List<HashSet<(char, bool)>> constraintsList) {
             // Recursively traverse the tree and gather constraints on the way down
             char condition = node.GetCondition();
@@ -283,13 +185,13 @@ namespace Spaghetti_Labeling
             GatherConstraints(node.GetRight(), constraintsCopy, constraintsList);
         }
 
-        private void GatherConstraints(HashSet<(char, bool)> constraints,
+        private static void GatherConstraints(HashSet<(char, bool)> constraints,
                                        List<HashSet<(char, bool)>> constraintsList) {
             // Append constraints to a list of constraints upon reaching a leaf
             constraintsList.Add(constraints);
         }
 
-        private char ShiftCondition(char condition) {
+        private static char ShiftCondition(char condition) {
             // Returns the shifted condition if applicable, return the same condition otherwise
             List<int> unshiftable = new List<int> {'a', 'b', 'g', 'h', 'm', 'n', 'q', 'r'};
             if (unshiftable.Contains(condition)) {
@@ -298,12 +200,12 @@ namespace Spaghetti_Labeling
             return (char) (condition - 2);
         }
 
-        private void ReduceTree(Tree tree, HashSet<(char, bool)> constraints) {
+        private static void ReduceTree(Tree tree, HashSet<(char, bool)> constraints) {
             // Reduces a given tree
             ReduceSubtree(tree.GetRoot(), constraints);
         }
 
-        private void ReduceSubtree(AbstractNode abstractNode, HashSet<(char, bool)> constraints) {
+        private static void ReduceSubtree(AbstractNode abstractNode, HashSet<(char, bool)> constraints) {
             if (abstractNode is Node) {
                 Node node = (Node) abstractNode;
                 ReduceSubtree(node.GetLeft(), constraints);
@@ -334,11 +236,10 @@ namespace Spaghetti_Labeling
             private static void TestReduceTreeAndMergeBranches() {
                 HashSet<(char, bool)> constraints = new HashSet<(char, bool)> 
                     {('h', false), ('n', true), ('i', true)};
-                ForestManager fm = new ForestManager();
                 Tree reduced = ODTree.GetTree();
-                fm.ReduceTree(reduced, constraints);
+                ReduceTree(reduced, constraints);
                 List<Tree> tmp = new List<Tree> {reduced};
-                fm.MergeIdenticalBranches(tmp);
+                MergeIdenticalBranches(tmp);
                 reduced = tmp[0];
 
                 Tree reference =  TestTrees.Tree11();
@@ -346,10 +247,9 @@ namespace Spaghetti_Labeling
             }
 
             private static void TestCreateForestOfReducedTrees() {
-                ForestManager fm = new ForestManager();
                 List<HashSet<(char, bool)>> constraintsList = new List<HashSet<(char, bool)>>();
-                fm.GatherConstraints(TestTrees.Tree6().GetRoot(), new HashSet<(char, bool)>(), constraintsList);
-                List<Tree> forest = fm.CreateForestOfReducedTrees(TestTrees.Tree6, constraintsList);
+                GatherConstraints(TestTrees.Tree6().GetRoot(), new HashSet<(char, bool)>(), constraintsList);
+                List<Tree> forest = CreateForestOfReducedTrees(TestTrees.Tree6, constraintsList);
                 Tree tree7 = TestTrees.Tree7();
                 Tree tree8 = TestTrees.Tree8();
                 Tree tree9 = TestTrees.Tree9();
@@ -365,11 +265,10 @@ namespace Spaghetti_Labeling
             }
 
             private static void TestRemoveDuplicateMainTrees() {
-                ForestManager fm = new ForestManager();
                 List<HashSet<(char, bool)>> constraintsList = new List<HashSet<(char, bool)>>();
-                fm.GatherConstraints(TestTrees.Tree12().GetRoot(), new HashSet<(char, bool)>(), constraintsList);
-                List<Tree> forest = fm.CreateForestOfReducedTrees(TestTrees.Tree12, constraintsList);
-                fm.RemoveDuplicateMainTrees(forest);
+                GatherConstraints(TestTrees.Tree12().GetRoot(), new HashSet<(char, bool)>(), constraintsList);
+                List<Tree> forest = CreateForestOfReducedTrees(TestTrees.Tree12, constraintsList);
+                RemoveDuplicateMainTrees(forest);
 
                 Tree ref0 = TestTrees.Tree13();
                 Tree ref1 = TestTrees.Tree14();
@@ -379,9 +278,9 @@ namespace Spaghetti_Labeling
                 Debug.Assert(forest[1].IsEqual(ref1));
 
                 constraintsList = new List<HashSet<(char, bool)>>();
-                fm.GatherConstraints(TestTrees.Tree15().GetRoot(), new HashSet<(char, bool)>(), constraintsList);
-                forest = fm.CreateForestOfReducedTrees(TestTrees.Tree15, constraintsList);
-                fm.RemoveDuplicateMainTrees(forest);
+                GatherConstraints(TestTrees.Tree15().GetRoot(), new HashSet<(char, bool)>(), constraintsList);
+                forest = CreateForestOfReducedTrees(TestTrees.Tree15, constraintsList);
+                RemoveDuplicateMainTrees(forest);
 
                 ref0 = TestTrees.Tree16();
                 ref1 = TestTrees.Tree17();
@@ -395,9 +294,8 @@ namespace Spaghetti_Labeling
 
             private static void TestFinalForest() {
                 /*
-                ForestManager fm = new ForestManager();
                 Console.WriteLine("ODTree test");
-                fm.FinalForest(ODTree.GetTree);
+                FinalForest(ODTree.GetTree);
 
                 // TODO: actual tests
                 // UPDATE: this can wait, as manual testing was good enough for now
@@ -412,8 +310,7 @@ namespace Spaghetti_Labeling
                 from any leaf.
                 */
 
-                ForestManager fm = new ForestManager();
-                List<Tree> forest = fm.MainForest(ODTree.GetTree);
+                List<Tree> forest = MainForest(ODTree.GetTree);
 
                 HashSet<int> unusedIncides = new HashSet<int>();
                 for (int i = 1; i < forest.Count; i++) {
@@ -446,8 +343,7 @@ namespace Spaghetti_Labeling
 
             private static void TestPage5Tree() {
                 // Tests if one of my reduced trees exactly matches the one on page 5 of the Spaghetti paper
-                ForestManager fm = new ForestManager();
-                List<Tree> forest = fm.MainForest(ODTree.GetTree);
+                List<Tree> forest = MainForest(ODTree.GetTree);
                 Tree refTree = TestTrees.Tree11();
                 
                 bool matches = false;
