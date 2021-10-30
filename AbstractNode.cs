@@ -47,6 +47,9 @@ namespace Spaghetti_Labeling
             
         public abstract void UpdateName(string newName);
 
+        // Counts the total number of inner nodes and leaves in the subtree of this abstract node
+        public abstract int CountNodes();
+
         public abstract AbstractNode DeepCopy();
 
         public string GetName() {

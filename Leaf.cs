@@ -87,6 +87,10 @@ namespace Spaghetti_Labeling
             SetName(newName);
         }
 
+        public override int CountNodes() {
+            return 1;
+        }
+
         public override AbstractNode DeepCopy() {
             return new Leaf(new HashSet<int>(actions));
         }

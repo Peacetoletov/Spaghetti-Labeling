@@ -23,7 +23,9 @@ namespace Spaghetti_Labeling
 
             ForestManager fm = new ForestManager();
             List<Tree> mainForest = fm.MainForest(ODTree.GetTree);
-            fm.EndForestEven(mainForest);
+            fm.EndForest(mainForest, true);
+            mainForest = fm.MainForest(ODTree.GetTree);
+            fm.EndForest(mainForest, false);
 
             RunTests();
         }

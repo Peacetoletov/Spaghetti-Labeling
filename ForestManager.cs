@@ -7,8 +7,11 @@ namespace Spaghetti_Labeling
     // Class for converting the ODTree into a forest of reduced trees
     public class ForestManager
     {
-        // TODO: end forest even
-        // TODO: end forest odd
+        // TODO: end forest even DONE
+        // TODO: end forest odd - needs testing
+
+        // Observations: Main forest is reduced to just 13 trees. End forest even also constains 13 trees, 
+        // end forest odd is further reduced to 9 trees. Odd trees also have a very small number of nodes (17 at most).
 
         public ForestManager() {
             // Sad empty constructor. Possibly make this class static later on
@@ -36,20 +39,52 @@ namespace Spaghetti_Labeling
             return forest;
         }
 
-        public List<(Tree, List<int>)> EndForestEven(List<Tree> mainForest) {
-            // Returns a list of even end trees together with indices of the main tree that each 
-            // end tree is associated with 
-            
-            // TODO: this
+        public List<(Tree, List<int>)> EndForest(List<Tree> mainForest, bool even) {
+            // Returns a list of end trees together with indices of all main trees that each 
+            // end tree is associated with.
+            // Parameter even determined the type of end forest to be created (even/odd).
+
             /*
             1) Copy main forest.
             2) Perform further reduction and branch merging, put all newly reduced trees into 
                a list together with a list containing the index of the associated main tree.
             3) Delete duplicate trees, add the deleted tree's index to the list of the other 
                tree (the one that is equal but wasn't deleted).
+               Note that only odd constraints result in having duplicate trees. Even trees
+               are all different despite reduction.
             */
-            // TODO: test this 
 
+            List<Tree> endForest = copyForest(mainForest);
+            HashSet<(char, bool)> constraintsList = even ? EndEvenConstraints() : EndOddConstraints();
+            foreach (Tree tree in endForest) {
+                ReduceTree(tree, constraintsList);
+            }
+            MergeIdenticalBranches(endForest);
+
+            /* Each end tree is associated with a main tree. Whenever an end tree is removed due to
+               being a duplicate, the other tree's list of associated main trees must be updated.
+               This list stores the end trees with their assocaited main trees. 
+            */
+            List<(Tree, List<int>)> endTreesWithMainTreeIndices = new List<(Tree, List<int>)>();
+            for (int i = 0; i < endForest.Count; i++) {
+                endTreesWithMainTreeIndices.Add((endForest[i], new List<int> {i + 1}));
+            }
+            RemoveDuplicateEndTrees(endTreesWithMainTreeIndices);
+
+            return endTreesWithMainTreeIndices;
+        }
+
+        /*
+        public List<(Tree, List<int>)> EndForestEven(List<Tree> mainForest) {
+            // Returns a list of even end trees together with indices of the main tree that each 
+            // end tree is associated with 
+            
+            1) Copy main forest.
+            2) Perform further reduction and branch merging, put all newly reduced trees into 
+               a list together with a list containing the index of the associated main tree.
+            3) Delete duplicate trees, add the deleted tree's index to the list of the other 
+               tree (the one that is equal but wasn't deleted).
+               UPDATE - turns out that all trees are different and therefore none can be deleted.
 
             List<Tree> endForest = copyForest(mainForest);
             HashSet<(char, bool)> constraintsList = EndEvenConstraints();
@@ -58,22 +93,61 @@ namespace Spaghetti_Labeling
             }
             MergeIdenticalBranches(endForest);
 
-            /* Each end tree is associated with a main tree. Whenever an end tree is removed due to
+               Each end tree is associated with a main tree. Whenever an end tree is removed due to
                being a duplicate, the associated main tree's end tree index must be updated. 
                One main tree has only one end tree of each parity, but one end tree can be associated
                with multiple main trees. 
                This list stores the end trees with their assocaited main trees. 
-            */
             List<(Tree, List<int>)> endTreesWithMainTreeIndices = new List<(Tree, List<int>)>();
             for (int i = 0; i < endForest.Count; i++) {
                 endTreesWithMainTreeIndices.Add((endForest[i], new List<int> {i + 1}));
             }
-
-            RemoveDuplicateEndTrees(endTreesWithMainTreeIndices, true);
-
+            RemoveDuplicateEndTrees(endTreesWithMainTreeIndices);
 
             return endTreesWithMainTreeIndices;
         }
+
+        // TODO: Possibly merge EndForestEven and EndForestOdd methods
+        public List<(Tree, List<int>)> EndForestOdd(List<Tree> mainForest) {
+            // Returns a list of even end trees together with indices of the main tree that each 
+            // end tree is associated with 
+            
+            // Same algorithm as with even trees, except using more constraints
+            // Unlike even constraints, odd constraints actually result in 4 trees becoming duplicates.
+
+            List<Tree> endForest = copyForest(mainForest);
+            HashSet<(char, bool)> constraintsList = EndOddConstraints();
+            foreach (Tree tree in endForest) {
+                ReduceTree(tree, constraintsList);
+            }
+            MergeIdenticalBranches(endForest);
+
+               Each end tree is associated with a main tree. Whenever an end tree is removed due to
+               being a duplicate, the associated main tree's end tree index must be updated. 
+               One main tree has only one end tree of each parity, but one end tree can be associated
+               with multiple main trees. 
+               This list stores the end trees with their assocaited main trees. 
+            
+            List<(Tree, List<int>)> endTreesWithMainTreeIndices = new List<(Tree, List<int>)>();
+            for (int i = 0; i < endForest.Count; i++) {
+                endTreesWithMainTreeIndices.Add((endForest[i], new List<int> {i + 1}));
+            }
+            RemoveDuplicateEndTrees(endTreesWithMainTreeIndices);
+
+            // testing
+            
+            for (int i = 0; i < endTreesWithMainTreeIndices.Count; i++) {
+                Console.Write("Tree " + i + " is used in the following main trees: ");
+                foreach (int index in endTreesWithMainTreeIndices[i].Item2) {
+                    Console.Write(index + " ");
+                }
+                Console.WriteLine();
+            }
+            
+
+            return endTreesWithMainTreeIndices;
+        }
+        */
 
         private HashSet<(char, bool)> EndEvenConstraints() {
             return new HashSet<(char, bool)> {
@@ -94,12 +168,6 @@ namespace Spaghetti_Labeling
                 copy.Add(new Tree(tree));
             }
             return copy;
-        }
-
-        public List<(Tree, HashSet<int>)> EndForestOdd(List<Tree> mainForest) {
-            // TODO: first even, then this
-
-            return null;
         }
 
         private List<HashSet<(char, bool)>> MainTreesConstraints(Func<Tree> newTree) {
@@ -148,16 +216,18 @@ namespace Spaghetti_Labeling
             //Console.WriteLine("Number of trees after the removal of duplicates: " + forest.Count);
         }
 
-        private void RemoveDuplicateEndTrees(List<(Tree, List<int>)> endTreesWithMainTreeIndices, bool isEven) {
-            int treeCount = endTreesWithMainTreeIndices.Count;
-            Console.WriteLine("Number of trees before the removal of duplicates: " + treeCount);
-            for (int i = 0; i < treeCount - 1; i++) {
-                for (int j = i + 1; j < treeCount; j++) {
-                    Tree tree1 = endTreesWithMainTreeIndices[i].Item1;
+        private void RemoveDuplicateEndTrees(List<(Tree, List<int>)> endTreesWithMainTreeIndices) {
+            Console.WriteLine("Number of trees before the removal of duplicates: " + endTreesWithMainTreeIndices.Count);
+            for (int i = 0; i < endTreesWithMainTreeIndices.Count - 1; i++) {
+                Tree tree1 = endTreesWithMainTreeIndices[i].Item1;
+                //Console.WriteLine("Tree " + i + " has " + tree1.GetRoot().CountNodes() + " nodes.");
+                for (int j = i + 1; j < endTreesWithMainTreeIndices.Count; j++) {
                     Tree tree2 = endTreesWithMainTreeIndices[j].Item1;
                     if (tree1.IsEqual(tree2)) {
                         // Add the duplicate tree's index to the other tree's indices
                         endTreesWithMainTreeIndices[i].Item2.Add(endTreesWithMainTreeIndices[j].Item2[0]);
+
+                        //Console.WriteLine("Tree " + j + " was a duplicate of tree " + i + " and was removed.");
 
                         // Delete the duplicate 
                         endTreesWithMainTreeIndices.RemoveAt(j);
@@ -165,7 +235,8 @@ namespace Spaghetti_Labeling
                     }
                 }
             }
-            Console.WriteLine("Number of trees after the removal of duplicates: " + treeCount);
+            //Console.WriteLine("Tree " + (endTreesWithMainTreeIndices.Count - 1) + " has " + endTreesWithMainTreeIndices[endTreesWithMainTreeIndices.Count - 1].Item1.GetRoot().CountNodes() + " nodes.");
+            Console.WriteLine("Number of trees after the removal of duplicates: " + endTreesWithMainTreeIndices.Count);
         }
 
         public List<Tree> CreateForestOfReducedTrees(Func<Tree> newTree, 
@@ -256,6 +327,8 @@ namespace Spaghetti_Labeling
                 TestFinalForest();
                 TestRangeOfNextTreeIndicesInReducedTrees();
                 TestPage5Tree();
+
+                // The creation of end forests *seems* to be working correctly. As testing it is hard to automate, I did a couple of manual tests instead.
             }
 
             private static void TestReduceTreeAndMergeBranches() {
