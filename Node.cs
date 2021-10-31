@@ -167,6 +167,17 @@ namespace Spaghetti_Labeling
 
         public override void DFS_Rec() {
             if (GetVisited()) {
+                Console.WriteLine("Node " + GetName() + " (" + condition + ") was already visited. Returning.");
+                return;
+            }
+            SetVisited(true);
+            Console.WriteLine("Going through node " + GetName() + " (" + condition + ") into the left subtree");
+            left.DFS_Rec();
+            Console.WriteLine("Back in node " + GetName() + " (" + condition + "). Going into the right subtree");
+            right.DFS_Rec();
+            Console.WriteLine("Back in node " + GetName() + " (" + condition + "). Returning");
+            /*
+            if (GetVisited()) {
                 Console.WriteLine("Node " + GetID() + " was already visited. Returning.");
                 return;
             }
@@ -176,6 +187,7 @@ namespace Spaghetti_Labeling
             Console.WriteLine("Back in node " + GetName() + " " + GetID() + " (" + condition + "). Going into the right subtree");
             right.DFS_Rec();
             Console.WriteLine("Back in node " + GetName() + " " + GetID() + " (" + condition + "). Returning");
+            */
         }
 
         public override int InitNextTreeIndex(int index) {
@@ -207,6 +219,7 @@ namespace Spaghetti_Labeling
             return newNode;
         } 
 
+        /*
         public override int AssignIDsInSubtree(int id=0) {
             SetID(id);
             int highestLeftID = left.AssignIDsInSubtree(id + 1);
@@ -219,6 +232,7 @@ namespace Spaghetti_Labeling
             left.AssignVisitedInSubtree(visited);
             right.AssignVisitedInSubtree(visited);
         }
+        */
 
         public static class Tests 
         {

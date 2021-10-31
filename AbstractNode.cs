@@ -12,9 +12,8 @@ namespace Spaghetti_Labeling
         private string name = "";
         // Note that the name only corresponds to the tree structure at the creation of the tree, it
         // may or may not correspond after modifications of the tree are made
-
-        private int id;
-        private bool visited;
+        //private int id;
+        private bool visited = false;
 
         public void SetTree(Tree tree) {
             // Pointer to the Tree structure is only set on parentless nodes
@@ -34,8 +33,8 @@ namespace Spaghetti_Labeling
 
         // Prints out information about the tree through DFS traversal (only for testing)
         public void InfoDFS() {
-            AssignIDsInSubtree();
-            AssignVisitedInSubtree(false);
+            //AssignIDsInSubtree();
+            //AssignVisitedInSubtree(false);
             DFS_Rec();
         }
 
@@ -84,6 +83,7 @@ namespace Spaghetti_Labeling
             return isLeft;
         }
 
+        /*
         public void SetID(int id) {
             this.id = id;
         }
@@ -91,8 +91,9 @@ namespace Spaghetti_Labeling
         public int GetID() {
             return id;
         }
+        */
 
-        public abstract int AssignIDsInSubtree(int id=0);
+        //public abstract int AssignIDsInSubtree(int id=0);
 
         public void SetVisited(bool visited) {
             this.visited = visited;
@@ -102,6 +103,6 @@ namespace Spaghetti_Labeling
             return visited;
         }
 
-        public abstract void AssignVisitedInSubtree(bool visited);
+        //public abstract void AssignVisitedInSubtree(bool visited);
     }
 }

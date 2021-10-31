@@ -37,10 +37,26 @@ namespace Spaghetti_Labeling
         }
 
         public void MergeEqualSubtrees(List<Tree> forest) {
+            /* For each pair of inner nodes, check if their left (right) subtrees are equal. If so, replace 
+            the left (right) subtree of the second node with the left (right) subtree of the first node.
+            */
+            // TODO: test this both manually and automatically
             List<AbstractNode> nodes = ForestToNodes(forest);
             for (int i = 0; i < nodes.Count - 1; i++) {
                 for (int j = i + 1; j < nodes.Count; j++) {
-
+                    if (nodes[i] is Leaf || nodes[j] is Leaf) {
+                        // Skip leaves
+                        continue;
+                    }
+                    Node node1 = (Node) nodes[i];
+                    Node node2 = (Node) nodes[j];
+                    if (node1.GetLeft().IsEqual(node2.GetLeft())) {
+                        Console.WriteLine("Left subtree of node " + i + " is equal to the left subtree of node " + j);
+                        node2.SetLeft(node1.GetLeft());
+                    }
+                    if (node1.GetRight().IsEqual(node2.GetRight())) {
+                        node2.SetRight(node1.GetRight());
+                    }
                 }
             }
         }
@@ -52,10 +68,10 @@ namespace Spaghetti_Labeling
                 List<AbstractNode> curTreeNodes = new List<AbstractNode>();
                 AddNodesOfSubtreeToList(tree.GetRoot(), curTreeNodes);
                 nodes.AddRange(curTreeNodes);
-                Console.WriteLine("Tree has " + curTreeNodes.Count + " nodes.");
+                //Console.WriteLine("Tree has " + curTreeNodes.Count + " nodes.");
             }
-            Console.WriteLine(nodes.Count + " nodes in total.");
-            forest[10].GetRoot().InfoDFS();
+            //Console.WriteLine(nodes.Count + " nodes in total.");
+            //forest[10].GetRoot().InfoDFS();
             return nodes;
         }
 

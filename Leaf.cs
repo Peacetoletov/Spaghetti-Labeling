@@ -69,7 +69,8 @@ namespace Spaghetti_Labeling
         */
 
         public override void DFS_Rec() {
-            Console.WriteLine("Leaf node " + GetName() + " " + GetID() +  ": {" + string.Join(", ", actions) + "} - " + nextTreeIndex);
+            Console.WriteLine("Leaf node " + GetName() + ": {" + string.Join(", ", actions) + "} - " + nextTreeIndex);
+            //Console.WriteLine("Leaf node " + GetName() + " " + GetID() +  ": {" + string.Join(", ", actions) + "} - " + nextTreeIndex);
         }
 
         public override int InitNextTreeIndex(int index) {
@@ -113,6 +114,7 @@ namespace Spaghetti_Labeling
             return new Leaf(new HashSet<int>(actions));
         }
 
+        /*
         public override int AssignIDsInSubtree(int id=0) {
             SetID(id);
             return id;
@@ -121,5 +123,6 @@ namespace Spaghetti_Labeling
         public override void AssignVisitedInSubtree(bool visited) {
             SetVisited(visited);
         }
+        */
     }
 }
