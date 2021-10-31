@@ -626,6 +626,82 @@ namespace Spaghetti_Labeling
             return tree;
         }
 
+        public static Tree Tree19() {
+            /*
+                       a
+                     /   \   
+                  1-1     2,3-2
+            */
+
+            Node root = new Node('a');
+            Tree tree = new Tree(root);
+
+            Leaf l = new Leaf(new HashSet<int> {1});
+            l.SetNextTreeIndex(1);
+            Leaf r = new Leaf(new HashSet<int> {2, 3});
+            r.SetNextTreeIndex(2);
+            root.SetChildren(l, r);
+
+            return tree;
+        }
+
+        public static Tree Tree20() {
+            /*
+                       a
+                     /   \   
+                1,2-1     3,4-2
+            */
+
+            Node root = new Node('a');
+            Tree tree = new Tree(root);
+
+            Leaf l = new Leaf(new HashSet<int> {1, 2});
+            l.SetNextTreeIndex(1);
+            Leaf r = new Leaf(new HashSet<int> {3, 4});
+            r.SetNextTreeIndex(2);
+            root.SetChildren(l, r);
+
+            return tree;
+        }
+
+        public static Tree Tree21() {
+            /*
+                       b
+                     /   \   
+                1,2-1     3,4-2
+            */
+
+            Node root = new Node('b');
+            Tree tree = new Tree(root);
+
+            Leaf l = new Leaf(new HashSet<int> {1, 2});
+            l.SetNextTreeIndex(1);
+            Leaf r = new Leaf(new HashSet<int> {3, 4});
+            r.SetNextTreeIndex(2);
+            root.SetChildren(l, r);
+
+            return tree;
+        }
+
+        public static Tree Tree22() {
+            /*
+                       a
+                     /   \   
+                1,2-1     3,4-3
+            */
+
+            Node root = new Node('a');
+            Tree tree = new Tree(root);
+
+            Leaf l = new Leaf(new HashSet<int> {1, 2});
+            l.SetNextTreeIndex(1);
+            Leaf r = new Leaf(new HashSet<int> {3, 4});
+            r.SetNextTreeIndex(3);
+            root.SetChildren(l, r);
+
+            return tree;
+        }
+
           
 
         public static Tree TreeLeaf1() {

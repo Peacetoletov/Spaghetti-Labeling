@@ -128,10 +128,6 @@ namespace Spaghetti_Labeling
             }
             return leftEquals && rightEquals;
         }
-        
-        public override int GetHashCode() {
-            return base.GetHashCode();
-        }
 
         public override bool IsEqualIgnoringLeafIndices(AbstractNode abstractNode, bool showDebugInfo=false) {
             if (abstractNode == null || GetType() != abstractNode.GetType()) {
@@ -147,12 +143,39 @@ namespace Spaghetti_Labeling
                    right.IsEqualIgnoringLeafIndices(otherNode.GetRight(), showDebugInfo);
         }
 
-        public override void InfoDFS() {
-            Console.WriteLine("Going through node " + GetName() + " (" + condition + ") into the left subtree");
-            left.InfoDFS();
-            Console.WriteLine("Back in node " + GetName() + " (" + condition + "). Going into the right subtree");
-            right.InfoDFS();
-            Console.WriteLine("Back in node " + GetName() + " (" + condition + "). Returning");
+        /*
+        public override bool IsEquivalent(AbstractNode abstractNode, bool showDebugInfo=false) {
+            if (abstractNode == null || GetType() != abstractNode.GetType()) {
+                return false;
+            }
+            
+            Node otherNode = (Node) abstractNode;
+            if (this.condition != otherNode.GetCondition()) {
+                return false;
+            }
+
+            bool leftEquivalent = left.IsEquivalent(otherNode.GetLeft(), showDebugInfo);
+            bool rightEquivalent = right.IsEquivalent(otherNode.GetRight(), showDebugInfo);
+            if (showDebugInfo) {
+                Console.WriteLine("Node " + GetName() + ". Left equivalent? " + leftEquivalent + 
+                                  ". Right equivalent? " + rightEquivalent);
+            }
+
+            return leftEquivalent && rightEquivalent;
+        }
+        */
+
+        public override void DFS_Rec() {
+            if (GetVisited()) {
+                Console.WriteLine("Node " + GetID() + " was already visited. Returning.");
+                return;
+            }
+            SetVisited(true);
+            Console.WriteLine("Going through node " + GetName() + " " + GetID() + " (" + condition + ") into the left subtree");
+            left.DFS_Rec();
+            Console.WriteLine("Back in node " + GetName() + " " + GetID() + " (" + condition + "). Going into the right subtree");
+            right.DFS_Rec();
+            Console.WriteLine("Back in node " + GetName() + " " + GetID() + " (" + condition + "). Returning");
         }
 
         public override int InitNextTreeIndex(int index) {
@@ -184,11 +207,25 @@ namespace Spaghetti_Labeling
             return newNode;
         } 
 
+        public override int AssignIDsInSubtree(int id=0) {
+            SetID(id);
+            int highestLeftID = left.AssignIDsInSubtree(id + 1);
+            int highestRightID = right.AssignIDsInSubtree(highestLeftID + 1);
+            return highestRightID;
+        }
+
+        public override void AssignVisitedInSubtree(bool visited) {
+            SetVisited(visited);
+            left.AssignVisitedInSubtree(visited);
+            right.AssignVisitedInSubtree(visited);
+        }
+
         public static class Tests 
         {
             public static void Run() {
                 TestIsEqual();
                 TestMergeIdenticalBranches();
+                //TestIsEquivalent();
             }
 
             private static void TestIsEqual() {
@@ -212,24 +249,34 @@ namespace Spaghetti_Labeling
                 ((Node) tree2.GetRoot()).MergeIdenticalBranches();
                 Tree treeLeaf2 = TestTrees.TreeLeaf2();
                 Tree treeLeaf3 = TestTrees.TreeLeaf3();
-                //Debug.Assert(!CheckTreeEqualityAndRootCorrectness(tree2, treeLeaf2));
                 Debug.Assert(!tree2.IsEqual(treeLeaf2));
-                //Debug.Assert(CheckTreeEqualityAndRootCorrectness(tree2, treeLeaf3));
                 Debug.Assert(tree2.IsEqual(treeLeaf3));
                 
                 Tree tree3 = TestTrees.Tree3();
                 tree2 = TestTrees.Tree2();
                 ((Node) tree3.GetRoot()).MergeIdenticalBranches();
                 ((Node) tree2.GetRoot()).MergeIdenticalBranches();
-                //Debug.Assert(CheckTreeEqualityAndRootCorrectness(tree3, tree2));
                 Debug.Assert(tree3.IsEqual(tree2));
                 
                 Tree tree4 = TestTrees.Tree4();
                 Tree tree5 = TestTrees.Tree5();
                 ((Node) tree5.GetRoot()).MergeIdenticalBranches();
-                //Debug.Assert(CheckTreeEqualityAndRootCorrectness(tree4, tree5));
                 Debug.Assert(tree4.IsEqual(tree5));
             }
+
+            /*
+            private static void TestIsEquivalent() {
+                AbstractNode root19 = TestTrees.Tree19().GetRoot();
+                AbstractNode root20 = TestTrees.Tree20().GetRoot();
+                AbstractNode root21 = TestTrees.Tree21().GetRoot();
+                AbstractNode root22 = TestTrees.Tree22().GetRoot();
+
+                Debug.Assert(root19.IsEquivalent(root19));
+                Debug.Assert(root19.IsEquivalent(root20));
+                Debug.Assert(!root19.IsEquivalent(root21));
+                Debug.Assert(!root19.IsEquivalent(root22));
+            }
+            */
         }
     }
 }

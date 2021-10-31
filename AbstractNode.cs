@@ -6,10 +6,15 @@ namespace Spaghetti_Labeling
     {
         private Node parent;
         private Tree tree;
-        private bool isLeft = false;        // if this node has a parent, is it the left child?
-        private string name = "";    // only for testing
+        private bool isLeft = false;        // if this node has a parent, is it the left child? this only applies to trees, not graphs
+        
+        // Variables only for testing, used in DFS
+        private string name = "";
         // Note that the name only corresponds to the tree structure at the creation of the tree, it
         // may or may not correspond after modifications of the tree are made
+
+        private int id;
+        private bool visited;
 
         public void SetTree(Tree tree) {
             // Pointer to the Tree structure is only set on parentless nodes
@@ -25,14 +30,17 @@ namespace Spaghetti_Labeling
         // I cannot override the standard Equals() method because I need to pass additional arguments
         public abstract bool IsEqual(AbstractNode abstractNode, bool showDebugInfo=false);
 
-        /*
-        public virtual bool IsEqual(AbstractNode abstractNode) {
-            return IsEqual(abstractNode, false);
-        }
-        */
+        //public abstract bool IsEquivalent(AbstractNode abstractNode, bool showDebugInfo=false);
 
         // Prints out information about the tree through DFS traversal (only for testing)
-        public abstract void InfoDFS();
+        public void InfoDFS() {
+            AssignIDsInSubtree();
+            AssignVisitedInSubtree(false);
+            DFS_Rec();
+        }
+
+        // Helper method for DFS, should not be called outside of InfoDFS.
+        public abstract void DFS_Rec();
 
         // Merges identical branches of this node and all subtrees
         public abstract void MergeIdenticalBranches();
@@ -75,5 +83,25 @@ namespace Spaghetti_Labeling
         public bool IsLeft() {
             return isLeft;
         }
+
+        public void SetID(int id) {
+            this.id = id;
+        }
+
+        public int GetID() {
+            return id;
+        }
+
+        public abstract int AssignIDsInSubtree(int id=0);
+
+        public void SetVisited(bool visited) {
+            this.visited = visited;
+        }
+
+        public bool GetVisited() {
+            return visited;
+        }
+
+        public abstract void AssignVisitedInSubtree(bool visited);
     }
 }

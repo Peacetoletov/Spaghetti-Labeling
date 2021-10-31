@@ -31,14 +31,16 @@ namespace Spaghetti_Labeling
             if (anotherTree == null) {
                 return false;
             }
-          
             return root.IsEqual(anotherTree.GetRoot(), showDebugInfo) && root.GetTree() == this && 
                    anotherTree.GetRoot().GetTree() == anotherTree;
         }
 
         public bool IsEqualIgnoringLeafIndices(Tree anotherTree, bool showDebugInfo=false) {
-        return root.IsEqualIgnoringLeafIndices(anotherTree.GetRoot(), showDebugInfo) && 
-               root.GetTree() == this && anotherTree.GetRoot().GetTree() == anotherTree;
+            if (anotherTree == null) {
+                return false;
+            }
+            return root.IsEqualIgnoringLeafIndices(anotherTree.GetRoot(), showDebugInfo) && 
+                root.GetTree() == this && anotherTree.GetRoot().GetTree() == anotherTree;
         }
 
         public void InitNextTreeIndices() {

@@ -28,6 +28,8 @@ namespace Spaghetti_Labeling
 
             Graph mainGraph = new Graph(mainForest);
 
+            //((Node) mainForest[0].GetRoot()).GetLeft().InfoDFS();
+
             RunTests();
         }
 

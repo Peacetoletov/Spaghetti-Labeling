@@ -50,8 +50,26 @@ namespace Spaghetti_Labeling
             return actions.SetEquals(anotherLeaf.GetActions());                   
         }
 
-        public override void InfoDFS() {
-            Console.WriteLine("Leaf node " + GetName() + ": {" + string.Join(", ", actions) + "} - " + nextTreeIndex);
+        /*
+        public override bool IsEquivalent(AbstractNode abstractNode, bool showDebugInfo = false) {
+            if (abstractNode == null || GetType() != abstractNode.GetType()) {
+                return false;
+            }
+            
+            if (showDebugInfo) {
+                Console.WriteLine("In leaf " + GetName());
+            }
+
+            Leaf anotherLeaf = (Leaf) abstractNode;
+            HashSet<int> actionsIntersection = new HashSet<int>(actions);
+            actionsIntersection.IntersectWith(anotherLeaf.GetActions());
+
+            return actionsIntersection.Count != 0 && nextTreeIndex == anotherLeaf.GetNextTreeIndex();
+        }
+        */
+
+        public override void DFS_Rec() {
+            Console.WriteLine("Leaf node " + GetName() + " " + GetID() +  ": {" + string.Join(", ", actions) + "} - " + nextTreeIndex);
         }
 
         public override int InitNextTreeIndex(int index) {
@@ -93,6 +111,15 @@ namespace Spaghetti_Labeling
 
         public override AbstractNode DeepCopy() {
             return new Leaf(new HashSet<int>(actions));
+        }
+
+        public override int AssignIDsInSubtree(int id=0) {
+            SetID(id);
+            return id;
+        }
+
+        public override void AssignVisitedInSubtree(bool visited) {
+            SetVisited(visited);
         }
     }
 }
