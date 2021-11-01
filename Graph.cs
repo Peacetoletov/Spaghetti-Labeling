@@ -9,6 +9,10 @@ namespace Spaghetti_Labeling
         private List<AbstractNode> roots;
 
 
+        public Graph() {
+            // Empty constructor, only used for testing
+        }
+
         public Graph(List<Tree> forest) {
             
             /*
@@ -20,10 +24,6 @@ namespace Spaghetti_Labeling
             trees anyway.
             */
 
-            // TODO: merge equal subtrees among different trees of the same forest, then manually test it using
-            // the improved InfoDFS method and automatically test it using tree equality methods with the addition
-            // of testing if the merged subtrees are the same object in memory.
-
             /*
             Go through all node pairs (For each node of each tree, go thorugh all nodes of all trees) and
             check equality (NOT equivalence!). If the given subtrees are equal, replace the whole second
@@ -33,6 +33,13 @@ namespace Spaghetti_Labeling
             because the root node will never be replaced.
             */
 
+            // Store the root of each tree
+            this.roots = new List<AbstractNode>();
+            foreach (Tree tree in forest) {
+                this.roots.Add(tree.GetRoot());
+            }
+
+            // Merge equal subtrees
             MergeEqualSubtrees(forest);
         }
 
@@ -51,7 +58,7 @@ namespace Spaghetti_Labeling
                     Node node1 = (Node) nodes[i];
                     Node node2 = (Node) nodes[j];
                     if (node1.GetLeft().IsEqual(node2.GetLeft())) {
-                        Console.WriteLine("Left subtree of node " + i + " is equal to the left subtree of node " + j);
+                        //Console.WriteLine("Left subtree of node " + i + " is equal to the left subtree of node " + j);
                         node2.SetLeft(node1.GetLeft());
                     }
                     if (node1.GetRight().IsEqual(node2.GetRight())) {
@@ -88,7 +95,45 @@ namespace Spaghetti_Labeling
         public static class Tests
         {
             public static void Run() {
+                TestEqualSubtreeMerging();
+            }
 
+            private static void TestEqualSubtreeMerging() {
+                Graph g = new Graph();
+                Tree tree13 = TestTrees.Tree13();
+                /* Tree 13:
+                                    o
+                         /                     \
+                        i                       i
+                   /         \             /         \
+                 1-1         2-2          n          6-2   
+                                        /   \
+                                      4-1   5-1
+                */
+                Tree tree14 = TestTrees.Tree14();
+                /* Tree 14:
+                                    o
+                         /                     \
+                        i                       i
+                   /         \             /         \
+                 1-1         3-2          n          6-2      
+                                        /   \
+                                      4-1   5-1
+                */
+                List<Tree> forest = new List<Tree> {tree13, tree14};
+                g.MergeEqualSubtrees(forest);
+
+                Debug.Assert(!tree13.IsEqual(tree14));
+                AbstractNode l13 = ((Node) tree13.GetRoot()).GetLeft();
+                AbstractNode l14 = ((Node) tree14.GetRoot()).GetLeft();
+                Debug.Assert(!l13.IsEqual(l14));
+                AbstractNode ll13 = ((Node) l13).GetLeft();
+                AbstractNode ll14 = ((Node) l14).GetLeft();
+                Debug.Assert(ll13 == ll14);
+                AbstractNode r13 = ((Node) tree13.GetRoot()).GetRight();
+                AbstractNode r14 = ((Node) tree14.GetRoot()).GetRight();
+                Debug.Assert(r13 == r14);
+                //Console.WriteLine(":)");
             }
         }
     }
