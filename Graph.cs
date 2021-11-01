@@ -41,14 +41,16 @@ namespace Spaghetti_Labeling
 
             // Merge equal subtrees
             MergeEqualSubtrees(forest);
+
+            // Merge equivalent subtrees
+            MergeEquivalentSubtrees(forest);
         }
 
         public void MergeEqualSubtrees(List<Tree> forest) {
             /* For each pair of inner nodes, check if their left (right) subtrees are equal. If so, replace 
             the left (right) subtree of the second node with the left (right) subtree of the first node.
             */
-            // TODO: test this both manually and automatically
-            List<AbstractNode> nodes = ForestToNodes(forest);
+            List<AbstractNode> nodes = GetUniqueNodes(forest);
             for (int i = 0; i < nodes.Count - 1; i++) {
                 for (int j = i + 1; j < nodes.Count; j++) {
                     if (nodes[i] is Leaf || nodes[j] is Leaf) {
@@ -68,26 +70,74 @@ namespace Spaghetti_Labeling
             }
         }
 
-        private List<AbstractNode> ForestToNodes(List<Tree> forest) {
-            // Returns a list containing each node of each tree in a given forest
+        public void MergeEquivalentSubtrees(List<Tree> forest) {
+            // current TODO: create a tuple
+
+            /* TODO
+            1. Unroll each subtree into a string containing the tree structure, conditions in inner
+               nodes and next tree indices in leaf nodes. The string does not contain actions. 
+               DONE
+            2. For each subtree, create a tuple containing the following:
+                a) the stringified tree
+                b) pointer to the root node of the subtree
+                c) a list of sets of actions (one set for each leaf, with actions of the left-most
+                   leaves being on the lowest positions in the list)
+            3. Add each tuple into a list, then sort the list primarly by the length of the string,
+               secondarily lexicograhically.
+            4. Start going through the list. If the current string (i) has the "substituted" flag,
+               shift the current string (i) by one. If the next string (j) has the "substituted" flag,
+               shift the next string (j) by one. If the next string (j) is not equal to the current string,
+               shift the current string (i) by one. If the current (i) and the next string (j) are equal, 
+               check the intersection of their actions. If it's empty, shift the next string (j) by one.
+               If the intersection is not empty, substitute the subtree associated with the next string (j)
+               by the subtree associated with the current string (i). The process of substitution is
+               described in 5. 
+            5. Substitution - first, assign the "substituted" flag of each node of the second subtree to 
+               true. Second, change the tree strucutre. Since I need to change it from the parents,
+               I first need to know who the parents are. I can check all possible nodes but that seems
+               very inefficient. Rather, I should keep a list of parents with each node and just look at
+               that. This is a bit of extra work but results in a much cleaner solution.
+            6. Keep going through the list until the end is reached.
+            */
+
+            List<StringifiedTree> stringifiedTrees = new List<StringifiedTree>();
+            
+        }
+
+        private List<StringifiedTree> CreateListOfStringifiedSubtrees(List<Tree> forest) {
+            List<StringifiedTree> stringifiedTrees = new List<StringifiedTree>();
+
+            // TODO: test the creation of StringifiedTree objects 
+
+            return stringifiedTrees;
+        }
+
+        private List<AbstractNode> GetUniqueNodes(List<Tree> forest) {
+            // Returns a list containing all nodes in a forest. If a node belongs to multiple trees,
+            // it is only added once.
+            foreach (Tree tree in forest) {
+                tree.GetRoot().AssignVisitedInSubtree(false);
+            }
             List<AbstractNode> nodes = new List<AbstractNode>();
             foreach (Tree tree in forest) {
                 List<AbstractNode> curTreeNodes = new List<AbstractNode>();
-                AddNodesOfSubtreeToList(tree.GetRoot(), curTreeNodes);
+                AddUniqueNodesOfSubtreeToList(tree.GetRoot(), curTreeNodes);
                 nodes.AddRange(curTreeNodes);
-                //Console.WriteLine("Tree has " + curTreeNodes.Count + " nodes.");
             }
-            //Console.WriteLine(nodes.Count + " nodes in total.");
-            //forest[10].GetRoot().InfoDFS();
             return nodes;
         }
 
-        private void AddNodesOfSubtreeToList(AbstractNode abstractNode, List<AbstractNode> abstractNodes) {
+        private void AddUniqueNodesOfSubtreeToList(AbstractNode abstractNode, List<AbstractNode> abstractNodes) {
+            // TODO: only add unique nodes
+            if (abstractNode.GetVisited()) {
+                return;
+            }
+            abstractNode.SetVisited(true);
             abstractNodes.Add(abstractNode);
             if (abstractNode is Node) {
                 Node node = (Node) abstractNode;
-                AddNodesOfSubtreeToList(node.GetLeft(), abstractNodes);
-                AddNodesOfSubtreeToList(node.GetRight(), abstractNodes);
+                AddUniqueNodesOfSubtreeToList(node.GetLeft(), abstractNodes);
+                AddUniqueNodesOfSubtreeToList(node.GetRight(), abstractNodes);
             }
         }
 
@@ -121,7 +171,9 @@ namespace Spaghetti_Labeling
                                       4-1   5-1
                 */
                 List<Tree> forest = new List<Tree> {tree13, tree14};
+                Debug.Assert(g.GetUniqueNodes(forest).Count == 18);
                 g.MergeEqualSubtrees(forest);
+                Debug.Assert(g.GetUniqueNodes(forest).Count == 12);
 
                 Debug.Assert(!tree13.IsEqual(tree14));
                 AbstractNode l13 = ((Node) tree13.GetRoot()).GetLeft();
@@ -133,6 +185,7 @@ namespace Spaghetti_Labeling
                 AbstractNode r13 = ((Node) tree13.GetRoot()).GetRight();
                 AbstractNode r14 = ((Node) tree14.GetRoot()).GetRight();
                 Debug.Assert(r13 == r14);
+                
                 //Console.WriteLine(":)");
             }
         }

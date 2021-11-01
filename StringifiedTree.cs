@@ -1,0 +1,86 @@
+using System;
+using System.Diagnostics;
+using System.Collections.Generic;
+
+namespace Spaghetti_Labeling
+{
+    public class StringifiedTree
+    {
+        private readonly string tree;
+        private readonly AbstractNode root;
+        private readonly List<HashSet<int>> actions = new List<HashSet<int>>();
+
+        public StringifiedTree(AbstractNode abstractNode) {
+            this.tree = abstractNode.Stringify();
+            this.root = abstractNode;
+            AddActionsToList(abstractNode, actions);
+        }
+
+        private void AddActionsToList(AbstractNode abstractNode, List<HashSet<int>> actions) {
+            if (abstractNode is Leaf) {
+                actions.Add(((Leaf) abstractNode).GetActions());
+            } else {
+                AddActionsToList(((Node) abstractNode).GetLeft(), actions); 
+                AddActionsToList(((Node) abstractNode).GetRight(), actions);
+            }
+        }
+
+        public string GetTree() {
+            return tree;
+        }
+
+        public AbstractNode GetRoot() {
+            return root;
+        } 
+
+        public List<HashSet<int>> GetActions() {
+            return actions;
+        }
+
+        // TODO: test the constructor
+        public class Tests
+        {
+            public static void Run() {
+                TestConstructor();
+            }
+
+            private static void TestConstructor() {
+                /*
+                                    o
+                         /                     \
+                        i                       i
+                   /         \             /         \
+                 1-1         2-2          n          6-2   
+                                        /   \
+                                      4-1   5-1
+                */
+                Tree tree13 = TestTrees.Tree13();
+                StringifiedTree st = new StringifiedTree(tree13.GetRoot());
+
+                Debug.Assert(st.GetTree() == "o(i(1)(2))(i(n(1)(1))(2))");
+                Debug.Assert(st.root == tree13.GetRoot());
+                Debug.Assert(st.GetActions().Count == 5);
+                Debug.Assert(st.GetActions()[0].SetEquals(new HashSet<int> {1}));
+                Debug.Assert(st.GetActions()[1].SetEquals(new HashSet<int> {2}));
+                Debug.Assert(st.GetActions()[2].SetEquals(new HashSet<int> {4}));
+                Debug.Assert(st.GetActions()[3].SetEquals(new HashSet<int> {5}));
+                Debug.Assert(st.GetActions()[4].SetEquals(new HashSet<int> {6}));
+
+
+                /*
+                       a
+                     /   \   
+                  1-1     2,3-2
+                */
+                Tree tree19 = TestTrees.Tree19();
+                StringifiedTree st2 = new StringifiedTree(tree19.GetRoot());
+
+                Debug.Assert(st2.GetTree() == "a(1)(2)");
+                Debug.Assert(st2.root == tree19.GetRoot());
+                Debug.Assert(st2.GetActions().Count == 2);
+                Debug.Assert(st2.GetActions()[0].SetEquals(new HashSet<int> {1}));
+                Debug.Assert(st2.GetActions()[1].SetEquals(new HashSet<int> {2, 3}));
+            }
+        }
+    }
+}

@@ -7,14 +7,15 @@ namespace Spaghetti_Labeling
         private Node parent;
         private Tree tree;
         private bool isLeft = false;        // if this node has a parent, is it the left child? this only applies to trees, not graphs
-        
+        private bool visited = false;   	// if this node was already visited when working with nodes in graphs
+
+
         // Variables only for testing, used in DFS
         private string name = "";
         // Note that the name only corresponds to the tree structure at the creation of the tree, it
         // may or may not correspond after modifications of the tree are made
         //private int id;
-        private bool visited = false;
-
+        
         public void SetTree(Tree tree) {
             // Pointer to the Tree structure is only set on parentless nodes
             Debug.Assert(parent == null);
@@ -58,6 +59,8 @@ namespace Spaghetti_Labeling
         public abstract int CountNodes();
 
         public abstract AbstractNode DeepCopy();
+
+        public abstract string Stringify();
 
         public string GetName() {
             return name;
@@ -103,6 +106,6 @@ namespace Spaghetti_Labeling
             return visited;
         }
 
-        //public abstract void AssignVisitedInSubtree(bool visited);
+        public abstract void AssignVisitedInSubtree(bool visited);
     }
 }

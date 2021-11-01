@@ -38,7 +38,8 @@ namespace Spaghetti_Labeling
             ForestCreator.Tests.Run();
             Tree.Tests.Run();
             Graph.Tests.Run();
-            //GraphManager.Tests.Run();
+            GraphManager.Tests.Run();
+            StringifiedTree.Tests.Run();
             Console.WriteLine("All tests passed!");
         }
     }

@@ -219,6 +219,11 @@ namespace Spaghetti_Labeling
             return newNode;
         } 
 
+        public override string Stringify() {
+            //return condition.ToString() + "(" + left.Stringify() + ")(" + right.Stringify() + ")";
+            return String.Format("{0}({1})({2})", condition, left.Stringify(), right.Stringify());        
+        }
+
         /*
         public override int AssignIDsInSubtree(int id=0) {
             SetID(id);
@@ -226,20 +231,20 @@ namespace Spaghetti_Labeling
             int highestRightID = right.AssignIDsInSubtree(highestLeftID + 1);
             return highestRightID;
         }
+        */
 
         public override void AssignVisitedInSubtree(bool visited) {
             SetVisited(visited);
             left.AssignVisitedInSubtree(visited);
             right.AssignVisitedInSubtree(visited);
         }
-        */
 
         public static class Tests 
         {
             public static void Run() {
                 TestIsEqual();
                 TestMergeIdenticalBranches();
-                //TestIsEquivalent();
+                TestStringify();
             }
 
             private static void TestIsEqual() {
@@ -278,19 +283,11 @@ namespace Spaghetti_Labeling
                 Debug.Assert(tree4.IsEqual(tree5));
             }
 
-            /*
-            private static void TestIsEquivalent() {
-                AbstractNode root19 = TestTrees.Tree19().GetRoot();
-                AbstractNode root20 = TestTrees.Tree20().GetRoot();
-                AbstractNode root21 = TestTrees.Tree21().GetRoot();
-                AbstractNode root22 = TestTrees.Tree22().GetRoot();
-
-                Debug.Assert(root19.IsEquivalent(root19));
-                Debug.Assert(root19.IsEquivalent(root20));
-                Debug.Assert(!root19.IsEquivalent(root21));
-                Debug.Assert(!root19.IsEquivalent(root22));
+            private static void TestStringify() {
+                Tree tree13 = TestTrees.Tree13();
+                string str = tree13.GetRoot().Stringify();
+                Debug.Assert(str == "o(i(1)(2))(i(n(1)(1))(2))");
             }
-            */
         }
     }
 }

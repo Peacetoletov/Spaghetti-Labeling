@@ -114,15 +114,23 @@ namespace Spaghetti_Labeling
             return new Leaf(new HashSet<int>(actions));
         }
 
+        public override string Stringify() {
+            if (nextTreeIndex != -1) {
+                return nextTreeIndex.ToString();
+            }
+            return "";          // return empty string in end trees
+        }
+
         /*
         public override int AssignIDsInSubtree(int id=0) {
             SetID(id);
             return id;
         }
+        */
 
         public override void AssignVisitedInSubtree(bool visited) {
             SetVisited(visited);
         }
-        */
+        
     }
 }
