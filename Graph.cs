@@ -77,13 +77,15 @@ namespace Spaghetti_Labeling
             1. Unroll each subtree into a string containing the tree structure, conditions in inner
                nodes and next tree indices in leaf nodes. The string does not contain actions. 
                DONE
-            2. For each subtree, create a tuple containing the following:
-                a) the stringified tree
-                b) pointer to the root node of the subtree
-                c) a list of sets of actions (one set for each leaf, with actions of the left-most
+            2. For each subtree, create an object containing the following:
+                 a) the subtree as a string
+                 b) pointer to the root node of the subtree
+                 c) a list of sets of actions (one set for each leaf, with actions of the left-most
                    leaves being on the lowest positions in the list)
-            3. Add each tuple into a list, then sort the list primarly by the length of the string,
+               DONE
+            3. Add each object into a list, then sort the list primarly by the length of the string,
                secondarily lexicograhically.
+               DONE
             4. Start going through the list. If the current string (i) has the "substituted" flag,
                shift the current string (i) by one. If the next string (j) has the "substituted" flag,
                shift the next string (j) by one. If the next string (j) is not equal to the current string,
@@ -100,15 +102,28 @@ namespace Spaghetti_Labeling
             6. Keep going through the list until the end is reached.
             */
 
-            List<StringifiedTree> stringifiedTrees = new List<StringifiedTree>();
+            List<StringifiedTree> stringifiedTrees = CreateListOfStringifiedSubtrees(forest);
+            /*
+            Console.WriteLine("Before sorting");
+            foreach (StringifiedTree st in stringifiedTrees) {
+                Console.WriteLine(st.GetTree());
+            }
+            */
+            stringifiedTrees.Sort();
+            Console.WriteLine("After sorting");
+            foreach (StringifiedTree st in stringifiedTrees) {
+                Console.WriteLine(st.GetTree());
+            }
             
         }
 
         private List<StringifiedTree> CreateListOfStringifiedSubtrees(List<Tree> forest) {
+            List<AbstractNode> nodes = GetUniqueNodes(forest);
             List<StringifiedTree> stringifiedTrees = new List<StringifiedTree>();
 
-            // TODO: test the creation of StringifiedTree objects 
-
+            foreach (AbstractNode node in nodes) {
+                stringifiedTrees.Add(new StringifiedTree(node));
+            }
             return stringifiedTrees;
         }
 
@@ -128,7 +143,6 @@ namespace Spaghetti_Labeling
         }
 
         private void AddUniqueNodesOfSubtreeToList(AbstractNode abstractNode, List<AbstractNode> abstractNodes) {
-            // TODO: only add unique nodes
             if (abstractNode.GetVisited()) {
                 return;
             }
@@ -146,6 +160,7 @@ namespace Spaghetti_Labeling
         {
             public static void Run() {
                 TestEqualSubtreeMerging();
+                TestStringifiedTreeSorting();
             }
 
             private static void TestEqualSubtreeMerging() {
@@ -187,6 +202,26 @@ namespace Spaghetti_Labeling
                 Debug.Assert(r13 == r14);
                 
                 //Console.WriteLine(":)");
+            }
+
+            private static void TestStringifiedTreeSorting() {
+                Graph g = new Graph();
+                List<StringifiedTree> stList = g.CreateListOfStringifiedSubtrees(new List<Tree> {TestTrees.Tree15()});
+                /*
+                                    k
+                         /                     \
+                        g                       i
+                   /         \             /         \
+                 1-1         2-2        3-3         4-4
+                */
+                stList.Sort();
+                Debug.Assert(stList[0].GetTree() == "k(g(1)(2))(i(3)(4))");
+                Debug.Assert(stList[1].GetTree() == "g(1)(2)");
+                Debug.Assert(stList[2].GetTree() == "i(3)(4)");
+                Debug.Assert(stList[3].GetTree() == "1");
+                Debug.Assert(stList[4].GetTree() == "2");
+                Debug.Assert(stList[5].GetTree() == "3");
+                Debug.Assert(stList[6].GetTree() == "4");
             }
         }
     }

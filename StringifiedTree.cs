@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Spaghetti_Labeling
 {
-    public class StringifiedTree
+    public class StringifiedTree : IComparable
     {
         private readonly string tree;
         private readonly AbstractNode root;
@@ -25,6 +25,30 @@ namespace Spaghetti_Labeling
             }
         }
 
+        public int CompareTo(object obj) {
+            if (obj == null) {
+                return -1;
+            }
+
+            StringifiedTree other = obj as StringifiedTree;
+            if (tree.Length > other.GetTree().Length) {
+                return -1;
+            }
+            if (tree.Length < other.GetTree().Length) {
+                return 1;
+            }
+            // Same length, sort lexicographically
+            for (int i = 0; i < tree.Length; i++) {
+                if (tree[i] < other.GetTree()[i]) {
+                    return -1;
+                }
+                if (tree[i] > other.GetTree()[i]) {
+                    return 1;
+                }
+            }
+            return 0;
+        }
+
         public string GetTree() {
             return tree;
         }
@@ -37,7 +61,6 @@ namespace Spaghetti_Labeling
             return actions;
         }
 
-        // TODO: test the constructor
         public class Tests
         {
             public static void Run() {
