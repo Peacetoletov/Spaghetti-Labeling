@@ -49,6 +49,20 @@ namespace Spaghetti_Labeling
             return 0;
         }
 
+        public List<HashSet<int>> IntersectActions(List<HashSet<int>> otherActions) {
+            // Returns a new list containing intersections of this tree's actions with another tree's actions
+            // TODO: write tests for this
+            Debug.Assert(actions.Count == otherActions.Count);
+
+            List<HashSet<int>> intersected = new List<HashSet<int>>();
+            for (int i = 0; i < actions.Count; i++) {
+                HashSet<int> newSet = new HashSet<int>(actions[i]);
+                newSet.IntersectWith(otherActions[i]);
+                intersected.Add(newSet);
+            }
+            return intersected;
+        }
+
         public string GetTree() {
             return tree;
         }

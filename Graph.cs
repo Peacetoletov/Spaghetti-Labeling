@@ -110,11 +110,49 @@ namespace Spaghetti_Labeling
             }
             */
             stringifiedTrees.Sort();
+            /*
             Console.WriteLine("After sorting");
             foreach (StringifiedTree st in stringifiedTrees) {
                 Console.WriteLine(st.GetTree());
             }
-            
+            */
+
+            for (int i = 0; i < stringifiedTrees.Count - 1; i++) {
+                StringifiedTree st1 = stringifiedTrees[i];
+                if (st1.GetRoot().GetSubstituted()) {
+                    // Skip already substituted subtrees
+                    continue;
+                }
+                for (int j = i + 1; j < stringifiedTrees.Count; j++) {
+                    StringifiedTree st2 = stringifiedTrees[j];
+                    // Skip already substituted subtrees
+                    if (st2.GetRoot().GetSubstituted()) {
+                        continue;
+                    }
+                    // Skip all subtrees with different strings
+                    if (st1.GetTree() != st2.GetTree()) {
+                        break;
+                    }
+                    // Skip subtrees with an empty intersection of actions 
+                    List<HashSet<int>> intersectedActionsList = st1.IntersectActions(st2.GetActions());
+                    bool empty = false;
+                    foreach (HashSet<int> actions in intersectedActionsList) {
+                        if (actions.Count == 0) {
+                            empty = true;
+                        }
+                    }
+                    if (empty) {
+                        continue;
+                    }
+                    // Two subtrees are compatible and one can be substituted with the other
+                    SubstituteSubtree(st1.GetRoot(), st2.GetRoot(), intersectedActionsList);
+                }    
+            }
+        }
+
+        private void SubstituteSubtree(AbstractNode root1, AbstractNode root2, List<HashSet<int>> intersectedActionsList) {
+            // root2 will be substituted with (replaced by) root1
+            // TODO: continue here after testing previously written and untested code
         }
 
         private List<StringifiedTree> CreateListOfStringifiedSubtrees(List<Tree> forest) {

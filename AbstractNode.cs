@@ -7,7 +7,8 @@ namespace Spaghetti_Labeling
         private Node parent;
         private Tree tree;
         private bool isLeft = false;        // if this node has a parent, is it the left child? this only applies to trees, not graphs
-        private bool visited = false;   	// if this node was already visited when working with nodes in graphs
+        private bool visited = false;   	// whether this node was already visited when working with nodes in graphs
+        private bool substituted = false;   // whether this node was already substituted by another node when resolving subtree equivalences
 
 
         // Variables only for testing, used in DFS
@@ -86,18 +87,6 @@ namespace Spaghetti_Labeling
             return isLeft;
         }
 
-        /*
-        public void SetID(int id) {
-            this.id = id;
-        }
-
-        public int GetID() {
-            return id;
-        }
-        */
-
-        //public abstract int AssignIDsInSubtree(int id=0);
-
         public void SetVisited(bool visited) {
             this.visited = visited;
         }
@@ -107,5 +96,13 @@ namespace Spaghetti_Labeling
         }
 
         public abstract void AssignVisitedInSubtree(bool visited);
+
+        public void SetSubstituted(bool substituted) {
+            this.substituted = substituted;
+        }
+
+        public bool GetSubstituted() {
+            return substituted;
+        }
     }
 }
