@@ -648,46 +648,36 @@ namespace Spaghetti_Labeling
         public static Tree Tree20() {
             /*
                        a
-                     /   \   
-                1,2-1     3,4-2
+                    /     \   
+                 1-1       b
+                         /   \
+                  2,3,4-2     3-3
             */
 
             Node root = new Node('a');
             Tree tree = new Tree(root);
 
-            Leaf l = new Leaf(new HashSet<int> {1, 2});
+            Leaf l = new Leaf(new HashSet<int> {1});
             l.SetNextTreeIndex(1);
-            Leaf r = new Leaf(new HashSet<int> {3, 4});
-            r.SetNextTreeIndex(2);
+            Node r = new Node('b');
             root.SetChildren(l, r);
+
+            Leaf rl = new Leaf(new HashSet<int> {2, 3, 4});
+            rl.SetNextTreeIndex(2);
+            Leaf rr = new Leaf(new HashSet<int> {3});
+            rr.SetNextTreeIndex(3);
+            r.SetChildren(rl, rr);
 
             return tree;
         }
 
         public static Tree Tree21() {
             /*
-                       b
-                     /   \   
-                1,2-1     3,4-2
-            */
-
-            Node root = new Node('b');
-            Tree tree = new Tree(root);
-
-            Leaf l = new Leaf(new HashSet<int> {1, 2});
-            l.SetNextTreeIndex(1);
-            Leaf r = new Leaf(new HashSet<int> {3, 4});
-            r.SetNextTreeIndex(2);
-            root.SetChildren(l, r);
-
-            return tree;
-        }
-
-        public static Tree Tree22() {
-            /*
                        a
-                     /   \   
-                1,2-1     3,4-3
+                    /     \   
+               1,2-1       b
+                         /   \
+                  2,4,5-2     4-3
             */
 
             Node root = new Node('a');
@@ -695,13 +685,17 @@ namespace Spaghetti_Labeling
 
             Leaf l = new Leaf(new HashSet<int> {1, 2});
             l.SetNextTreeIndex(1);
-            Leaf r = new Leaf(new HashSet<int> {3, 4});
-            r.SetNextTreeIndex(3);
+            Node r = new Node('b');
             root.SetChildren(l, r);
+
+            Leaf rl = new Leaf(new HashSet<int> {2, 4, 5});
+            rl.SetNextTreeIndex(2);
+            Leaf rr = new Leaf(new HashSet<int> {4});
+            rr.SetNextTreeIndex(3);
+            r.SetChildren(rl, rr);
 
             return tree;
         }
-
           
 
         public static Tree TreeLeaf1() {

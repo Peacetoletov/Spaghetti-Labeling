@@ -1,12 +1,12 @@
 using System.Diagnostics;
+using System.Collections.Generic;
 
 namespace Spaghetti_Labeling
 {
     public abstract class AbstractNode
     {
-        private Node parent;
+        private List<Node> parents = new List<Node>();
         private Tree tree;
-        private bool isLeft = false;        // if this node has a parent, is it the left child? this only applies to trees, not graphs
         private bool visited = false;   	// whether this node was already visited when working with nodes in graphs
         private bool substituted = false;   // whether this node was already substituted by another node when resolving subtree equivalences
 
@@ -19,7 +19,7 @@ namespace Spaghetti_Labeling
         
         public void SetTree(Tree tree) {
             // Pointer to the Tree structure is only set on parentless nodes
-            Debug.Assert(parent == null);
+            Debug.Assert(parents.Count == 0);
             this.tree = tree;
         }
 
@@ -71,20 +71,24 @@ namespace Spaghetti_Labeling
             this.name = name;
         }
 
-        public void SetParent(Node parent) {
-            this.parent = parent;
+        public void AddParent(Node parent) {
+            this.parents.Add(parent);
         }
 
-        public Node GetParent() {
-            return parent;
+        public void RemoveParent(Node toRemove) {
+            for (int i = 0; i < parents.Count; i++) {
+                if (parents[i] == toRemove) {
+                    parents.RemoveAt(i);
+                }
+            }
         }
 
-        public void SetIsLeft(bool isLeft) {
-            this.isLeft = isLeft;
+        public List<Node> GetParents() {
+            return parents;
         }
 
-        public bool IsLeft() {
-            return isLeft;
+        public bool IsLeftChild(Node parent) {
+            return parent.GetLeft() == this;
         }
 
         public void SetVisited(bool visited) {

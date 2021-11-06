@@ -117,6 +117,8 @@ namespace Spaghetti_Labeling
             }
             */
 
+            // TODO: after implementing SubstituteSubtree, thoroughly manually test these nested loops
+
             for (int i = 0; i < stringifiedTrees.Count - 1; i++) {
                 StringifiedTree st1 = stringifiedTrees[i];
                 if (st1.GetRoot().GetSubstituted()) {
@@ -153,6 +155,7 @@ namespace Spaghetti_Labeling
         private void SubstituteSubtree(AbstractNode root1, AbstractNode root2, List<HashSet<int>> intersectedActionsList) {
             // root2 will be substituted with (replaced by) root1
             // TODO: continue here after testing previously written and untested code
+            //    First of all, implement multiple node parents.
         }
 
         private List<StringifiedTree> CreateListOfStringifiedSubtrees(List<Tree> forest) {

@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Collections.Generic;
 
 namespace Spaghetti_Labeling
 {
@@ -31,15 +32,17 @@ namespace Spaghetti_Labeling
         public void SetLeft(AbstractNode left) {
             this.left = left;
             this.left.SetName(GetName() + "l");
-            this.left.SetParent(this);
-            this.left.SetIsLeft(true);
+            //this.left.SetParent(this);
+            this.left.AddParent(this);
+            //this.left.SetIsLeft(true);
         }
 
         public void SetRight(AbstractNode right) {
             this.right = right;
             this.right.SetName(GetName() + "r");
-            this.right.SetParent(this);
-            this.right.SetIsLeft(false);
+            //this.right.SetParent(this);
+            this.right.AddParent(this);
+            //this.right.SetIsLeft(false);
         }
 
         public char GetCondition() {
@@ -84,23 +87,22 @@ namespace Spaghetti_Labeling
         }
 
         private void ReplaceByChild(AbstractNode child) {
+            // This method is only called when working with pure trees, not graphs.
             AbstractNode replacement = child;
-            Node parent = GetParent();
-            if (parent != null) {
+            List<Node> parents = GetParents();
+            replacement.RemoveParent(this);
+            if (parents.Count != 0) {
                 // This node has a parent
-                replacement.SetParent(parent);
-                if (IsLeft()) {
+                Node parent = parents[0];
+                if (IsLeftChild(parent)) {
                     parent.SetLeft(replacement);
-                    //Console.WriteLine("Setting node " + GetName() + " as the left subtree of node " + GetParent().GetName());
                 } else {
                     parent.SetRight(replacement);
-                    //Console.WriteLine("Setting node " + GetName() + " as the right subtree of node " + GetParent().GetName());
                 }
                 //Console.WriteLine("Has parent.");
             } 
             else {
                 // This node doesn't have a parent
-                replacement.SetParent(null);
                 //Console.WriteLine("No parent, setting new root to the tree.");
                 Tree tree = GetTree();
                 tree.SetRoot(replacement);
