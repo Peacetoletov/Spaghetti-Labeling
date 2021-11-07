@@ -83,7 +83,7 @@ namespace Spaghetti_Labeling
                  c) a list of sets of actions (one set for each leaf, with actions of the left-most
                    leaves being on the lowest positions in the list)
                DONE
-            3. Add each object into a list, then sort the list primarly by the length of the string,
+            3. Add each object into a list, then sort the list primarily by the length of the string,
                secondarily lexicograhically.
                DONE
             4. Start going through the list. If the current string (i) has the "substituted" flag,
