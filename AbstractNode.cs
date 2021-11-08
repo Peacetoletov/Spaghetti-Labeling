@@ -108,5 +108,11 @@ namespace Spaghetti_Labeling
         public bool GetSubstituted() {
             return substituted;
         }
+
+        public abstract void AssignSubstitutedInSubtree(bool substituted);
+
+        // Updates actions in each leaf. The left-most gets assigned the actions on position 0 in the list,
+        // the second left-most leaf position 1 etc.
+        public abstract void UpdateActionsInSubtree(List<HashSet<int>> actionsList);
     }
 }

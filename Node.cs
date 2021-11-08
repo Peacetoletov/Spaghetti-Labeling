@@ -32,17 +32,13 @@ namespace Spaghetti_Labeling
         public void SetLeft(AbstractNode left) {
             this.left = left;
             this.left.SetName(GetName() + "l");
-            //this.left.SetParent(this);
             this.left.AddParent(this);
-            //this.left.SetIsLeft(true);
         }
 
         public void SetRight(AbstractNode right) {
             this.right = right;
             this.right.SetName(GetName() + "r");
-            //this.right.SetParent(this);
             this.right.AddParent(this);
-            //this.right.SetIsLeft(false);
         }
 
         public char GetCondition() {
@@ -145,28 +141,6 @@ namespace Spaghetti_Labeling
                    right.IsEqualIgnoringLeafIndices(otherNode.GetRight(), showDebugInfo);
         }
 
-        /*
-        public override bool IsEquivalent(AbstractNode abstractNode, bool showDebugInfo=false) {
-            if (abstractNode == null || GetType() != abstractNode.GetType()) {
-                return false;
-            }
-            
-            Node otherNode = (Node) abstractNode;
-            if (this.condition != otherNode.GetCondition()) {
-                return false;
-            }
-
-            bool leftEquivalent = left.IsEquivalent(otherNode.GetLeft(), showDebugInfo);
-            bool rightEquivalent = right.IsEquivalent(otherNode.GetRight(), showDebugInfo);
-            if (showDebugInfo) {
-                Console.WriteLine("Node " + GetName() + ". Left equivalent? " + leftEquivalent + 
-                                  ". Right equivalent? " + rightEquivalent);
-            }
-
-            return leftEquivalent && rightEquivalent;
-        }
-        */
-
         public override void DFS_Rec() {
             if (GetVisited()) {
                 Console.WriteLine("Node " + GetName() + " (" + condition + ") was already visited. Returning.");
@@ -178,18 +152,6 @@ namespace Spaghetti_Labeling
             Console.WriteLine("Back in node " + GetName() + " (" + condition + "). Going into the right subtree");
             right.DFS_Rec();
             Console.WriteLine("Back in node " + GetName() + " (" + condition + "). Returning");
-            /*
-            if (GetVisited()) {
-                Console.WriteLine("Node " + GetID() + " was already visited. Returning.");
-                return;
-            }
-            SetVisited(true);
-            Console.WriteLine("Going through node " + GetName() + " " + GetID() + " (" + condition + ") into the left subtree");
-            left.DFS_Rec();
-            Console.WriteLine("Back in node " + GetName() + " " + GetID() + " (" + condition + "). Going into the right subtree");
-            right.DFS_Rec();
-            Console.WriteLine("Back in node " + GetName() + " " + GetID() + " (" + condition + "). Returning");
-            */
         }
 
         public override int InitNextTreeIndex(int index) {
@@ -226,19 +188,21 @@ namespace Spaghetti_Labeling
             return String.Format("{0}({1})({2})", condition, left.Stringify(), right.Stringify());        
         }
 
-        /*
-        public override int AssignIDsInSubtree(int id=0) {
-            SetID(id);
-            int highestLeftID = left.AssignIDsInSubtree(id + 1);
-            int highestRightID = right.AssignIDsInSubtree(highestLeftID + 1);
-            return highestRightID;
-        }
-        */
-
         public override void AssignVisitedInSubtree(bool visited) {
             SetVisited(visited);
             left.AssignVisitedInSubtree(visited);
             right.AssignVisitedInSubtree(visited);
+        }
+
+        public override void AssignSubstitutedInSubtree(bool substituted) {
+            SetSubstituted(substituted);
+            left.AssignSubstitutedInSubtree(substituted);
+            right.AssignSubstitutedInSubtree(substituted);
+        }
+
+        public override void UpdateActionsInSubtree(List<HashSet<int>> actionsList) {
+            left.UpdateActionsInSubtree(actionsList);
+            right.UpdateActionsInSubtree(actionsList);
         }
 
         public static class Tests 

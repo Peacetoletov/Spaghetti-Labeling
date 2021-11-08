@@ -696,6 +696,32 @@ namespace Spaghetti_Labeling
 
             return tree;
         }
+
+         public static Tree Tree22() {
+            /*
+                              c
+                           /     \   
+                          b       1,2-1
+                        /   \
+                 4,5,6-2     4,5-3
+            */
+            
+            Node root = new Node('c');
+            Tree tree = new Tree(root);
+
+            Node l = new Node('b');
+            Leaf r = new Leaf(new HashSet<int> {1, 2});
+            r.SetNextTreeIndex(1);
+            root.SetChildren(l, r);
+
+            Leaf ll = new Leaf(new HashSet<int> {4, 5, 6});
+            ll.SetNextTreeIndex(2);
+            Leaf lr = new Leaf(new HashSet<int> {4, 5});
+            lr.SetNextTreeIndex(3);
+            l.SetChildren(ll, lr);
+
+            return tree;
+        }
           
 
         public static Tree TreeLeaf1() {

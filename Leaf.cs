@@ -15,10 +15,6 @@ namespace Spaghetti_Labeling
         private int nextTreeIndex = -1;         // -1 represents no tree
         
 
-        // Pointer to the root of the next tree
-        //private Tree nextTree;
-        
-
         public Leaf(HashSet<int> actions) {
             this.actions = actions;
         }
@@ -49,24 +45,6 @@ namespace Spaghetti_Labeling
             Leaf anotherLeaf = (Leaf) abstractNode;
             return actions.SetEquals(anotherLeaf.GetActions());                   
         }
-
-        /*
-        public override bool IsEquivalent(AbstractNode abstractNode, bool showDebugInfo = false) {
-            if (abstractNode == null || GetType() != abstractNode.GetType()) {
-                return false;
-            }
-            
-            if (showDebugInfo) {
-                Console.WriteLine("In leaf " + GetName());
-            }
-
-            Leaf anotherLeaf = (Leaf) abstractNode;
-            HashSet<int> actionsIntersection = new HashSet<int>(actions);
-            actionsIntersection.IntersectWith(anotherLeaf.GetActions());
-
-            return actionsIntersection.Count != 0 && nextTreeIndex == anotherLeaf.GetNextTreeIndex();
-        }
-        */
 
         public override void DFS_Rec() {
             Console.WriteLine("Leaf node " + GetName() + ": {" + string.Join(", ", actions) + "} - " + nextTreeIndex);
@@ -121,16 +99,17 @@ namespace Spaghetti_Labeling
             return "";          // return empty string in end trees
         }
 
-        /*
-        public override int AssignIDsInSubtree(int id=0) {
-            SetID(id);
-            return id;
-        }
-        */
-
         public override void AssignVisitedInSubtree(bool visited) {
             SetVisited(visited);
         }
+
+        public override void AssignSubstitutedInSubtree(bool substituted) {
+            SetSubstituted(substituted);
+        }
         
+        public override void UpdateActionsInSubtree(List<HashSet<int>> actionsList) {
+            this.actions = actionsList[0];
+            actionsList.RemoveAt(0);
+        }
     }
 }

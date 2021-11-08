@@ -14,15 +14,6 @@ namespace Spaghetti_Labeling
         }
 
         public Graph(List<Tree> forest) {
-            
-            /*
-            Each node in a tree has one parent at most. When converting a forest into a graph, each node
-            may have an arbitrary number of parents. The Node class doesn't support multiple parents but
-            this is not an issue, as the parent property isn't necessary to precisely describe a graph 
-            (information about children is sufficient). 
-            Because of this, I can simply ignore the parent property, as it is only useful for testing
-            trees anyway.
-            */
 
             /*
             Go through all node pairs (For each node of each tree, go thorugh all nodes of all trees) and
@@ -93,13 +84,13 @@ namespace Spaghetti_Labeling
                check the intersection of their actions. If it's empty, shift the next string (j) by one.
                If the intersection is not empty, substitute the subtree associated with the next string (j)
                by the subtree associated with the current string (i). The process of substitution is
-               described in 5. 
-            5. Substitution - first, assign the "substituted" flag of each node of the second subtree to 
-               true. Second, change the tree strucutre. Since I need to change it from the parents,
-               I first need to know who the parents are. I can check all possible nodes but that seems
-               very inefficient. Rather, I should keep a list of parents with each node and just look at
-               that. This is a bit of extra work but results in a much cleaner solution.
+               described in 5.
+               DONE 
+            5. Substitution - change the tree strucutre, then assign the "substituted" flag of each node
+               of the second subtree to true.
+               DONE
             6. Keep going through the list until the end is reached.
+               DONE (needs testing)
             */
 
             List<StringifiedTree> stringifiedTrees = CreateListOfStringifiedSubtrees(forest);
@@ -117,7 +108,7 @@ namespace Spaghetti_Labeling
             }
             */
 
-            // TODO: after implementing SubstituteSubtree, thoroughly manually test these nested loops
+            // TODO: after implementing SubstituteSubtree (done), thoroughly manually test these nested loops
 
             for (int i = 0; i < stringifiedTrees.Count - 1; i++) {
                 StringifiedTree st1 = stringifiedTrees[i];
@@ -136,7 +127,7 @@ namespace Spaghetti_Labeling
                         break;
                     }
                     // Skip subtrees with an empty intersection of actions 
-                    List<HashSet<int>> intersectedActionsList = st1.IntersectActions(st2.GetActions());
+                    List<HashSet<int>> intersectedActionsList = st1.IntersectedActions(st2.GetActions());
                     bool empty = false;
                     foreach (HashSet<int> actions in intersectedActionsList) {
                         if (actions.Count == 0) {
@@ -152,10 +143,24 @@ namespace Spaghetti_Labeling
             }
         }
 
-        private void SubstituteSubtree(AbstractNode root1, AbstractNode root2, List<HashSet<int>> intersectedActionsList) {
+        private void SubstituteSubtree(AbstractNode root1, AbstractNode root2,
+                                       List<HashSet<int>> intersectedActionsList) {
             // root2 will be substituted with (replaced by) root1
-            // TODO: continue here after testing previously written and untested code
-            //    First of all, implement multiple node parents.
+
+            // Change the graph structure
+            foreach (Node parent in root2.GetParents()) {
+                if (root2.IsLeftChild(parent)) {
+                    parent.SetLeft(root1);
+                } else {
+                    parent.SetRight(root1);
+                }
+            }
+
+            // Set the 'substituted' flag of the root2 subtree to true
+            root2.AssignSubstitutedInSubtree(true);
+
+            // Update actions sets
+            root1.UpdateActionsInSubtree(intersectedActionsList);
         }
 
         private List<StringifiedTree> CreateListOfStringifiedSubtrees(List<Tree> forest) {
@@ -202,6 +207,7 @@ namespace Spaghetti_Labeling
             public static void Run() {
                 TestEqualSubtreeMerging();
                 TestStringifiedTreeSorting();
+                TestSubstituteSubtree();
             }
 
             private static void TestEqualSubtreeMerging() {
@@ -263,6 +269,50 @@ namespace Spaghetti_Labeling
                 Debug.Assert(stList[4].GetTree() == "2");
                 Debug.Assert(stList[5].GetTree() == "3");
                 Debug.Assert(stList[6].GetTree() == "4");
+            }
+
+            private static void TestSubstituteSubtree() {
+                Graph g = new Graph();
+                Tree tree1 = TestTrees.Tree21();
+                /*
+                         a
+                      /     \   
+                 1,2-1       b
+                           /   \
+                    2,4,5-2     4-3
+                */
+
+                Tree tree2 = TestTrees.Tree22();
+                /*
+                              c
+                           /     \   
+                          b       1,2-1
+                        /   \
+                 4,5,6-2     4,5-3
+                */
+
+                StringifiedTree st1 = new StringifiedTree(((Node) tree1.GetRoot()).GetRight());
+                StringifiedTree st2 = new StringifiedTree(((Node) tree2.GetRoot()).GetLeft());
+                AbstractNode b = st1.GetRoot();
+                AbstractNode toBeSubstituted = st2.GetRoot();
+                g.SubstituteSubtree(b, toBeSubstituted, st1.IntersectedActions(st2.GetActions()));
+
+                Debug.Assert(((Node) tree1.GetRoot()).GetRight() == b);
+                Debug.Assert(((Node) tree2.GetRoot()).GetLeft() == b);
+                Debug.Assert(b.GetParents().Count == 2);
+                Debug.Assert(b.GetParents()[0] == tree1.GetRoot());
+                Debug.Assert(b.GetParents()[1] == tree2.GetRoot());
+                Leaf bLeft = (Leaf) ((Node) b).GetLeft();
+                Leaf bRight = (Leaf) ((Node) b).GetRight();
+                Debug.Assert(bLeft.GetActions().SetEquals(new HashSet<int> {4, 5}));
+                Debug.Assert(bRight.GetActions().SetEquals(new HashSet<int> {4}));
+                Debug.Assert(!b.GetSubstituted());
+                Debug.Assert(!((Node) b).GetLeft().GetSubstituted());
+                Debug.Assert(!((Node) b).GetRight().GetSubstituted());
+                Debug.Assert(toBeSubstituted.GetSubstituted());
+                Debug.Assert(((Node) toBeSubstituted).GetLeft().GetSubstituted());
+                Debug.Assert(((Node) toBeSubstituted).GetRight().GetSubstituted());
+                //Console.WriteLine("Poggies");
             }
         }
     }

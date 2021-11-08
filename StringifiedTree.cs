@@ -49,7 +49,7 @@ namespace Spaghetti_Labeling
             return 0;
         }
 
-        public List<HashSet<int>> IntersectActions(List<HashSet<int>> otherActions) {
+        public List<HashSet<int>> IntersectedActions(List<HashSet<int>> otherActions) {
             // Returns a new list containing intersections of this tree's actions with another tree's actions
             Debug.Assert(actions.Count == otherActions.Count);
 
@@ -124,7 +124,7 @@ namespace Spaghetti_Labeling
                 Tree tree21 = TestTrees.Tree21();
                 StringifiedTree st1 = new StringifiedTree(tree20.GetRoot());
                 StringifiedTree st2 = new StringifiedTree(tree21.GetRoot());
-                List<HashSet<int>> intersected = st1.IntersectActions(st2.GetActions());
+                List<HashSet<int>> intersected = st1.IntersectedActions(st2.GetActions());
 
                 Debug.Assert(intersected.Count == 3);
                 Debug.Assert(intersected[0].SetEquals(new HashSet<int> {1}));
