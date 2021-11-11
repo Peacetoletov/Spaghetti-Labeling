@@ -62,8 +62,6 @@ namespace Spaghetti_Labeling
         }
 
         public void MergeEquivalentSubtrees(List<Tree> forest) {
-            // current TODO: create a tuple
-
             /* TODO
             1. Unroll each subtree into a string containing the tree structure, conditions in inner
                nodes and next tree indices in leaf nodes. The string does not contain actions. 
@@ -103,23 +101,26 @@ namespace Spaghetti_Labeling
             stringifiedTrees.Sort();
             /*
             Console.WriteLine("After sorting");
-            foreach (StringifiedTree st in stringifiedTrees) {
-                Console.WriteLine(st.GetTree());
+            for (int i = 0; i < stringifiedTrees.Count; i++) {
+                Console.WriteLine("Tree {0}: {1}", i, stringifiedTrees[i].GetTree());
             }
             */
 
-            // TODO: after implementing SubstituteSubtree (done), thoroughly manually test these nested loops
+            // TODO: write automatic tests for this function... it won't be easy but I need to make sure this 
+            // really works
 
             for (int i = 0; i < stringifiedTrees.Count - 1; i++) {
                 StringifiedTree st1 = stringifiedTrees[i];
                 if (st1.GetRoot().GetSubstituted()) {
                     // Skip already substituted subtrees
+                    //Console.WriteLine("Skipping primary tree {0} because it was already substituted.", i);
                     continue;
                 }
                 for (int j = i + 1; j < stringifiedTrees.Count; j++) {
                     StringifiedTree st2 = stringifiedTrees[j];
                     // Skip already substituted subtrees
                     if (st2.GetRoot().GetSubstituted()) {
+                        //Console.WriteLine("Skipping secondary tree {0} because it was already substituted.", j);
                         continue;
                     }
                     // Skip all subtrees with different strings
@@ -135,9 +136,19 @@ namespace Spaghetti_Labeling
                         }
                     }
                     if (empty) {
+                        /*
+                        Console.WriteLine("Skipping trees {0}, {1} because they have empty actions intersection.", i, j);
+                        Console.WriteLine("1st tree: {0}", st1.GetTree());
+                        Console.WriteLine("2nd tree: {0}", st2.GetTree());
+                        */
                         continue;
                     }
                     // Two subtrees are compatible and one can be substituted with the other
+                    /*
+                    Console.WriteLine("Substituting tree {0} with tree {1}", j, i);
+                    Console.WriteLine("1st tree: {0}", st1.GetTree());
+                    Console.WriteLine("2nd tree: {0}", st2.GetTree());
+                    */
                     SubstituteSubtree(st1.GetRoot(), st2.GetRoot(), intersectedActionsList);
                 }    
             }
@@ -208,6 +219,7 @@ namespace Spaghetti_Labeling
                 TestEqualSubtreeMerging();
                 TestStringifiedTreeSorting();
                 TestSubstituteSubtree();
+                TestGraph();
             }
 
             private static void TestEqualSubtreeMerging() {
@@ -313,6 +325,195 @@ namespace Spaghetti_Labeling
                 Debug.Assert(((Node) toBeSubstituted).GetLeft().GetSubstituted());
                 Debug.Assert(((Node) toBeSubstituted).GetRight().GetSubstituted());
                 //Console.WriteLine("Poggies");
+            }
+
+            public static void TestGraph() {
+                // TODO: this. First create a decently sized test forest, then create a graph from it
+                // and check the results.
+
+                // TODO: fix bugs. For some reason, l1 has two parents, and they are both different nodes.
+                // I can investigate this further by checking the parents of these parents to see which trees
+                // they belong to. The current hypothesis is that smaller substitutions are made before
+                // larger ones and this causes problems, however I can't imagine how this could happen
+                // because I sort the stringified trees before making any substitutions.
+                // UPDATE: Maybe it gets first merged because of equality (not equivalence) and this causes
+                // problems with subsequent substitutions?
+                // BETTER HYPOTHESIS: I'm pretty sure I figured out at least part of the problem. In the graph
+                // creation process, I first merge equal subtrees, which may lead to a leaf having two
+                // parents. Then, when performing equivalence substitutions, a subtree leading to that leaf
+                // may get substituted away in a node above the leaf's parents, which leads to the leaf
+                // retaining both parents in the "parents" list, one of which will have the "substituted" flag
+                // set to true. This can be easily fixed by going through each node of the complete graph
+                // and removing those nodes from the "parents" lists, which have the flag set to true.
+
+                Tree tree23 = TestTrees.Tree23();
+                Tree tree24 = TestTrees.Tree24();
+                Tree tree25 = TestTrees.Tree25();
+
+                Graph g = new Graph(new List<Tree> {tree23, tree24, tree25});
+                Node a1 = (Node) tree23.GetRoot();
+                Node b1 = (Node) a1.GetLeft();
+                Node c1 = (Node) a1.GetRight();
+                Node d1 = (Node) b1.GetLeft();
+                Node e1 = (Node) b1.GetRight();
+                Node f1 = (Node) c1.GetLeft();
+                Node g1 = (Node) c1.GetRight();
+                Node a2 = (Node) tree24.GetRoot();
+                Node c2 = (Node) a2.GetRight();
+                Node f2 = (Node) c2.GetLeft();
+                Node a3 = (Node) tree25.GetRoot();
+                Node b3 = (Node) a3.GetLeft();
+                Node c3 = (Node) a3.GetRight();
+                Node e3 = (Node) b3.GetRight();
+                Node f3 = (Node) c3.GetLeft();
+                Leaf l1 = (Leaf) d1.GetLeft();
+                Leaf l2 = (Leaf) d1.GetRight();
+                Leaf l3 = (Leaf) e1.GetLeft();
+                Leaf l4 = (Leaf) e1.GetRight();
+                Leaf l5 = (Leaf) f1.GetLeft();
+                Leaf l6 = (Leaf) f1.GetRight();
+                Leaf l7 = (Leaf) g1.GetLeft();
+                Leaf l8 = (Leaf) f2.GetRight();
+                Leaf l9 = (Leaf) e3.GetLeft();
+                Leaf l10 = (Leaf) e3.GetRight();
+                
+                // check if leaves have correct actions
+                /*
+                Debug.Assert(((Leaf) d1.GetLeft()).GetActions().SetEquals(new HashSet<int> {1}));
+                Debug.Assert(((Leaf) d1.GetRight()).GetActions().SetEquals(new HashSet<int> {3, 4}));
+                Debug.Assert(((Leaf) e1.GetLeft()).GetActions().SetEquals(new HashSet<int> {1}));
+                Debug.Assert(((Leaf) e1.GetRight()).GetActions().SetEquals(new HashSet<int> {2}));
+                Debug.Assert(((Leaf) f1.GetLeft()).GetActions().SetEquals(new HashSet<int> {6}));
+                Debug.Assert(((Leaf) f1.GetRight()).GetActions().SetEquals(new HashSet<int> {5}));
+                Debug.Assert(((Leaf) g1.GetLeft()).GetActions().SetEquals(new HashSet<int> {7}));
+                Debug.Assert(((Leaf) f2.GetRight()).GetActions().SetEquals(new HashSet<int> {7}));
+                Debug.Assert(((Leaf) e3.GetLeft()).GetActions().SetEquals(new HashSet<int> {1}));
+                Debug.Assert(((Leaf) e3.GetRight()).GetActions().SetEquals(new HashSet<int> {3}));
+
+                // TODO: check if the structure exactly matches 
+                // TODO: uncomment every assert
+                Debug.Assert(a1.GetLeft() == b1);
+                Debug.Assert(a1.GetRight() == c1);
+                Debug.Assert(a1.GetParents().Count == 0);
+                Debug.Assert(b1.GetLeft() == d1);
+                Debug.Assert(b1.GetLeft() == d1);
+                Debug.Assert(MatchingParents(b1, new List<AbstractNode> {a1, a2}));
+                Debug.Assert(c1.GetLeft() == f1);
+                Debug.Assert(c1.GetRight() == g1);
+                Debug.Assert(MatchingParents(c1, new List<AbstractNode> {a1}));
+                Debug.Assert(d1.GetLeft() == l1);
+                Debug.Assert(d1.GetRight() == l2);
+                Debug.Assert(MatchingParents(d1, new List<AbstractNode> {b1, b3}));
+                Debug.Assert(e1.GetLeft() == l3);
+                Debug.Assert(e1.GetRight() == l4);
+                Debug.Assert(MatchingParents(e1, new List<AbstractNode> {b1}));
+                Debug.Assert(f1.GetLeft() == l5);
+                Debug.Assert(f1.GetRight() == l6);
+                Debug.Assert(MatchingParents(f1, new List<AbstractNode> {c1}));
+                Debug.Assert(g1.GetLeft() == l7);
+                //Debug.Assert(g1.GetRight() == l3);
+                Debug.Assert(MatchingParents(l1, new List<AbstractNode> {d1}));
+                Debug.Assert(MatchingParents(l2, new List<AbstractNode> {d1}));
+                Debug.Assert(MatchingParents(l3, new List<AbstractNode> {e1, g1}));
+                Debug.Assert(MatchingParents(l4, new List<AbstractNode> {e1}));
+                Debug.Assert(MatchingParents(l5, new List<AbstractNode> {f1, f2, f3}));
+                Debug.Assert(MatchingParents(l6, new List<AbstractNode> {f1}));
+                Debug.Assert(MatchingParents(l7, new List<AbstractNode> {g1, c2, c3}));
+                Debug.Assert(a2.GetLeft() == b1);
+                Debug.Assert(a2.GetRight() == c2);
+                Debug.Assert(a2.GetParents().Count == 0);
+                Debug.Assert(c2.GetLeft() == f2);
+                Debug.Assert(c2.GetRight() == l7);
+                Debug.Assert(MatchingParents(c2, new List<AbstractNode> {a2}));
+                Debug.Assert(f2.GetLeft() == l5);
+                Debug.Assert(f2.GetRight() == l8);
+                Debug.Assert(MatchingParents(f2, new List<AbstractNode> {c2}));
+                Debug.Assert(MatchingParents(l8, new List<AbstractNode> {f2, f3}));
+                Debug.Assert(a3.GetLeft() == b3);
+                Debug.Assert(a3.GetRight() == c3);
+                Debug.Assert(a3.GetParents().Count == 0);
+                Debug.Assert(b3.GetLeft() == d1);
+                Debug.Assert(b3.GetRight() == e3);
+                Debug.Assert(MatchingParents(b3, new List<AbstractNode> {a3}));
+                Debug.Assert(c3.GetLeft() == f3);
+                Debug.Assert(c3.GetRight() == l7);
+                Debug.Assert(MatchingParents(c3, new List<AbstractNode> {a3}));
+                Debug.Assert(e3.GetLeft() == l9);
+                Debug.Assert(e3.GetRight() == l10);
+                Debug.Assert(MatchingParents(e3, new List<AbstractNode> {b3}));
+                Debug.Assert(f3.GetLeft() == l5);
+                Debug.Assert(f3.GetRight() == l8);
+                Debug.Assert(MatchingParents(f3, new List<AbstractNode> {c3}));
+                Debug.Assert(MatchingParents(l9, new List<AbstractNode> {e3}));
+                Debug.Assert(MatchingParents(l10, new List<AbstractNode> {e3}));
+                */
+
+                foreach (AbstractNode p in l1.GetParents()) {
+                    Console.WriteLine("\nDFS on parent of l1:");
+                    p.AssignVisitedInSubtree(false);
+                    p.InfoDFS();
+                }
+                Console.WriteLine("Are both l1 parent equal? {0}", l1.GetParents()[0] == l1.GetParents()[1]);
+
+                Console.WriteLine("pls");
+            }
+
+            private static bool MatchingParents(AbstractNode node, List<AbstractNode> parents) {
+                // This method checks if the parents of "node" exactly match the content of
+                // the "parents" list, while ignoring the order in both lists
+
+                /*
+                Console.WriteLine("DFS on node:");
+                node.AssignVisitedInSubtree(false);
+                node.InfoDFS();
+
+                foreach (AbstractNode p in parents) {
+                    Console.WriteLine("\nDFS on parent:");
+                    p.AssignVisitedInSubtree(false);
+                    p.InfoDFS();
+                }
+                */
+
+                Console.WriteLine("New call");
+
+                if (node.GetParents().Count != parents.Count) {
+                    Console.WriteLine("List lengths are not equal! Node parents length: {0}. Supposed length: {1}",
+                                      node.GetParents().Count, parents.Count);
+                    return false;
+                }
+                /*
+                foreach (AbstractNode p1 in node.GetParents()) {
+                    bool matching = false;
+                    foreach (AbstractNode p2 in parents) {
+                        if (p1 == p2) {
+                            matching = true;
+                        }
+                    }
+                    if (!matching) {
+                        return false;
+                    }
+                }
+                */
+                
+                
+                for (int i = 0; i < node.GetParents().Count; i++) {
+                    bool matching = false;
+                    for (int j = 0; j < parents.Count; j++) {
+                        if (node.GetParents()[i] == parents[j]) {
+                            Console.WriteLine("parent {0} matches parent {1}", i, j);
+                            matching = true;
+                        }
+                        else {
+                            Console.WriteLine("parent {0} does not match parent {1}", i, j);
+                        }
+                    }
+                    if (!matching) {
+                        return false;
+                    }
+                }
+                
+
+                return true;
             }
         }
     }

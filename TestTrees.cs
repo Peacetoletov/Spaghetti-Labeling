@@ -722,7 +722,155 @@ namespace Spaghetti_Labeling
 
             return tree;
         }
-          
+
+        public static Tree Tree23() {
+            /*
+                                            a
+                               /                        \
+                              b                          c 
+                      /              \               /         \
+                     d                e             f           g
+                    / \              / \           / \         / \  
+               1,2-1   2,3,4-2    1-3   2-4   5,6-5   5-6   7-7   1,2-3   
+            */
+            
+            Node root = new Node('a');
+            Tree tree = new Tree(root);
+
+            Node l = new Node('b');
+            Node r = new Node('c');
+            root.SetChildren(l, r);
+
+            Node ll = new Node('d');
+            Node lr = new Node('e');
+            l.SetChildren(ll, lr);
+
+            Node rl = new Node('f');
+            Node rr = new Node('g');
+            r.SetChildren(rl, rr);
+
+            Leaf lll = new Leaf(new HashSet<int> {1, 2});
+            lll.SetNextTreeIndex(1);
+            Leaf llr = new Leaf(new HashSet<int> {2, 3, 4});
+            llr.SetNextTreeIndex(2);
+            ll.SetChildren(lll, llr);
+
+            Leaf lrl = new Leaf(new HashSet<int> {1});
+            lrl.SetNextTreeIndex(3);
+            Leaf lrr = new Leaf(new HashSet<int> {2});
+            lrr.SetNextTreeIndex(4);
+            lr.SetChildren(lrl, lrr);
+
+            Leaf rll = new Leaf(new HashSet<int> {5, 6});
+            rll.SetNextTreeIndex(5);
+            Leaf rlr = new Leaf(new HashSet<int> {5});
+            rlr.SetNextTreeIndex(6);
+            rl.SetChildren(rll, rlr);
+
+            Leaf rrl = new Leaf(new HashSet<int> {7});
+            rrl.SetNextTreeIndex(7);
+            Leaf rrr = new Leaf(new HashSet<int> {1, 2});
+            rrr.SetNextTreeIndex(3);
+            rr.SetChildren(rrl, rrr);
+
+            return tree;
+        }
+
+        public static Tree Tree24() {   
+            /*
+                                            a
+                              /                          \
+                             b                            c 
+                      /             \                 /        \
+                     d               e               f          7-7
+                    / \             / \             / \        
+               1,2-1   3,4-2     1-3   2,3-4   6,7-5   6,7-6   
+            */
+            
+            Node root = new Node('a');
+            Tree tree = new Tree(root);
+
+            Node l = new Node('b');
+            Node r = new Node('c');
+            root.SetChildren(l, r);
+
+            Node ll = new Node('d');
+            Node lr = new Node('e');
+            l.SetChildren(ll, lr);
+
+            Node rl = new Node('f');
+            Leaf rr = new Leaf(new HashSet<int> {7});
+            rr.SetNextTreeIndex(7);
+            r.SetChildren(rl, rr);
+
+            Leaf lll = new Leaf(new HashSet<int> {1, 2});
+            lll.SetNextTreeIndex(1);
+            Leaf llr = new Leaf(new HashSet<int> {3, 4});
+            llr.SetNextTreeIndex(2);
+            ll.SetChildren(lll, llr);
+
+            Leaf lrl = new Leaf(new HashSet<int> {1});
+            lrl.SetNextTreeIndex(3);
+            Leaf lrr = new Leaf(new HashSet<int> {2, 3});
+            lrr.SetNextTreeIndex(4);
+            lr.SetChildren(lrl, lrr);
+
+            Leaf rll = new Leaf(new HashSet<int> {6, 7});
+            rll.SetNextTreeIndex(5);
+            Leaf rlr = new Leaf(new HashSet<int> {6, 7});
+            rlr.SetNextTreeIndex(6);
+            rl.SetChildren(rll, rlr);
+
+            return tree;
+        }
+
+        public static Tree Tree25() {   
+            /*
+                                             a
+                               /                           \
+                              b                             c 
+                      /               \                 /        \
+                     d                 e               f          7-7
+                    / \               / \             / \        
+                 1-1   3,4,5,6-2   1-2   3-4       6-5   7,8-6   
+            */
+            
+            Node root = new Node('a');
+            Tree tree = new Tree(root);
+
+            Node l = new Node('b');
+            Node r = new Node('c');
+            root.SetChildren(l, r);
+
+            Node ll = new Node('d');
+            Node lr = new Node('e');
+            l.SetChildren(ll, lr);
+
+            Node rl = new Node('f');
+            Leaf rr = new Leaf(new HashSet<int> {7});
+            rr.SetNextTreeIndex(7);
+            r.SetChildren(rl, rr);
+
+            Leaf lll = new Leaf(new HashSet<int> {1});
+            lll.SetNextTreeIndex(1);
+            Leaf llr = new Leaf(new HashSet<int> {3, 4, 5, 6});
+            llr.SetNextTreeIndex(2);
+            ll.SetChildren(lll, llr);
+
+            Leaf lrl = new Leaf(new HashSet<int> {1});
+            lrl.SetNextTreeIndex(2);
+            Leaf lrr = new Leaf(new HashSet<int> {3});
+            lrr.SetNextTreeIndex(4);
+            lr.SetChildren(lrl, lrr);
+
+            Leaf rll = new Leaf(new HashSet<int> {6});
+            rll.SetNextTreeIndex(5);
+            Leaf rlr = new Leaf(new HashSet<int> {7, 8});
+            rlr.SetNextTreeIndex(6);
+            rl.SetChildren(rll, rlr);
+
+            return tree;
+        }
 
         public static Tree TreeLeaf1() {
             /*
