@@ -62,6 +62,14 @@ namespace Spaghetti_Labeling
             return intersected;
         }
 
+        public string Name() {
+            if (root is Node) {
+                return ((Node) root).GetCondition().ToString() + root.GetID().ToString();
+            }
+            Leaf leaf =  ((Leaf) root);
+            return "{" + string.Join(", ", leaf.GetActions()) + "} - " + leaf.GetNextTreeIndex();
+        }
+
         public string GetTree() {
             return tree;
         }

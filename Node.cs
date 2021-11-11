@@ -200,6 +200,12 @@ namespace Spaghetti_Labeling
             right.AssignSubstitutedInSubtree(substituted);
         }
 
+        public override void AssignIdInSubtree(int id) {
+            SetID(id);
+            left.AssignIdInSubtree(id);
+            right.AssignIdInSubtree(id);
+        }
+
         public override void UpdateActionsInSubtree(List<HashSet<int>> actionsList) {
             left.UpdateActionsInSubtree(actionsList);
             right.UpdateActionsInSubtree(actionsList);

@@ -26,7 +26,7 @@ namespace Spaghetti_Labeling
             List<(Tree, List<int>)> endForestEven = ForestCreator.EndForest(mainForest, true);
             List<(Tree, List<int>)> endForestOdd = ForestCreator.EndForest(mainForest, false);
 
-            Graph mainGraph = new Graph(mainForest);
+            //Graph mainGraph = new Graph(mainForest);
 
             RunTests();
         }

@@ -15,7 +15,7 @@ namespace Spaghetti_Labeling
         private string name = "";
         // Note that the name only corresponds to the tree structure at the creation of the tree, it
         // may or may not correspond after modifications of the tree are made
-        //private int id;
+        private int id = 666;
         
         public void SetTree(Tree tree) {
             // Pointer to the Tree structure is only set on parentless nodes
@@ -110,6 +110,16 @@ namespace Spaghetti_Labeling
         }
 
         public abstract void AssignSubstitutedInSubtree(bool substituted);
+
+        public void SetID(int id) {
+            this.id = id;
+        }
+
+        public int GetID() {
+            return id;
+        }
+
+        public abstract void AssignIdInSubtree(int id);
 
         // Updates actions in each leaf. The left-most gets assigned the actions on position 0 in the list,
         // the second left-most leaf position 1 etc.

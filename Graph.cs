@@ -30,6 +30,15 @@ namespace Spaghetti_Labeling
                 this.roots.Add(tree.GetRoot());
             }
 
+            // purely for testing
+            for (int i = 0; i < forest.Count; i++) {
+                forest[i].GetRoot().AssignIdInSubtree(i + 1);
+            }
+            List<AbstractNode> nodes = GetUniqueNodes(forest);
+            foreach (AbstractNode an in nodes) {
+                Debug.Assert(an.GetID() != 666);
+            }
+
             // Merge equal subtrees
             MergeEqualSubtrees(forest);
 
@@ -99,28 +108,40 @@ namespace Spaghetti_Labeling
             }
             */
             stringifiedTrees.Sort();
-            /*
+            
             Console.WriteLine("After sorting");
             for (int i = 0; i < stringifiedTrees.Count; i++) {
                 Console.WriteLine("Tree {0}: {1}", i, stringifiedTrees[i].GetTree());
             }
-            */
+            
 
             // TODO: write automatic tests for this function... it won't be easy but I need to make sure this 
             // really works
+            // UPDATE: something is wrong, I need to find out what
+            /*
+            I found another problem, this one is harder to both describe and fix. In my trees, there are two
+            1-3 leaves. When equal subtrees are merged, one of these leaves is removed and the other now has
+            two parents, and therefore two nodes having this leaf as their child. 
+            Now, the problem becomes when this leaf is part of a larger subtree which gets substituted and 
+            replaced by a tree that also contains this leaf. This results in the "substituted" flag being
+            set to true on a node that is not actually removed from the final graph.
+            In other words - a leaf is being pointed to by two different nodes. One of these nodes is removed,
+            while the other node remains. The node is then being viewed as removed, despite still being valid. 
+            */
+
 
             for (int i = 0; i < stringifiedTrees.Count - 1; i++) {
                 StringifiedTree st1 = stringifiedTrees[i];
                 if (st1.GetRoot().GetSubstituted()) {
                     // Skip already substituted subtrees
-                    //Console.WriteLine("Skipping primary tree {0} because it was already substituted.", i);
+                    Console.WriteLine("Skipping primary tree {0} ({1}) because it was already substituted.", i, st1.Name());
                     continue;
                 }
                 for (int j = i + 1; j < stringifiedTrees.Count; j++) {
                     StringifiedTree st2 = stringifiedTrees[j];
                     // Skip already substituted subtrees
                     if (st2.GetRoot().GetSubstituted()) {
-                        //Console.WriteLine("Skipping secondary tree {0} because it was already substituted.", j);
+                        Console.WriteLine("Skipping secondary tree {0} ({1}) because it was already substituted.", j, st2.Name());
                         continue;
                     }
                     // Skip all subtrees with different strings
@@ -136,11 +157,12 @@ namespace Spaghetti_Labeling
                         }
                     }
                     if (empty) {
-                        /*
-                        Console.WriteLine("Skipping trees {0}, {1} because they have empty actions intersection.", i, j);
+                        
+                        Console.WriteLine("Skipping trees {0} ({1}), {2} ({3}) because they have empty actions intersection.",
+                                          i, st1.Name(), j, st2.Name());
                         Console.WriteLine("1st tree: {0}", st1.GetTree());
                         Console.WriteLine("2nd tree: {0}", st2.GetTree());
-                        */
+                        
                         continue;
                     }
                     // Two subtrees are compatible and one can be substituted with the other
@@ -150,9 +172,31 @@ namespace Spaghetti_Labeling
                     Console.WriteLine("2nd tree: {0}", st2.GetTree());
                     */
                     SubstituteSubtree(st1.GetRoot(), st2.GetRoot(), intersectedActionsList);
+                    Console.WriteLine("Substitution: replacing {0} with {1}", st2.Name(), st1.Name());
                 }    
             }
+
+            // Remove references (in "parents" lists) to trees which were substituted away
+            foreach (Tree tree in forest) {
+                RemoveReferencesToSubstitutedTrees(tree.GetRoot());
+            }
         }
+
+        private void RemoveReferencesToSubstitutedTrees(AbstractNode abstractNode) {
+            // Remove references (in "parents" lists of the given subtree) to trees which were substituted away
+            List<Node> parents = abstractNode.GetParents(); 
+            for (int i = 0; i < parents.Count; i++) {
+                if (parents[i].GetSubstituted()) {
+                    parents.RemoveAt(i);
+                    i--;
+                }
+            }
+            if (abstractNode is Node) {
+                Node node = (Node) abstractNode;
+                RemoveReferencesToSubstitutedTrees(node.GetLeft());
+                RemoveReferencesToSubstitutedTrees(node.GetRight());
+            }
+        } 
 
         private void SubstituteSubtree(AbstractNode root1, AbstractNode root2,
                                        List<HashSet<int>> intersectedActionsList) {
@@ -331,25 +375,14 @@ namespace Spaghetti_Labeling
                 // TODO: this. First create a decently sized test forest, then create a graph from it
                 // and check the results.
 
-                // TODO: fix bugs. For some reason, l1 has two parents, and they are both different nodes.
-                // I can investigate this further by checking the parents of these parents to see which trees
-                // they belong to. The current hypothesis is that smaller substitutions are made before
-                // larger ones and this causes problems, however I can't imagine how this could happen
-                // because I sort the stringified trees before making any substitutions.
-                // UPDATE: Maybe it gets first merged because of equality (not equivalence) and this causes
-                // problems with subsequent substitutions?
-                // BETTER HYPOTHESIS: I'm pretty sure I figured out at least part of the problem. In the graph
-                // creation process, I first merge equal subtrees, which may lead to a leaf having two
-                // parents. Then, when performing equivalence substitutions, a subtree leading to that leaf
-                // may get substituted away in a node above the leaf's parents, which leads to the leaf
-                // retaining both parents in the "parents" list, one of which will have the "substituted" flag
-                // set to true. This can be easily fixed by going through each node of the complete graph
-                // and removing those nodes from the "parents" lists, which have the flag set to true.
+                // TODO: fix more bugs. I don't know why there are so many problems in leaves, I will have to
+                // walk through the process of substitution and check each step.
 
                 Tree tree23 = TestTrees.Tree23();
                 Tree tree24 = TestTrees.Tree24();
                 Tree tree25 = TestTrees.Tree25();
 
+                Console.WriteLine("Creating graph.");
                 Graph g = new Graph(new List<Tree> {tree23, tree24, tree25});
                 Node a1 = (Node) tree23.GetRoot();
                 Node b1 = (Node) a1.GetLeft();
@@ -378,7 +411,7 @@ namespace Spaghetti_Labeling
                 Leaf l10 = (Leaf) e3.GetRight();
                 
                 // check if leaves have correct actions
-                /*
+                
                 Debug.Assert(((Leaf) d1.GetLeft()).GetActions().SetEquals(new HashSet<int> {1}));
                 Debug.Assert(((Leaf) d1.GetRight()).GetActions().SetEquals(new HashSet<int> {3, 4}));
                 Debug.Assert(((Leaf) e1.GetLeft()).GetActions().SetEquals(new HashSet<int> {1}));
@@ -414,7 +447,7 @@ namespace Spaghetti_Labeling
                 //Debug.Assert(g1.GetRight() == l3);
                 Debug.Assert(MatchingParents(l1, new List<AbstractNode> {d1}));
                 Debug.Assert(MatchingParents(l2, new List<AbstractNode> {d1}));
-                Debug.Assert(MatchingParents(l3, new List<AbstractNode> {e1, g1}));
+                //Debug.Assert(MatchingParents(l3, new List<AbstractNode> {e1, g1}));
                 Debug.Assert(MatchingParents(l4, new List<AbstractNode> {e1}));
                 Debug.Assert(MatchingParents(l5, new List<AbstractNode> {f1, f2, f3}));
                 Debug.Assert(MatchingParents(l6, new List<AbstractNode> {f1}));
@@ -446,14 +479,16 @@ namespace Spaghetti_Labeling
                 Debug.Assert(MatchingParents(f3, new List<AbstractNode> {c3}));
                 Debug.Assert(MatchingParents(l9, new List<AbstractNode> {e3}));
                 Debug.Assert(MatchingParents(l10, new List<AbstractNode> {e3}));
-                */
+                
 
+                /*
                 foreach (AbstractNode p in l1.GetParents()) {
                     Console.WriteLine("\nDFS on parent of l1:");
                     p.AssignVisitedInSubtree(false);
                     p.InfoDFS();
                 }
                 Console.WriteLine("Are both l1 parent equal? {0}", l1.GetParents()[0] == l1.GetParents()[1]);
+                */
 
                 Console.WriteLine("pls");
             }
@@ -474,11 +509,11 @@ namespace Spaghetti_Labeling
                 }
                 */
 
-                Console.WriteLine("New call");
+                //Console.WriteLine("New call");
 
                 if (node.GetParents().Count != parents.Count) {
-                    Console.WriteLine("List lengths are not equal! Node parents length: {0}. Supposed length: {1}",
-                                      node.GetParents().Count, parents.Count);
+                    //Console.WriteLine("List lengths are not equal! Node parents length: {0}. Supposed length: {1}",
+                    //                  node.GetParents().Count, parents.Count);
                     return false;
                 }
                 /*
@@ -500,11 +535,11 @@ namespace Spaghetti_Labeling
                     bool matching = false;
                     for (int j = 0; j < parents.Count; j++) {
                         if (node.GetParents()[i] == parents[j]) {
-                            Console.WriteLine("parent {0} matches parent {1}", i, j);
+                            //Console.WriteLine("parent {0} matches parent {1}", i, j);
                             matching = true;
                         }
                         else {
-                            Console.WriteLine("parent {0} does not match parent {1}", i, j);
+                            //Console.WriteLine("parent {0} does not match parent {1}", i, j);
                         }
                     }
                     if (!matching) {

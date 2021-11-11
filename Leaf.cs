@@ -106,6 +106,10 @@ namespace Spaghetti_Labeling
         public override void AssignSubstitutedInSubtree(bool substituted) {
             SetSubstituted(substituted);
         }
+
+        public override void AssignIdInSubtree(int id) {
+            SetID(id);
+        }
         
         public override void UpdateActionsInSubtree(List<HashSet<int>> actionsList) {
             this.actions = actionsList[0];
