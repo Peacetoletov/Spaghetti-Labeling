@@ -114,12 +114,12 @@ namespace Spaghetti_Labeling
             for (int i = 0; i < stringifiedTrees.Count - 1; i++) {
                 StringifiedTree st1 = stringifiedTrees[i];
                 if (st1.GetRoot().GetSubstituted()) {
-                    // Skip already substituted subtrees
+                    // Skip already substituted primary subtrees
                     continue;
                 }
                 for (int j = i + 1; j < stringifiedTrees.Count; j++) {
                     StringifiedTree st2 = stringifiedTrees[j];
-                    // Skip already substituted subtrees
+                    // Skip already substituted secondary subtrees
                     if (st2.GetRoot().GetSubstituted()) {
                         continue;
                     }
@@ -129,17 +129,10 @@ namespace Spaghetti_Labeling
                     }
                     // Skip subtrees with an empty intersection of actions 
                     List<HashSet<int>> intersectedActionsList = st1.IntersectedActions(st2.GetActions());
-                    bool empty = false;
-                    foreach (HashSet<int> actions in intersectedActionsList) {
-                        if (actions.Count == 0) {
-                            empty = true;
-                        }
+                    if (!ContainsEmptySet(intersectedActionsList)) {
+                        // Two subtrees are compatible and one can be substituted with the other
+                        SubstituteSubtree(st1.GetRoot(), st2.GetRoot(), intersectedActionsList);
                     }
-                    if (empty) {
-                        continue;
-                    }
-                    // Two subtrees are compatible and one can be substituted with the other
-                    SubstituteSubtree(st1.GetRoot(), st2.GetRoot(), intersectedActionsList);
                 }    
             }
 
@@ -147,6 +140,15 @@ namespace Spaghetti_Labeling
             foreach (Tree tree in forest) {
                 RemoveReferencesToSubstitutedTrees(tree.GetRoot());
             }
+        }
+
+        private bool ContainsEmptySet<T>(List<HashSet<T>> list) {
+            foreach (HashSet<T> elem in list) {
+                if (elem.Count == 0) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         private void RemoveReferencesToSubstitutedTrees(AbstractNode abstractNode) {
