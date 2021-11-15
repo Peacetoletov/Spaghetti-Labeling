@@ -11,7 +11,7 @@ namespace Spaghetti_Labeling
         3) Remove duplicates trees. DONE
         4) Add row beginning tree DONE
         5) Add row end trees DONE
-        6) Convert trees to DRAGs
+        6) Convert trees to DRAGs DONE
         7) Actions, labeling, label equivalence resolution
         ...
         */
