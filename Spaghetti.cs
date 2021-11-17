@@ -22,11 +22,14 @@ namespace Spaghetti_Labeling
             //Node treeRoot = (Node) (ODTree.GetTree().GetRoot());
             //treeRoot.InfoDFS();
 
+            /*
             List<Tree> mainForest = ForestCreator.MainForest(ODTree.GetTree);
             List<(Tree, List<int>)> endForestEven = ForestCreator.EndForest(mainForest, true);
             List<(Tree, List<int>)> endForestOdd = ForestCreator.EndForest(mainForest, false);
+            Graph mainGraph = new Graph(mainForest);
+            */
 
-            //Graph mainGraph = new Graph(mainForest);
+            ImageProcessor.SpaghettiCCL();
 
             RunTests();
         }

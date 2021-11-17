@@ -4,40 +4,44 @@ using System.Collections.Generic;
 
 namespace Spaghetti_Labeling
 {
-    public class BinaryImage
+    public class Image
     {
-        private List<List<bool>> image;
+        private List<List<int>> matrix;
 
-        public BinaryImage() {
+        public Image() {
             // Default image for testing
-            this.image = TestImages.Image1();
+            this.matrix = TestImages.BinaryImage1();
         }
 
-        public BinaryImage(string path) {
-            // TODO: Load the image and convert it 
+        public Image(string path) {
+            // TODO: Load the image and convert it to BinaryImage
         }
 
-        public List<List<bool>> GetImage() {
-            return image;
+        public Image(List<List<int>> matrix) {
+            this.matrix = matrix;
+        }
+
+        public List<List<int>> GetMatrix() {
+            return matrix;
         }
 
         private static class TestImages
         {
-            private static List<List<bool>> StringifiedToBinary(List<string> stringified) {
-                List<List<bool>> binary = new List<List<bool>>();
+            private static List<List<int>> StringifiedToBinary(List<string> stringified) {
+                List<List<int>> binary = new List<List<int>>();
                 int firstRowLength = stringified[0].Length;                
                 foreach (string row in stringified) {
                     Debug.Assert(row.Length == firstRowLength);
-                    List<bool> binarRow = new List<bool>();
+                    List<int> binarRow = new List<int>();
                     foreach (char c in row) {
-                        binarRow.Add(c == '.');
+                        binarRow.Add(c == '.' ? 1 : 0);
                     }
                     binary.Add(binarRow);
                 }
                 return binary;
             }
 
-            public static List<List<bool>> Image1() {
+            public static List<List<int>> BinaryImage1() {
                 return StringifiedToBinary(new List<string> {
                     "....xxx.........",
                     "x...xxxx....xxx.",
