@@ -6,90 +6,131 @@ namespace Spaghetti_Labeling
 {
     public static class ImageProcessor
     {
-        public static Image SpaghettiCCL(string path="") {
-            // TODO: first test classic CCL, then implement this
+        private static Image SpaghettiAssignLabels(List<List<int>> input,  
+                                                   List<HashSet<int>> equivalentLabels) {
+            // TODO: this
 
-            List<List<int>> input = path == "" ? new Image().GetMatrix() : new Image(path).GetMatrix();
+            /* NOTE: Due to the lack of special forests for the first and last row, all images labeled with the
+            Spaghetti algortihm are required to have first 2 rows filled with background pixels and the number
+            of rows must be even.
+            Once the special trees are implemented, this condition will disappear.
+            */
+            Debug.Assert(input.Count % 2 == 0);
+
+            List<Tree> mainForest = ForestCreator.MainForest(ODTree.GetTree);
+            List<(Tree, List<int>)> endForestEven = ForestCreator.EndForest(mainForest, true);
+            List<(Tree, List<int>)> endForestOdd = ForestCreator.EndForest(mainForest, false);
+            Graph mainGraph = new Graph(mainForest);
+            //Graph endGraphEven = new Graph(endForestEven);
+            //Graph endGraphOdd = new Graph(endForestOdd);
+
+            /* NOTES TO SELF: the represenation of end forests along with a list of main forest indices that point to the given end tree
+            is hard to work with. I need to put this information into the mainGraph.
+            */
+
+            int width = input[0].Count;
+            int height = input.Count;
+            Image output = new Image(InitMatrixWithZeroes(width, height));
+
+            for (int i = 0; i < input.Count; i += 2) {
+                if (i == 0) {
+                    // First row
+                    // currently does nothing. First implement middle rows, then this.
+                } 
+                else if (i != input.Count - 1) {
+                    // Middle rows
+                    // TODO: 
+                }
+                else {
+                    // Last row
+                    // currently does nothing. First implement middle rows and first row, then this.
+                }
+            }
 
             return null;
         }
 
-        /*
-        public static Image ClassicCCL(string path="") {
-            // TODO: implement this function which works with a path to an image (this can wait)
+        private static void SetPointersToEndGraphRootsInMainGraphRoots(Graph mainGraph, List<int> evenIndices, List<int> oddIndices) {
 
-            
-            List<List<int>> input = path == "" ? new Image().GetMatrix() : new Image(path).GetMatrix();
-
-            List<HashSet<int>> equivalentLabels;
-            List<List<int>> output = ClassicCCL_AssignLabels(input, out equivalentLabels);
-
-            ResolveLabelEquivalencies(output, equivalentLabels);
-
-            return new Image(output);   
         }
-        */
+
+        private static Image SpaghettiLabelBlocksInRow(int row) {
+            // row i means that pixels at positions i and i+1 will be labeled
+            return null;
+        }
+
+        public static Image SpaghettiCCL(List<List<int>> binaryImage) {
+            return CCL(binaryImage, SpaghettiAssignLabels);
+        }
+
+        // TODO: override SpaghettiCCL and ClassicCCL methods to work with a path to an image as the argument
 
         public static Image ClassicCCL(List<List<int>> binaryImage) {
-            List<HashSet<int>> equivalentLabels;
-            List<List<int>> output = ClassicCCL_AssignLabels(binaryImage, out equivalentLabels);
-            ResolveLabelEquivalencies(output, equivalentLabels);
-            return new Image(output);
+            return CCL(binaryImage, ClassicCCL_AssignLabels);
         }
 
-        private static List<List<int>> ClassicCCL_AssignLabels(List<List<int>> input,  
-                                                               out List<HashSet<int>> equivalentLabels) {
-            equivalentLabels = new List<HashSet<int>>();
+        private static Image CCL(List<List<int>> binaryImage, Func<List<List<int>>, List<HashSet<int>>, Image> assignLabels) {
+            List<HashSet<int>> equivalentLabels = new List<HashSet<int>>();
+            Image output = assignLabels(binaryImage, equivalentLabels);
+            ResolveLabelEquivalencies(output, equivalentLabels);
+            return output;
+        }
+
+        private static Image ClassicCCL_AssignLabels(List<List<int>> input,  
+                                                     List<HashSet<int>> equivalentLabels) {
             int width = input[0].Count;
             int height = input.Count;
-            List<List<int>> output = InitMatrixWithZeroes(width, height);
+            //List<List<int>> output = ;
+            Image image = new Image(InitMatrixWithZeroes(width, height));
             int highestLabel = 0;
             for (int y = 0; y < height; y++) {
                 for (int x = 0; x < width; x++) {
                     if (input[y][x] == 1) {
                         // Assign label if current pixel is foreground 
-                        highestLabel = ClassicCCL_LabelPixel(output, x, y, highestLabel, equivalentLabels);
+                        highestLabel = ClassicCCL_LabelPixel(image, x, y, highestLabel, equivalentLabels);
 
                         // Store information about equivalent labels
-                        ClassicCCL_ManageEquivalencies(output, x, y, equivalentLabels);
+                        ClassicCCL_ManageEquivalencies(image, x, y, equivalentLabels);
                     }
                 }
             }
 
-            return output;
+            return image;
         }
 
-        private static int ClassicCCL_LabelPixel(List<List<int>> output, int x, int y, int highestLabel, List<HashSet<int>> equivalentLabels) {
-            int width = output[0].Count;
-            if (x - 1 >= 0 && y - 1 >= 0 && output[y - 1][x - 1] != 0) {
-                output[y][x] = output[y - 1][x - 1];
-            } else if (y - 1 >= 0 && output[y - 1][x] != 0) {
-                output[y][x] = output[y - 1][x];
-            } else if (x + 1 < width && y - 1 >= 0 && output[y - 1][x + 1] != 0) {
-                output[y][x] = output[y - 1][x + 1];
-            } else if (x - 1 >= 0 && output[y][x - 1] != 0) {
-                output[y][x] = output[y][x - 1];
+        private static int ClassicCCL_LabelPixel(Image image, int x, int y, int highestLabel, List<HashSet<int>> equivalentLabels) {
+            List<List<int>> imageMatrix = image.GetMatrix();
+            int width = imageMatrix[0].Count;
+            if (x - 1 >= 0 && y - 1 >= 0 && imageMatrix[y - 1][x - 1] != 0) {
+                imageMatrix[y][x] = imageMatrix[y - 1][x - 1];
+            } else if (y - 1 >= 0 && imageMatrix[y - 1][x] != 0) {
+                imageMatrix[y][x] = imageMatrix[y - 1][x];
+            } else if (x + 1 < width && y - 1 >= 0 && imageMatrix[y - 1][x + 1] != 0) {
+                imageMatrix[y][x] = imageMatrix[y - 1][x + 1];
+            } else if (x - 1 >= 0 && imageMatrix[y][x - 1] != 0) {
+                imageMatrix[y][x] = imageMatrix[y][x - 1];
             } else {
                 highestLabel++;
-                output[y][x] = highestLabel;
+                imageMatrix[y][x] = highestLabel;
                 equivalentLabels.Add(new HashSet<int> {highestLabel});
             }
             return highestLabel;
         }
 
-        private static void ClassicCCL_ManageEquivalencies(List<List<int>> output, int x, int y, 
-                                                          List<HashSet<int>> equivalentLabels) {
+        private static void ClassicCCL_ManageEquivalencies(Image image, int x, int y, 
+                                                           List<HashSet<int>> equivalentLabels) {
             /* Note that the only pixels which can theoretically be equivalent and haven't been marked
             as equivalent yet are the ones in the upper left and right corner. */
             // Return if either of the relevant pixels is out of bounds
-            int width = output[0].Count;
+            List<List<int>> imageMatrix = image.GetMatrix();
+            int width = imageMatrix[0].Count;
             if (x == 0 || y == 0 || x == width - 1) {
                 return;
             }
 
             // Return if either of the relevant pixels is background, or if they both have the same label
-            int label1 = output[y - 1][x - 1];
-            int label2 = output[y - 1][x + 1];
+            int label1 = imageMatrix[y - 1][x - 1];
+            int label2 = imageMatrix[y - 1][x + 1];
             if (label1 == 0 || label2 == 0 || label1 == label2) {
                 return;
             }
@@ -127,8 +168,8 @@ namespace Spaghetti_Labeling
             return matrix;
         }
 
-        private static void ResolveLabelEquivalencies(List<List<int>> imageMatrix, 
-                                                      List<HashSet<int>> equivalentLabels) {
+        private static void ResolveLabelEquivalencies(Image image, List<HashSet<int>> equivalentLabels) {
+            List<List<int>> imageMatrix = image.GetMatrix();
             int width = imageMatrix[0].Count;
             int height = imageMatrix.Count;
             for (int y = 0; y < height; y++) {
@@ -158,7 +199,7 @@ namespace Spaghetti_Labeling
                 Image reference2 = Image.TestImages.LabeledImage2();
                 Debug.Assert(labeled2.Equals(reference2));
 
-                /*
+                
                 List<List<int>> labeledMatrix = labeled2.GetMatrix();
                 foreach (List<int> row in labeledMatrix) {
                     foreach (int label in row) {
@@ -166,7 +207,7 @@ namespace Spaghetti_Labeling
                     }
                     Console.WriteLine();
                 }
-                */          
+                
 
                 //Console.WriteLine("Classic CCL works");
             }
