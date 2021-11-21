@@ -41,6 +41,7 @@ namespace Spaghetti_Labeling
             Graph.Tests.Run();
             GraphManager.Tests.Run();
             StringifiedTree.Tests.Run();
+            ImageProcessor.Tests.Run();
             Console.WriteLine("All tests passed!");
         }
     }

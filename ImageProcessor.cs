@@ -7,16 +7,18 @@ namespace Spaghetti_Labeling
     public static class ImageProcessor
     {
         public static Image SpaghettiCCL(string path="") {
-            // TODO: firest test classic CCL, then implement this
+            // TODO: first test classic CCL, then implement this
 
             List<List<int>> input = path == "" ? new Image().GetMatrix() : new Image(path).GetMatrix();
 
             return null;
         }
 
+        /*
         public static Image ClassicCCL(string path="") {
-            // TODO: test this
+            // TODO: implement this function which works with a path to an image (this can wait)
 
+            
             List<List<int>> input = path == "" ? new Image().GetMatrix() : new Image(path).GetMatrix();
 
             List<HashSet<int>> equivalentLabels;
@@ -24,6 +26,14 @@ namespace Spaghetti_Labeling
 
             ResolveLabelEquivalencies(output, equivalentLabels);
 
+            return new Image(output);   
+        }
+        */
+
+        public static Image ClassicCCL(List<List<int>> binaryImage) {
+            List<HashSet<int>> equivalentLabels;
+            List<List<int>> output = ClassicCCL_AssignLabels(binaryImage, out equivalentLabels);
+            ResolveLabelEquivalencies(output, equivalentLabels);
             return new Image(output);
         }
 
@@ -38,12 +48,10 @@ namespace Spaghetti_Labeling
                 for (int x = 0; x < width; x++) {
                     if (input[y][x] == 1) {
                         // Assign label if current pixel is foreground 
-                        highestLabel = ClassicCCL_LabelPixel(output, x, y, highestLabel);
+                        highestLabel = ClassicCCL_LabelPixel(output, x, y, highestLabel, equivalentLabels);
 
                         // Store information about equivalent labels
-                        /* Note that the only pixels which can theoretically be equivalent and haven't been marked
-                        as equivalent yet are the ones in the upper left and right corner. */
-                        ClassicCCL_StoreEquivalencies(output, x, y, equivalentLabels);
+                        ClassicCCL_ManageEquivalencies(output, x, y, equivalentLabels);
                     }
                 }
             }
@@ -51,39 +59,50 @@ namespace Spaghetti_Labeling
             return output;
         }
 
-        private static int ClassicCCL_LabelPixel(List<List<int>> output, int x, int y, int highestLabel) {
+        private static int ClassicCCL_LabelPixel(List<List<int>> output, int x, int y, int highestLabel, List<HashSet<int>> equivalentLabels) {
             int width = output[0].Count;
-            if (x - 1 > 0 && y - 1 > 0 && output[y - 1][x - 1] != 0) {
+            if (x - 1 >= 0 && y - 1 >= 0 && output[y - 1][x - 1] != 0) {
                 output[y][x] = output[y - 1][x - 1];
-            } else if (y - 1 > 0 && output[y - 1][x] != 0) {
+            } else if (y - 1 >= 0 && output[y - 1][x] != 0) {
                 output[y][x] = output[y - 1][x];
-            } else if (x + 1 < width && y - 1 > 0 && output[y - 1][x + 1] != 0) {
+            } else if (x + 1 < width && y - 1 >= 0 && output[y - 1][x + 1] != 0) {
                 output[y][x] = output[y - 1][x + 1];
-            } else if (x - 1 > 0 && output[y][x - 1] != 0) {
+            } else if (x - 1 >= 0 && output[y][x - 1] != 0) {
                 output[y][x] = output[y][x - 1];
             } else {
                 highestLabel++;
                 output[y][x] = highestLabel;
+                equivalentLabels.Add(new HashSet<int> {highestLabel});
             }
             return highestLabel;
         }
 
-        private static void ClassicCCL_StoreEquivalencies(List<List<int>> output, int x, int y, 
+        private static void ClassicCCL_ManageEquivalencies(List<List<int>> output, int x, int y, 
                                                           List<HashSet<int>> equivalentLabels) {
+            /* Note that the only pixels which can theoretically be equivalent and haven't been marked
+            as equivalent yet are the ones in the upper left and right corner. */
             // Return if either of the relevant pixels is out of bounds
             int width = output[0].Count;
-            if (x < 0 || y < 0 || x >= width) {
+            if (x == 0 || y == 0 || x == width - 1) {
                 return;
             }
 
-            // Return if both relevant pixels have the same label
+            // Return if either of the relevant pixels is background, or if they both have the same label
             int label1 = output[y - 1][x - 1];
             int label2 = output[y - 1][x + 1];
-            if (label1 == label2) {
+            if (label1 == 0 || label2 == 0 || label1 == label2) {
                 return;
             }
 
-            // Find sets containing the labels, if there are any
+            // If both labels are in different sets, join the sets together
+            (HashSet<int> setWithLabel1, HashSet<int> setWithLabel2) = FindSetsWithLabels(equivalentLabels, label1, label2);
+            if (setWithLabel1 != setWithLabel2) {
+                setWithLabel1.UnionWith(setWithLabel2);
+                equivalentLabels.Remove(setWithLabel2);
+            }
+        }
+
+        private static (HashSet<int>, HashSet<int>) FindSetsWithLabels(List<HashSet<int>> equivalentLabels, int label1, int label2) {
             HashSet<int> setWithLabel1 = null;
             HashSet<int> setWithLabel2 = null;
             foreach (HashSet<int> set in equivalentLabels) {
@@ -93,25 +112,8 @@ namespace Spaghetti_Labeling
                 if (set.Contains(label2)) {
                     setWithLabel2 = set;
                 }
-                if (setWithLabel1 != null && setWithLabel2 != null) {
-                    break;
-                }
             }
-
-            // Perform an action based on which label belongs to which set
-            if (setWithLabel1 == null && setWithLabel2 == null) {
-                equivalentLabels.Add(new HashSet<int> {label1, label2});
-            } else if (setWithLabel1 != null && setWithLabel2 == null) {
-                setWithLabel1.Add(label2);
-            } else if (setWithLabel1 == null && setWithLabel2 != null) {
-                setWithLabel2.Add(label1);
-            } else {
-                if (setWithLabel1 != setWithLabel2) {
-                    setWithLabel1.UnionWith(setWithLabel2);
-                    equivalentLabels.Remove(setWithLabel2);
-                }
-                // Do nothing if both sets are the same
-            }
+            return (setWithLabel1, setWithLabel2);
         }
 
         private static List<List<int>> InitMatrixWithZeroes(int width, int height) {
@@ -134,10 +136,39 @@ namespace Spaghetti_Labeling
                     for (int i = 0; i < equivalentLabels.Count; i++) {
                         HashSet<int> set = equivalentLabels[i];
                         if (set.Contains(imageMatrix[y][x])) {
-                            imageMatrix[y][x] = i;
+                            imageMatrix[y][x] = i + 1;
                         }
                     }
                 }
+            }
+        }
+
+        public static class Tests 
+        {
+            public static void Run() {
+                TestClassicCCL();
+            }
+
+            private static void TestClassicCCL() {
+                Image labeled1 = ClassicCCL(Image.TestImages.BinaryImage1().GetMatrix());
+                Image reference1 = Image.TestImages.LabeledImage1();
+                Debug.Assert(labeled1.Equals(reference1));
+
+                Image labeled2 = ClassicCCL(Image.TestImages.BinaryImage2().GetMatrix());
+                Image reference2 = Image.TestImages.LabeledImage2();
+                Debug.Assert(labeled2.Equals(reference2));
+
+                /*
+                List<List<int>> labeledMatrix = labeled2.GetMatrix();
+                foreach (List<int> row in labeledMatrix) {
+                    foreach (int label in row) {
+                        Console.Write(label);
+                    }
+                    Console.WriteLine();
+                }
+                */          
+
+                //Console.WriteLine("Classic CCL works");
             }
         }
     }
