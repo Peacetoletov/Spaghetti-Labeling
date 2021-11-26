@@ -7,9 +7,6 @@ namespace Spaghetti_Labeling
     public class Graph
     {
         private List<AbstractNode> roots;
-        private List<int> endEvenIndices;
-        private List<int> endOddIndices;
-
 
         public Graph() {
             // Empty constructor, only used for testing
@@ -48,12 +45,6 @@ namespace Spaghetti_Labeling
 
             // Merge equivalent subtrees
             MergeEquivalentSubtrees(forest);
-        }
-
-        private static void SetPointersToEndGraphRoots() {
-            // (TODO: description)
-            // This method must only be called on main graphs.
-            //for ()
         }
 
         public void MergeEqualSubtrees(List<Tree> forest) {

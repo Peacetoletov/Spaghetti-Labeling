@@ -18,41 +18,63 @@ namespace Spaghetti_Labeling
             Debug.Assert(input.Count % 2 == 0);
 
             List<Tree> mainForest = ForestCreator.MainForest(ODTree.GetTree);
-            List<(Tree, List<int>)> endForestEven = ForestCreator.EndForest(mainForest, true);
-            List<(Tree, List<int>)> endForestOdd = ForestCreator.EndForest(mainForest, false);
-            Graph mainGraph = new Graph(mainForest);
-            //Graph endGraphEven = new Graph(endForestEven);
-            //Graph endGraphOdd = new Graph(endForestOdd);
+            (List<Tree> endForestEvenTrees, List<List<int>> endForestEvenIndices) = SplitList(ForestCreator.EndForest(mainForest, true));
+            (List<Tree> endForestOddTrees, List<List<int>> endForestOddIndices) = SplitList(ForestCreator.EndForest(mainForest, false));
 
-            /* NOTES TO SELF: the represenation of end forests along with a list of main forest indices that point to the given end tree
-            is hard to work with. I need to put this information into the mainGraph.
-            */
+            MainGraph mainGraph = new MainGraph(mainForest, endForestEvenIndices, endForestOddIndices);
+            Graph endGraphEven = new Graph(endForestEvenTrees);
+            Graph endGraphOdd = new Graph(endForestOddTrees);
+
 
             int width = input[0].Count;
             int height = input.Count;
             Image output = new Image(InitMatrixWithZeroes(width, height));
 
-            for (int i = 0; i < input.Count; i += 2) {
-                if (i == 0) {
-                    // First row
-                    // currently does nothing. First implement middle rows, then this.
-                } 
-                else if (i != input.Count - 1) {
-                    // Middle rows
-                    // TODO: 
-                }
-                else {
-                    // Last row
-                    // currently does nothing. First implement middle rows and first row, then this.
+            for (int y = 0; y < height; y += 2) {
+                for (int x = 0; x < width; x += 2) {
+                    if (y == 0) {
+                        // First row
+                        // currently does nothing. First implement middle rows, then this.
+                    } 
+                    else if (y != height - 1) {
+                        // Middle rows
+                        // TODO: 
+                        //SpaghettiLabelBlocksInRow()
+                        
+                        /*
+                        if (not last column) {
+                            use main tree
+                        } else {
+                            use corresponding end tree
+                        }
+                        */
+
+                    }
+                    else {
+                        // Last row
+                        // currently does nothing. First implement middle rows and first row, then this.
+                    }
                 }
             }
 
             return null;
         }
 
-        private static void SetPointersToEndGraphRootsInMainGraphRoots(Graph mainGraph, List<int> evenIndices, List<int> oddIndices) {
+        private static (List<Tree>, List<List<int>>) SplitList(List<(Tree, List<int>)> endForest) {
+            List<Tree> trees = new List<Tree>();
+            List<List<int>> indicesList = new List<List<int>>();
+            foreach ((Tree tree, List<int> indices) in endForest) {
+                trees.Add(tree);
+                indicesList.Add(indices);
+            }
+            return (trees, indicesList);
+        }
+
+        /*
+        private static void SetIndicesOfEndGraphRootsInMainGraph(Graph mainGraph, List<int> evenIndices, List<int> oddIndices) {
 
         }
+        */
 
         private static Image SpaghettiLabelBlocksInRow(int row) {
             // row i means that pixels at positions i and i+1 will be labeled
@@ -199,7 +221,7 @@ namespace Spaghetti_Labeling
                 Image reference2 = Image.TestImages.LabeledImage2();
                 Debug.Assert(labeled2.Equals(reference2));
 
-                
+                /*
                 List<List<int>> labeledMatrix = labeled2.GetMatrix();
                 foreach (List<int> row in labeledMatrix) {
                     foreach (int label in row) {
@@ -207,7 +229,7 @@ namespace Spaghetti_Labeling
                     }
                     Console.WriteLine();
                 }
-                
+                */                
 
                 //Console.WriteLine("Classic CCL works");
             }
