@@ -8,6 +8,15 @@ namespace Spaghetti_Labeling
     {
         private static Image SpaghettiAssignLabels(List<List<int>> input,  
                                                    List<HashSet<int>> equivalentLabels) {
+            /* URGENT TODO:
+            When creating the main forest, I add constraints for the first column after all other constraints. This means
+            that I don't know which index corresponds to the tree that should be first used.
+            I tried to swap the order to have it at the first index, therefore it would always remain at the first index
+            even during tree duplicate removal etc., but doing so broke all tests.
+            I need to find out how to move it to the first index and not break everything, which will probably involve adjusting
+            some of the tests.
+            */
+
             // TODO: this
 
             /* NOTE: Due to the lack of special forests for the first and last row, all images labeled with the
@@ -31,7 +40,7 @@ namespace Spaghetti_Labeling
             Image output = new Image(InitMatrixWithZeroes(width, height));
 
             for (int y = 0; y < height; y += 2) {
-                for (int x = 0; x < width; x += 2) {
+                
                     if (y == 0) {
                         // First row
                         // currently does nothing. First implement middle rows, then this.
@@ -54,7 +63,6 @@ namespace Spaghetti_Labeling
                         // Last row
                         // currently does nothing. First implement middle rows and first row, then this.
                     }
-                }
             }
 
             return null;
@@ -70,15 +78,19 @@ namespace Spaghetti_Labeling
             return (trees, indicesList);
         }
 
-        /*
-        private static void SetIndicesOfEndGraphRootsInMainGraph(Graph mainGraph, List<int> evenIndices, List<int> oddIndices) {
-
+        private static void SpaghettiLabelBlocksInMiddleRow(Image image, int y) {
+            // row y means that pixels at positions y and y+1 will be labeled
+            int width = image.GetMatrix()[0].Count;
+            for (int x = 0; x < width; x += 2) {
+                SpaghettiLabelMiddleBlock(666, x, y, width);
+            }
         }
-        */
 
-        private static Image SpaghettiLabelBlocksInRow(int row) {
-            // row i means that pixels at positions i and i+1 will be labeled
-            return null;
+        private static int SpaghettiLabelMiddleBlock(int treeIndex, int x, int y, int width) {
+            // Labels the 2x2 block, with x and y being the upper left corner of the block.
+            // Returns the index of the next tree to be used.
+
+            return 0;
         }
 
         public static Image SpaghettiCCL(List<List<int>> binaryImage) {
@@ -94,7 +106,7 @@ namespace Spaghetti_Labeling
         private static Image CCL(List<List<int>> binaryImage, Func<List<List<int>>, List<HashSet<int>>, Image> assignLabels) {
             List<HashSet<int>> equivalentLabels = new List<HashSet<int>>();
             Image output = assignLabels(binaryImage, equivalentLabels);
-            ResolveLabelEquivalencies(output, equivalentLabels);
+            //ResolveLabelEquivalencies(output, equivalentLabels);      // TEMPORARILY COMMENTED OUT
             return output;
         }
 
@@ -209,7 +221,7 @@ namespace Spaghetti_Labeling
         public static class Tests 
         {
             public static void Run() {
-                TestClassicCCL();
+                //TestClassicCCL();
             }
 
             private static void TestClassicCCL() {

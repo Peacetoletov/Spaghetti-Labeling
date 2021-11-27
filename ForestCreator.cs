@@ -80,8 +80,9 @@ namespace Spaghetti_Labeling
 
         private static List<HashSet<(char, bool)>> MainTreesConstraints(Func<Tree> newTree) {
             List<HashSet<(char, bool)>> constraintsList = new List<HashSet<(char, bool)>>();
+            //constraintsList.Add(RowBeginningConstraints());
             GatherConstraints(newTree().GetRoot(), new HashSet<(char, bool)>(), constraintsList);
-            constraintsList.Add(RowBeginningConstraints());
+            constraintsList.Add(RowBeginningConstraints());       // moved before other constraints
             return constraintsList;
         }
 
@@ -186,7 +187,7 @@ namespace Spaghetti_Labeling
         }
 
         private static void GatherConstraints(HashSet<(char, bool)> constraints,
-                                       List<HashSet<(char, bool)>> constraintsList) {
+                                              List<HashSet<(char, bool)>> constraintsList) {
             // Append constraints to a list of constraints upon reaching a leaf
             constraintsList.Add(constraints);
         }
@@ -345,6 +346,8 @@ namespace Spaghetti_Labeling
                 // Tests if one of my reduced trees exactly matches the one on page 5 of the Spaghetti paper
                 List<Tree> forest = MainForest(ODTree.GetTree);
                 Tree refTree = TestTrees.Tree11();
+
+
                 
                 bool matches = false;
                 foreach (Tree reduced in forest) {
