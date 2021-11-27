@@ -228,6 +228,10 @@ namespace Spaghetti_Labeling
             }
         }
 
+        public AbstractNode GetRoot(int index) {
+            return roots[index];
+        }
+
 
         public static class Tests
         {

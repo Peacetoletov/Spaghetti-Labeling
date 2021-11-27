@@ -45,7 +45,6 @@ namespace Spaghetti_Labeling
 
         public void InitNextTreeIndices() {
             root.InitNextTreeIndex(1);
-            //root.InitNextTreeIndex(0);
         }
 
         public void UpdateNames() {

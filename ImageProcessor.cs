@@ -8,15 +8,6 @@ namespace Spaghetti_Labeling
     {
         private static Image SpaghettiAssignLabels(List<List<int>> input,  
                                                    List<HashSet<int>> equivalentLabels) {
-            /* URGENT TODO:
-            When creating the main forest, I add constraints for the first column after all other constraints. This means
-            that I don't know which index corresponds to the tree that should be first used.
-            I tried to swap the order to have it at the first index, therefore it would always remain at the first index
-            even during tree duplicate removal etc., but doing so broke all tests.
-            I need to find out how to move it to the first index and not break everything, which will probably involve adjusting
-            some of the tests.
-            */
-
             // TODO: this
 
             /* NOTE: Due to the lack of special forests for the first and last row, all images labeled with the
@@ -26,72 +17,72 @@ namespace Spaghetti_Labeling
             */
             Debug.Assert(input.Count % 2 == 0);
 
-            List<Tree> mainForest = ForestCreator.MainForest(ODTree.GetTree);
-            (List<Tree> endForestEvenTrees, List<List<int>> endForestEvenIndices) = SplitList(ForestCreator.EndForest(mainForest, true));
-            (List<Tree> endForestOddTrees, List<List<int>> endForestOddIndices) = SplitList(ForestCreator.EndForest(mainForest, false));
-
-            MainGraph mainGraph = new MainGraph(mainForest, endForestEvenIndices, endForestOddIndices);
-            Graph endGraphEven = new Graph(endForestEvenTrees);
-            Graph endGraphOdd = new Graph(endForestOddTrees);
-
+            GraphManager gm = new GraphManager();
 
             int width = input[0].Count;
             int height = input.Count;
             Image output = new Image(InitMatrixWithZeroes(width, height));
 
             for (int y = 0; y < height; y += 2) {
-                
-                    if (y == 0) {
-                        // First row
-                        // currently does nothing. First implement middle rows, then this.
-                    } 
-                    else if (y != height - 1) {
-                        // Middle rows
-                        // TODO: 
-                        //SpaghettiLabelBlocksInRow()
-                        
-                        /*
-                        if (not last column) {
-                            use main tree
-                        } else {
-                            use corresponding end tree
-                        }
-                        */
-
-                    }
-                    else {
-                        // Last row
-                        // currently does nothing. First implement middle rows and first row, then this.
-                    }
+                if (y == 0) {
+                    // First row
+                    // currently does nothing. First implement middle rows, then this.
+                } 
+                else if (y != height - 1) {
+                    // Middle rows
+                    // TODO: 
+                    //SpaghettiLabelBlocksInRow()
+                    
+                    SpaghettiLabelBlocksInMiddleRow(gm, input, output, y);
+                }
+                else {
+                    // Last row
+                    // currently does nothing. First implement middle rows and first row, then this.
+                }
             }
 
             return null;
         }
 
-        private static (List<Tree>, List<List<int>>) SplitList(List<(Tree, List<int>)> endForest) {
-            List<Tree> trees = new List<Tree>();
-            List<List<int>> indicesList = new List<List<int>>();
-            foreach ((Tree tree, List<int> indices) in endForest) {
-                trees.Add(tree);
-                indicesList.Add(indices);
-            }
-            return (trees, indicesList);
-        }
 
-        private static void SpaghettiLabelBlocksInMiddleRow(Image image, int y) {
+        private static void SpaghettiLabelBlocksInMiddleRow(GraphManager gm, List<List<int>> input, Image output, int y) {
             // row y means that pixels at positions y and y+1 will be labeled
-            int width = image.GetMatrix()[0].Count;
+            int width = input[0].Count;
+            int nextTreeIndex = gm.GetStartTreeIndex();
+            int action = -1;
             for (int x = 0; x < width; x += 2) {
-                SpaghettiLabelMiddleBlock(666, x, y, width);
+                if (x < width - 2) {
+                    // Use main tree
+                    (action, nextTreeIndex) = GetActionAndNextTreeIndex(gm.GetMainGraphRoot(nextTreeIndex), input, x, y);
+                } else {
+                    if (x == width - 2) {
+                        // Use even tree
+
+                    } else {
+                        // Use odd tree
+
+                        // (...)
+                    }
+                }
+                //SpaghettiLabelMiddleBlock(input, image, 666, x, y, width);
             }
         }
 
-        private static int SpaghettiLabelMiddleBlock(int treeIndex, int x, int y, int width) {
+        private static (int, int) GetActionAndNextTreeIndex(AbstractNode node, List<List<int>> input, int x, int y) {
+            // Recursively traverses tree from a given node based on the "input" matrix and returns a tuple containing the 
+            // action to be performed and next tree index
+
+            return (-1, -1);
+        }
+
+        /*
+        private static int SpaghettiLabelMiddleBlock(List<List<int>> input, Image image, int treeIndex, int x, int y, int width) {
             // Labels the 2x2 block, with x and y being the upper left corner of the block.
             // Returns the index of the next tree to be used.
 
             return 0;
         }
+        */
 
         public static Image SpaghettiCCL(List<List<int>> binaryImage) {
             return CCL(binaryImage, SpaghettiAssignLabels);
@@ -114,7 +105,6 @@ namespace Spaghetti_Labeling
                                                      List<HashSet<int>> equivalentLabels) {
             int width = input[0].Count;
             int height = input.Count;
-            //List<List<int>> output = ;
             Image image = new Image(InitMatrixWithZeroes(width, height));
             int highestLabel = 0;
             for (int y = 0; y < height; y++) {
@@ -221,7 +211,7 @@ namespace Spaghetti_Labeling
         public static class Tests 
         {
             public static void Run() {
-                //TestClassicCCL();
+                //TestClassicCCL();         // TEMPORARILY COMMENTED OUT
             }
 
             private static void TestClassicCCL() {

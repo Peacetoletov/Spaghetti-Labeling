@@ -10,21 +10,22 @@ namespace Spaghetti_Labeling
         // Observations: Main forest is reduced to just 13 trees. End forest even also constains 13 trees, 
         // end forest odd is further reduced to 9 trees. Odd trees also have a very small number of nodes (17 at most).
 
-        public static List<Tree> MainForest(Func<Tree> newTree) {
+        public static (List<Tree>, int) MainForest(Func<Tree> newTree) {
             // Creates a forest of reduced trees with merged identical branches, removes duplicate trees
             // and assigns an index of the next tree to each leaf of each tree.
 
             List<HashSet<(char, bool)>> constraintsList = MainTreesConstraints(newTree);
             List<Tree> forest = CreateForestOfReducedTrees(newTree, constraintsList);
+            Tree startTree = forest[forest.Count - 1];      // Start tree constraints are added last, therefore start tree will be at the last index
             MergeIdenticalBranches(forest);
             RemoveDuplicateMainTrees(forest);
             
-            return forest;
+            return (forest, GetStartTreeIndex(startTree, forest));
         }
 
         public static List<(Tree, List<int>)> EndForest(List<Tree> mainForest, bool even) {
             // Returns a list of end trees together with indices of all main trees that each 
-            // end tree is associated with.
+            // end tree is associated with (these indices start at 1).
             // Parameter even determined the type of end forest to be created (even/odd).
 
             /*
@@ -57,6 +58,17 @@ namespace Spaghetti_Labeling
             return endTreesWithMainTreeIndices;
         }
 
+        private static int GetStartTreeIndex(Tree startTree, List<Tree> forest) {
+            for (int i = 0; i < forest.Count; i++) {
+                if (startTree == forest[i]) {
+                    //Console.WriteLine("Start tree has index {0}", i);
+                    // Start tree has index 12 (which is the last index, as expected)
+                    return i;
+                }
+            }
+            throw new NotSupportedException("Critical error: Start tree not found.");
+        }
+
         private static HashSet<(char, bool)> EndEvenConstraints() {
             return new HashSet<(char, bool)> {
                 ('e', false), ('f', false), ('k', false), ('l', false),
@@ -80,9 +92,8 @@ namespace Spaghetti_Labeling
 
         private static List<HashSet<(char, bool)>> MainTreesConstraints(Func<Tree> newTree) {
             List<HashSet<(char, bool)>> constraintsList = new List<HashSet<(char, bool)>>();
-            //constraintsList.Add(RowBeginningConstraints());
             GatherConstraints(newTree().GetRoot(), new HashSet<(char, bool)>(), constraintsList);
-            constraintsList.Add(RowBeginningConstraints());       // moved before other constraints
+            constraintsList.Add(RowBeginningConstraints());
             return constraintsList;
         }
 
@@ -311,7 +322,7 @@ namespace Spaghetti_Labeling
                 from any leaf.
                 */
 
-                List<Tree> forest = MainForest(ODTree.GetTree);
+                (List<Tree> forest, int _) = MainForest(ODTree.GetTree);
 
                 HashSet<int> unusedIncides = new HashSet<int>();
                 for (int i = 1; i < forest.Count; i++) {
@@ -344,15 +355,14 @@ namespace Spaghetti_Labeling
 
             private static void TestPage5Tree() {
                 // Tests if one of my reduced trees exactly matches the one on page 5 of the Spaghetti paper
-                List<Tree> forest = MainForest(ODTree.GetTree);
+                (List<Tree> forest, int _) = MainForest(ODTree.GetTree);
                 Tree refTree = TestTrees.Tree11();
 
-
-                
                 bool matches = false;
                 foreach (Tree reduced in forest) {
                     if (reduced.IsEqual(refTree)) {
                         matches = true;
+                        // Tree at index 4 is matching the page 5 tree.
                         break;
                     }
                 }
