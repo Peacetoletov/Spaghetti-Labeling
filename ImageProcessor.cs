@@ -9,6 +9,12 @@ namespace Spaghetti_Labeling
         private static Image SpaghettiAssignLabels(List<List<int>> input,  
                                                    List<HashSet<int>> equivalentLabels) {
             // TODO: this
+            /* UPDATED TODO:
+               Implement the basic version (only labeling middle rows, requiring the first 2 rows of pixels to
+               be filled with 0s and the number of rows to be even), then thoroughly test every part of the
+               labeling process. Some tests can be automated, other parts will do with just manual tests.
+               After this is done, I may implement the rest, depending on how much time I will have.
+            */
 
             /* NOTE: Due to the lack of special forests for the first and last row, all images labeled with the
             Spaghetti algortihm are required to have first 2 rows filled with background pixels and the number
@@ -30,13 +36,13 @@ namespace Spaghetti_Labeling
                 } 
                 else if (y != height - 1) {
                     // Middle rows
-                    // TODO: 
+                    // TODO: ???
                     //SpaghettiLabelBlocksInRow()
                     
                     SpaghettiLabelBlocksInMiddleRow(gm, input, output, y);
                 }
                 else {
-                    // Last row
+                    // Last row (only used in images with an odd number of rows)
                     // currently does nothing. First implement middle rows and first row, then this.
                 }
             }
@@ -71,6 +77,8 @@ namespace Spaghetti_Labeling
         private static (int, int) GetActionAndNextTreeIndex(AbstractNode node, List<List<int>> input, int x, int y) {
             // Recursively traverses tree from a given node based on the "input" matrix and returns a tuple containing the 
             // action to be performed and next tree index
+
+            // TODO: this function is not implemented. Implement it.
 
             return (-1, -1);
         }
