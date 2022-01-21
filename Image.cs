@@ -91,23 +91,23 @@ namespace Spaghetti_Labeling
 
             public static Image BinaryImage2() {
                 return new Image(StringifiedToBinary(new List<string> {
-                    ".............",
-                    ".............",
-                    "x.x.x.x.x.x.x",
-                    ".x...x.x...x.",
-                    "..x.x...x.x..",
-                    "x..x........."
+                    "..............",
+                    "..............",
+                    "x.x.x.x.x.x.x.",
+                    ".x...x.x...x..",
+                    "..x.x...x.x...",
+                    "x..x.........."
                 }));
             }
 
             public static Image LabeledImage2() {
                 List<List<int>> labeled = new List<List<int>>();
-                labeled.Add(new List<int> {0,0,0,0,0,0,0,0,0,0,0,0,0});
-                labeled.Add(new List<int> {0,0,0,0,0,0,0,0,0,0,0,0,0});
-                labeled.Add(new List<int> {1,0,1,0,1,0,1,0,1,0,2,0,2});
-                labeled.Add(new List<int> {0,1,0,0,0,1,0,1,0,0,0,2,0});
-                labeled.Add(new List<int> {0,0,1,0,1,0,0,0,1,0,2,0,0});
-                labeled.Add(new List<int> {3,0,0,1,0,0,0,0,0,0,0,0,0});
+                labeled.Add(new List<int> {0,0,0,0,0,0,0,0,0,0,0,0,0,0});
+                labeled.Add(new List<int> {0,0,0,0,0,0,0,0,0,0,0,0,0,0});
+                labeled.Add(new List<int> {1,0,1,0,1,0,1,0,1,0,2,0,2,0});
+                labeled.Add(new List<int> {0,1,0,0,0,1,0,1,0,0,0,2,0,0});
+                labeled.Add(new List<int> {0,0,1,0,1,0,0,0,1,0,2,0,0,0});
+                labeled.Add(new List<int> {3,0,0,1,0,0,0,0,0,0,0,0,0,0});
                 return new Image(labeled);
             }
         }

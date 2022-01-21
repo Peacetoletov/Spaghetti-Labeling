@@ -28,17 +28,19 @@ namespace Spaghetti_Labeling
             int width = input[0].Count;
             int height = input.Count;
             Image output = new Image(InitMatrixWithZeroes(width, height));
+            Console.WriteLine("Initiated spaghetti labeling");
 
             for (int y = 0; y < height; y += 2) {
                 if (y == 0) {
                     // First row
                     // currently does nothing. First implement middle rows, then this.
+                    Console.WriteLine("Skipping blocks in row 0.");
                 } 
                 else if (y != height - 1) {
                     // Middle rows
                     // TODO: ???
                     //SpaghettiLabelBlocksInRow()
-                    
+                    Console.WriteLine("Beginning labeling blocks in row {0}", y);
                     SpaghettiLabelBlocksInMiddleRow(gm, input, output, y);
                 }
                 else {
@@ -57,10 +59,25 @@ namespace Spaghetti_Labeling
             int nextTreeIndex = gm.GetStartTreeIndex();
             int action = -1;
             for (int x = 0; x < width; x += 2) {
+                Console.Write("Block in column {0}. ", x);
                 if (x < width - 2) {
                     // Use main tree
+                    Console.Write("Using main tree with index {0}. ", nextTreeIndex);
                     (action, nextTreeIndex) = GetActionAndNextTreeIndex(gm.GetMainGraphRoot(nextTreeIndex), input, x, y);
+                    Console.WriteLine("Chosen action: {0}", action);
+                    // TODO: manually test if the chosen action is correct (this will require some pen and paper)
+                    /*
+                    IMPORTANT: MANUAL TESTS ARE FAILING. In BinaryImage2, block at row 4, column 2 results in action 6 being chosen,
+                    when clearly that block and the one on the left have no connected pixels. Something must be wrong. 
+                    Start by printing out tree with index 7, as that is the one that is used on that block.
+                    */
+
+                    
+                    // TODO: perform the chosen action
+                    
+
                 } else {
+                    Console.WriteLine("End of row. End trees not implemented yet, doing nothing.");
                     if (x == width - 2) {
                         // Use even tree
 
@@ -74,13 +91,120 @@ namespace Spaghetti_Labeling
             }
         }
 
-        private static (int, int) GetActionAndNextTreeIndex(AbstractNode node, List<List<int>> input, int x, int y) {
-            // Recursively traverses tree from a given node based on the "input" matrix and returns a tuple containing the 
+        /*
+        // Turns out I don't need this method.
+        private static bool DoesBlockContainForegroundPixels(char block, int x, int y, List<List<int>> input) {
+            //Block layout:
+            //    __________
+            //   | P | Q | R |
+            //   |___|___|___|
+            //   | S | X |
+            //   |___|___|
+            int xOffset;
+            int yOffset;
+            switch (block) {
+                case 'P':
+                    xOffset = -2;
+                    yOffset = -2;
+                    break;
+                case 'Q':
+                    xOffset = 0;
+                    yOffset = -2;
+                    break;
+                case 'R':
+                    xOffset = 2;
+                    yOffset = -2;
+                    break;
+                case 'S':
+                    xOffset = -2;
+                    yOffset = 0;
+                    break;
+                case 'X':
+                    xOffset = 0;
+                    yOffset = 0;
+                    break;
+                default:
+                    throw new NotSupportedException("Critical error: block not found.");
+            }
+            x += xOffset;
+            y += yOffset;
+            return input[y][x] == 1 || input[y + 1][x] == 1 || input[y][x + 1] == 1 || input[y + 1][x + 1] == 1;
+        }
+        */
+
+        private static (int, int) GetActionAndNextTreeIndex(AbstractNode root, List<List<int>> input, int x, int y) {
+            // Traverses the tree from a given node based on the "input" matrix and returns a tuple containing the 
             // action to be performed and next tree index
+            AbstractNode curNode = root;
+            while (curNode is Node) {
+                if (ConditionToPixelValue(((Node) curNode).GetCondition(), x, y, input) == 0) {
+                    curNode = ((Node) curNode).GetLeft();
+                } else {
+                    curNode = ((Node) curNode).GetRight();
+                }
+            }
+            // curNode now contains the correct leaf based on the pixels in surrounding blocks
+            int action = GetAnyHashsetElement(((Leaf) curNode).GetActions());
+            int nextTreeIndex = ((Leaf) curNode).GetNextTreeIndex();
 
-            // TODO: this function is not implemented. Implement it.
+            return (action, nextTreeIndex);
+        }
 
-            return (-1, -1);
+        private static T GetAnyHashsetElement<T>(HashSet<T> set) {
+            // This is probably super dumb but I couldn't find a built-in method that does this
+            foreach (T elem in set) {
+                return elem;
+            }
+            throw new IndexOutOfRangeException("Set must not be empty!");
+        }
+
+        private static int ConditionToPixelValue(char condition, int x, int y, List<List<int>> input) {
+            // Takes a node condition (given by a char in range a-t) and the current position of a block (corresponding to the 'o' char
+            // of the block) and returns the value of the pixel at the position specified by the condition.
+            switch (condition) {
+                case 'a':
+                    return input[y - 2][x - 2];
+                case 'b':
+                    return input[y - 2][x - 1];
+                case 'c':
+                    return input[y - 2][x];
+                case 'd':
+                    return input[y - 2][x + 1];
+                case 'e':
+                    return input[y - 2][x + 2];
+                case 'f':
+                    return input[y - 2][x + 3];
+                case 'g':
+                    return input[y - 1][x - 2];
+                case 'h':
+                    return input[y - 1][x - 1];
+                case 'i':
+                    return input[y - 1][x];
+                case 'j':
+                    return input[y - 1][x + 1];
+                case 'k':
+                    return input[y - 1][x + 2];
+                case 'l':
+                    return input[y - 1][x + 3];
+                case 'm':
+                    return input[y][x - 2];
+                case 'n':
+                    return input[y][x - 1];
+                case 'o':
+                    return input[y][x];
+                case 'p':
+                    return input[y][x + 1];
+                case 'q':
+                    return input[y + 1][x - 2];
+                case 'r':
+                    return input[y + 1][x - 1];
+                case 's':
+                    return input[y + 1][x];
+                case 't':
+                    return input[y + 1][x + 1];
+                default:
+                    throw new NotSupportedException("Critical error: condition not found.");
+            }
         }
 
         /*

@@ -29,7 +29,7 @@ namespace Spaghetti_Labeling
             Graph mainGraph = new Graph(mainForest);
             */
 
-            ImageProcessor.SpaghettiCCL(Image.TestImages.BinaryImage1().GetMatrix());
+            ImageProcessor.SpaghettiCCL(Image.TestImages.BinaryImage2().GetMatrix());
 
             RunTests();
         }
