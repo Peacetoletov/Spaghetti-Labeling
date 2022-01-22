@@ -53,8 +53,8 @@ namespace Spaghetti_Labeling
             return startTreeIndex;
         }
 
-        public AbstractNode GetMainGraphRoot(int index) {
-            return mainGraph.GetRoot(index);
+        public AbstractNode AdjustIndexAndGetMainGraphRoot(int index) {
+            return mainGraph.GetRoot(index - 1);
         }
 
         public AbstractNode GetEndGraphEvenRoot(int index) {

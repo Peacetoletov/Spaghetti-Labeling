@@ -19,6 +19,8 @@ namespace Spaghetti_Labeling
             Tree startTree = forest[forest.Count - 1];      // Start tree constraints are added last, therefore start tree will be at the last index
             MergeIdenticalBranches(forest);
             RemoveDuplicateMainTrees(forest);
+
+
             
             return (forest, GetStartTreeIndex(startTree, forest));
         }
@@ -63,7 +65,9 @@ namespace Spaghetti_Labeling
                 if (startTree == forest[i]) {
                     //Console.WriteLine("Start tree has index {0}", i);
                     // Start tree has index 12 (which is the last index, as expected)
-                    return i;
+                    // 1 is added to the index to adjust for the fact that in tree leaves, next tree indices start at 1,
+                    // therefore 13 is returned
+                    return i + 1;
                 }
             }
             throw new NotSupportedException("Critical error: Start tree not found.");

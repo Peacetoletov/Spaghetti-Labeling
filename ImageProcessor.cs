@@ -63,13 +63,28 @@ namespace Spaghetti_Labeling
                 if (x < width - 2) {
                     // Use main tree
                     Console.Write("Using main tree with index {0}. ", nextTreeIndex);
-                    (action, nextTreeIndex) = GetActionAndNextTreeIndex(gm.GetMainGraphRoot(nextTreeIndex), input, x, y);
+                    (action, nextTreeIndex) = GetActionAndNextTreeIndex(gm.AdjustIndexAndGetMainGraphRoot(nextTreeIndex), input, x, y);
                     Console.WriteLine("Chosen action: {0}", action);
                     // TODO: manually test if the chosen action is correct (this will require some pen and paper)
                     /*
                     IMPORTANT: MANUAL TESTS ARE FAILING. In BinaryImage2, block at row 4, column 2 results in action 6 being chosen,
                     when clearly that block and the one on the left have no connected pixels. Something must be wrong. 
                     Start by printing out tree with index 7, as that is the one that is used on that block.
+
+                    UPDATE: I drew the tree with index 7 on paper and it looks scuffed. I need to find out what happened when during the
+                    creation of this tree.
+                    */
+                    /*
+                    if (nextTreeIndex == 7) {
+                        gm.AdjustIndexAndGetMainGraphRoot(nextTreeIndex).AssignVisitedInSubtree(false);
+                        gm.AdjustIndexAndGetMainGraphRoot(nextTreeIndex).InfoDFS();
+                    }
+                    */
+                    /*
+                    for (int i = 0; i < 100; i++) {
+                        Console.WriteLine("Trying to get tree with index {0}", i);
+                        gm.GetMainGraphRoot(i);
+                    }
                     */
 
                     
