@@ -110,6 +110,51 @@ namespace Spaghetti_Labeling
                 labeled.Add(new List<int> {3,0,0,1,0,0,0,0,0,0,0,0,0,0});
                 return new Image(labeled);
             }
+
+            public static Image BinaryImage3() {
+                // This image contains all possible action results
+                return new Image(StringifiedToBinary(new List<string> {
+                    "........",     // skip the first 2 rows
+                    "........",
+                    "xxx.....",     // 2 - new label, 6 - assign x = s, 1 - no action
+                    "xx......",
+                    "..xx....",     // 3 - assign x = p
+                    "..xx....",     
+                    ".x.x....",     // 5 - assign x = r, 4 - assign x = q
+                    ".x.x....",
+                    "........",
+                    ".x..x...",
+                    "..xx....",     // 8 - merge x = p + r
+                    "........",
+                    "....x...", 
+                    "....x...",
+                    "...x....",     // 12 - merge x = r + s 
+                    "xxx.....",                   
+                }));
+
+                // IMPORTANT - when I run CCL, instead of choosing actions 8 and 12, actions 7 and 11 are chosen instead. FIX ASAP!
+            }
+
+            public static Image LabeledImage3() {
+                List<List<int>> labeled = new List<List<int>>();
+                labeled.Add(new List<int> {0,0,0,0,0,0,0,0});
+                labeled.Add(new List<int> {0,0,0,0,0,0,0,0});
+                labeled.Add(new List<int> {1,1,1,0,0,0,0,0});
+                labeled.Add(new List<int> {1,1,0,0,0,0,0,0});
+                labeled.Add(new List<int> {0,0,1,1,0,0,0,0});
+                labeled.Add(new List<int> {0,0,1,1,0,0,0,0});
+                labeled.Add(new List<int> {0,1,0,1,0,0,0,0});
+                labeled.Add(new List<int> {0,1,0,1,0,0,0,0});
+                labeled.Add(new List<int> {0,0,0,0,0,0,0,0});
+                labeled.Add(new List<int> {0,2,0,2,0,0,0,0});
+                labeled.Add(new List<int> {0,0,2,0,0,0,0,0});
+                labeled.Add(new List<int> {0,0,2,0,0,0,0,0});
+                labeled.Add(new List<int> {0,0,0,0,3,0,0,0});
+                labeled.Add(new List<int> {0,0,0,0,3,0,0,0});
+                labeled.Add(new List<int> {0,0,0,3,0,0,0,0});
+                labeled.Add(new List<int> {3,3,3,0,0,0,0,0});
+                return new Image(labeled);
+            }
         }
     }
 }

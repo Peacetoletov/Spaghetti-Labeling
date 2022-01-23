@@ -30,6 +30,23 @@ namespace Spaghetti_Labeling
             Image output = new Image(InitMatrixWithZeroes(width, height));
             Console.WriteLine("Initiated spaghetti labeling");
 
+            /*
+            //test
+            gm.AdjustIndexAndGetMainGraphRoot(1).AssignVisitedInSubtree(false);
+            gm.AdjustIndexAndGetMainGraphRoot(1).InfoDFS();
+            */
+
+            /*
+            VERY URGENT TODO:
+            Some trees are wrong. Certainly tree 1, likely tree 8, maybe other trees too.
+            I'm not sure where the problem is coming from, possibly from merging multiple trees into one graph.
+            First, check if tree 1 is correctly created from the ODTree. If it is ok, then try to look at the 
+            procedure that turns trees into a graph and find whether something is wrong there or not.
+
+            Update: Confirmed, ODTree is converted to tree 1 correctly. The issue must be in converting 13 trees
+            into 1 DRAG.
+            */
+
             for (int y = 0; y < height; y += 2) {
                 if (y == 0) {
                     // First row
@@ -74,18 +91,8 @@ namespace Spaghetti_Labeling
                     UPDATE: I drew the tree with index 7 on paper and it looks scuffed. I need to find out what happened when during the
                     creation of this tree.
                     */
-                    /*
-                    if (nextTreeIndex == 7) {
-                        gm.AdjustIndexAndGetMainGraphRoot(nextTreeIndex).AssignVisitedInSubtree(false);
-                        gm.AdjustIndexAndGetMainGraphRoot(nextTreeIndex).InfoDFS();
-                    }
-                    */
-                    /*
-                    for (int i = 0; i < 100; i++) {
-                        Console.WriteLine("Trying to get tree with index {0}", i);
-                        gm.GetMainGraphRoot(i);
-                    }
-                    */
+                    
+                    // TODO: Create a new binary image for testing that causes each action to be performed
 
                     
                     // TODO: perform the chosen action
