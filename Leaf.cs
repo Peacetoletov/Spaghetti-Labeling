@@ -99,6 +99,10 @@ namespace Spaghetti_Labeling
             return "";          // return empty string in end trees
         }
 
+        public override List<HashSet<int>> GatherActions() {
+            return new List<HashSet<int>> { actions };
+        }
+
         public override void AssignVisitedInSubtree(bool visited) {
             SetVisited(visited);
         }

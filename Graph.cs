@@ -43,15 +43,21 @@ namespace Spaghetti_Labeling
             // Merge equal subtrees
             MergeEqualSubtrees(forest);            // this is working correctly
 
-            /*
-            roots[0].AssignVisitedInSubtree(false);
             Console.WriteLine("\nPRINTING\n");
             roots[0].InfoDFS();
-            */
+
+            
+            //Console.WriteLine("\nPRINTING\n");
+            //roots[0].InfoDFS();
+            // CORRECTION: this is in fact NOT working correctly, as some nodes have over 200 parents, wtf?
+            // UPDATE: WTF! I "fixed" the method and now it's even worse than before, the MergeEqualSubtrees results in incorrect merging.
+            
 
             // Merge equivalent subtrees
-            MergeEquivalentSubtrees(forest);        // this is not working correctly
+            //MergeEquivalentSubtrees(forest);        // this is not working correctly
+            // ^ currently commented out because I need to first figure out why some nodes have over 200 parents after merging equal subtrees 
 
+            
             // CONFIRMED: During the MergeEquivalentSubtrees procedure, something goes wrong and parts of trees are incorrectly merged.
             // Fix this ASAP.
         }
@@ -61,6 +67,37 @@ namespace Spaghetti_Labeling
             the left (right) subtree of the second node with the left (right) subtree of the first node.
             */
             List<AbstractNode> nodes = GetUniqueNodes(forest);
+            //Console.WriteLine("After gathering all unique nodes, I have {0} of them.", nodes.Count);
+
+            for (int i = 0; i < nodes.Count - 1; i++) {
+                for (int j = i + 1; j < nodes.Count; j++) {
+                    if (nodes[i].IsEqual(nodes[j])) {
+                        List<HashSet<int>> actions1 = nodes[i].GatherActions();
+                        // Beginning of test code - verify that both lists of actions are the same 
+                        List<HashSet<int>> actions2 = nodes[j].GatherActions();
+                        Debug.Assert(actions1.Count == actions2.Count);
+                        for (int k = 0; k < actions1.Count; k++) {
+                            Debug.Assert(actions1[k].SetEquals(actions2[k]));
+                        }   // End of test code
+                        
+                        SubstituteSubtree(nodes[i], nodes[j], actions1);
+                    }
+                    // TODO: Update this method's description
+                    // MORE URGENT TODO: Find out what's wrong and fix it, because my rework of this method made it even less correct.
+                }
+            }
+
+            
+            // Remove references (in "parents" lists) to trees which were substituted away
+            foreach (Tree tree in forest) {
+                RemoveReferencesToSubstitutedTrees(tree.GetRoot());
+            }
+            // ^^ I'm not sure if this is necessary here. It is necessary when resolving equivalent subtrees but I don't think it is
+            // necessary here. I'll keep it just in case because it shouldn't do any harm.
+            
+
+            /*
+            // Backup of the old code
             for (int i = 0; i < nodes.Count - 1; i++) {
                 for (int j = i + 1; j < nodes.Count; j++) {
                     if (nodes[i] is Leaf || nodes[j] is Leaf) {
@@ -69,6 +106,7 @@ namespace Spaghetti_Labeling
                     }
                     Node node1 = (Node) nodes[i];
                     Node node2 = (Node) nodes[j];
+                    // THE FOLLOWING IF STATEMENTS NEED TO BE FIXED, AS THEY CURRENTLY DON'T WORK CORRECTLY!
                     if (node1.GetLeft().IsEqual(node2.GetLeft())) {
                         //Console.WriteLine("Left subtree of node " + i + " is equal to the left subtree of node " + j);
                         node2.SetLeft(node1.GetLeft());
@@ -78,6 +116,7 @@ namespace Spaghetti_Labeling
                     }
                 }
             }
+            */            
         }
 
         public void MergeEquivalentSubtrees(List<Tree> forest) {
@@ -192,7 +231,8 @@ namespace Spaghetti_Labeling
                     if (!ContainsEmptySet(intersectedActionsList)) {
                         // Two subtrees are compatible and one can be substituted with the other
                         //Console.WriteLine("SUBSTITUTING!");
-                        SubstituteSubtree(st1.GetRoot(), st2.GetRoot(), intersectedActionsList, i == 240);
+                        //SubstituteSubtree(st1.GetRoot(), st2.GetRoot(), intersectedActionsList, i == 240);
+                        SubstituteSubtree(st1.GetRoot(), st2.GetRoot(), intersectedActionsList);
                     } else {
                         //Console.WriteLine("Skipping subtree with an empty intersection of actions");
                     }
@@ -203,6 +243,7 @@ namespace Spaghetti_Labeling
             foreach (Tree tree in forest) {
                 RemoveReferencesToSubstitutedTrees(tree.GetRoot());
             }
+            
             
             /*
             // Backup of old code 
@@ -311,12 +352,21 @@ namespace Spaghetti_Labeling
             foreach (Tree tree in forest) {
                 tree.GetRoot().AssignVisitedInSubtree(false);
             }
+            
             List<AbstractNode> nodes = new List<AbstractNode>();
             foreach (Tree tree in forest) {
                 List<AbstractNode> curTreeNodes = new List<AbstractNode>();
                 AddUniqueNodesOfSubtreeToList(tree.GetRoot(), curTreeNodes);
                 nodes.AddRange(curTreeNodes);
+                //Console.WriteLine("Tree has {0} nodes.", curTreeNodes.Count);
             }
+
+            // To preserve the original state, each node's "visited" property is set to false again. This has
+            // no impact on the actual functionality but helps with testing and debugging.
+            foreach (Tree tree in forest) {
+                tree.GetRoot().AssignVisitedInSubtree(false);
+            }
+
             return nodes;
         }
 

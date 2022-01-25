@@ -147,7 +147,17 @@ namespace Spaghetti_Labeling
                 return;
             }
             SetVisited(true);
-            Console.WriteLine("Going through node " + GetName() + " (" + condition + ") into the left subtree");
+            //Console.WriteLine("In node " + GetName() + " (" + condition + "). Going into the left subtree");
+            Console.Write("In node " + GetName() + " (" + condition + "). ");
+            if (GetParents().Count > 1) {
+                string parentsMessage = "This node has " + GetParents().Count + " parents:";
+                foreach (Node parent in GetParents()) {
+                    parentsMessage += " " + parent.GetCondition();
+                }
+                parentsMessage += ". ";
+                Console.Write(parentsMessage);
+            }
+            Console.WriteLine("Going into the left subtree");
             left.DFS_Rec();
             Console.WriteLine("Back in node " + GetName() + " (" + condition + "). Going into the right subtree");
             right.DFS_Rec();
@@ -186,6 +196,12 @@ namespace Spaghetti_Labeling
         public override string Stringify() {
             //return condition.ToString() + "(" + left.Stringify() + ")(" + right.Stringify() + ")";
             return String.Format("{0}({1})({2})", condition, left.Stringify(), right.Stringify());        
+        }
+
+        public override List<HashSet<int>> GatherActions() {
+            List<HashSet<int>> actions = left.GatherActions();
+            actions.AddRange(right.GatherActions());
+            return actions;
         }
 
         public override void AssignVisitedInSubtree(bool visited) {

@@ -8,14 +8,15 @@ namespace Spaghetti_Labeling
     {
         private readonly string tree;
         private readonly AbstractNode root;
-        private readonly List<HashSet<int>> actions = new List<HashSet<int>>();
-
+        private readonly List<HashSet<int>> actions;
         public StringifiedTree(AbstractNode abstractNode) {
             this.tree = abstractNode.Stringify();
             this.root = abstractNode;
-            AddActionsToList(abstractNode, actions);
+            this.actions = abstractNode.GatherActions();
+            //AddActionsToList(abstractNode, actions);
         }
 
+        /*
         private void AddActionsToList(AbstractNode abstractNode, List<HashSet<int>> actions) {
             if (abstractNode is Leaf) {
                 actions.Add(((Leaf) abstractNode).GetActions());
@@ -24,6 +25,7 @@ namespace Spaghetti_Labeling
                 AddActionsToList(((Node) abstractNode).GetRight(), actions);
             }
         }
+        */
 
         public int CompareTo(object obj) {
             if (obj == null) {

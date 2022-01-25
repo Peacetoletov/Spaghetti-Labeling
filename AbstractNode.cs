@@ -70,6 +70,8 @@ namespace Spaghetti_Labeling
 
         public abstract string Stringify();
 
+        public abstract List<HashSet<int>> GatherActions();
+
         public string GetName() {
             return name;
         }
