@@ -45,6 +45,8 @@ namespace Spaghetti_Labeling
 
             Update: Confirmed, ODTree is converted to tree 1 correctly. The issue must be in converting 13 trees
             into 1 DRAG.
+
+            Update 2: Confirmed, during the MergeEquivalentSubtrees procedure in Graph.cs, something goes wrong.
             */
 
             for (int y = 0; y < height; y += 2) {
@@ -90,6 +92,9 @@ namespace Spaghetti_Labeling
 
                     UPDATE: I drew the tree with index 7 on paper and it looks scuffed. I need to find out what happened when during the
                     creation of this tree.
+
+                    UPDATE 2: I fixed the bug that caused incorrect trees to be chosen, however the scuffed trees still persist and are
+                    causing additional problems.
                     */
                     
                     // TODO: Create a new binary image for testing that causes each action to be performed

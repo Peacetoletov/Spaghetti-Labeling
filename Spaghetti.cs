@@ -15,6 +15,9 @@ namespace Spaghetti_Labeling
         7) Actions, labeling, label equivalence resolution
         ...
         */
+
+        private const bool testing = false;
+
         static void Main(string[] args)
         {
             Console.WriteLine("Hello Bolelli!");
@@ -31,10 +34,18 @@ namespace Spaghetti_Labeling
 
             //ImageProcessor.SpaghettiCCL(Image.TestImages.BinaryImage3().GetMatrix());
 
-            (List<Tree> mainForest, int _) = ForestCreator.MainForest(ODTree.GetTree);
-            mainForest[0].GetRoot().InfoDFS();
+            //(List<Tree> mainForest, int _) = ForestCreator.MainForest(ODTree.GetTree);
+            //mainForest[0].GetRoot().InfoDFS();
 
-            RunTests();
+            //GraphManager gm = new GraphManager();
+            (List<Tree> mainForest, int _) = ForestCreator.MainForest(ODTree.GetTree);
+            Graph g = new Graph(mainForest);
+
+            if (testing) {
+                RunTests();
+            } else {
+                Console.WriteLine("WARNING: Tests are turned off.");
+            }            
         }
 
         private static void RunTests() {

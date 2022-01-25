@@ -15,7 +15,7 @@ namespace Spaghetti_Labeling
         public Graph(List<Tree> forest) {
 
             /*
-            Go through all node pairs (For each node of each tree, go thorugh all nodes of all trees) and
+            Go through all node pairs (For each node of each tree, go through all nodes of all trees) and
             check equality (NOT equivalence!). If the given subtrees are equal, replace the whole second
             subtree with the first subtree.
             This will be easier to implement if instead of replacing the current node, its children are replaced
@@ -41,10 +41,19 @@ namespace Spaghetti_Labeling
             */
 
             // Merge equal subtrees
-            MergeEqualSubtrees(forest);
+            MergeEqualSubtrees(forest);            // this is working correctly
+
+            /*
+            roots[0].AssignVisitedInSubtree(false);
+            Console.WriteLine("\nPRINTING\n");
+            roots[0].InfoDFS();
+            */
 
             // Merge equivalent subtrees
-            MergeEquivalentSubtrees(forest);
+            MergeEquivalentSubtrees(forest);        // this is not working correctly
+
+            // CONFIRMED: During the MergeEquivalentSubtrees procedure, something goes wrong and parts of trees are incorrectly merged.
+            // Fix this ASAP.
         }
 
         public void MergeEqualSubtrees(List<Tree> forest) {
@@ -109,7 +118,94 @@ namespace Spaghetti_Labeling
                 Console.WriteLine("Tree {0}: {1}", i, stringifiedTrees[i].GetTree());
             }
             */
+            
+            // The code above this comment will not be touched
 
+
+            /*
+            // Get the root of my problematic subtree
+            Node o = ((Node) forest[0].GetRoot());
+            Node j_ = (Node) (o.GetRight());
+            Node p = (Node) (j_.GetLeft());
+            Node k = (Node) (p.GetRight());
+            Node i_ = (Node) (k.GetRight());
+            Node problematicRoot = (Node) (i_.GetLeft());
+            Node problematicRight = (Node) (problematicRoot.GetRight());
+            */
+
+            for (int i = 0; i < stringifiedTrees.Count - 1; i++) {
+                StringifiedTree st1 = stringifiedTrees[i];
+
+                /*
+                // Get the root of my problematic subtree
+                o = ((Node) forest[0].GetRoot());
+                j_ = (Node) (o.GetRight());
+                p = (Node) (j_.GetLeft());
+                k = (Node) (p.GetRight());
+                i_ = (Node) (k.GetRight());
+                problematicRoot = (Node) (i_.GetLeft());
+                */
+                //problematicRoot.AssignVisitedInSubtree(false);
+                //problematicRoot.InfoDFS();
+                /*
+                if (i == 240) {
+                    Console.WriteLine("Start of iteration 240. Problematic subtree:");
+                    problematicRoot.AssignVisitedInSubtree(false);
+                    problematicRoot.InfoDFS();
+                } 
+                */
+                /*
+                if (problematicRoot.GetRight() != problematicRight) {
+                    Console.WriteLine("At the start of iteration {0}, subtree is incorrectly substituted", i);
+                }
+                */
+                /* IMPORTANT OBSERVATION: Starting at iteration 241, both subtrees of the problematic subtree are (incorrectly) equal.
+                Starting at iteration 240, the problematic subtree has the correct structure.
+
+                ANOTHER IMPORTANT OBSERVATION: When I looked at the number of parents the secondary trees have, the numbers seemed WAY too high.
+                I don't think it should be possible for one node to have more than 10 parents but some nodes had over 200 parents. It's possible
+                that the bug is caused by incorrectly keeping track of parent nodes. 
+                */
+
+                //Console.WriteLine("Iteration {0}. Primary subtree: {1}", i, st1.GetTree());
+
+                if (st1.GetRoot().GetSubstituted()) {
+                    // Skip already substituted primary subtrees
+                    //Console.WriteLine("Skipping already substituted primary subtree");
+                    continue;
+                }
+                for (int j = i + 1; j < stringifiedTrees.Count; j++) {
+                    StringifiedTree st2 = stringifiedTrees[j];
+                    //Console.WriteLine("Secondary subtree: {0}", st2.GetTree());
+                    // Skip already substituted secondary subtrees
+                    if (st2.GetRoot().GetSubstituted()) {
+                        //Console.WriteLine("Skipping already substituted secondary subtree");
+                        continue;
+                    }
+                    // Skip all subtrees with different strings
+                    if (st1.GetTree() != st2.GetTree()) {
+                        //Console.WriteLine("Skipping subtree with a different string");
+                        break;
+                    }
+                    // Skip subtrees with an empty intersection of actions 
+                    List<HashSet<int>> intersectedActionsList = st1.IntersectedActions(st2.GetActions());
+                    if (!ContainsEmptySet(intersectedActionsList)) {
+                        // Two subtrees are compatible and one can be substituted with the other
+                        //Console.WriteLine("SUBSTITUTING!");
+                        SubstituteSubtree(st1.GetRoot(), st2.GetRoot(), intersectedActionsList, i == 240);
+                    } else {
+                        //Console.WriteLine("Skipping subtree with an empty intersection of actions");
+                    }
+                }    
+            }
+
+            // Remove references (in "parents" lists) to trees which were substituted away
+            foreach (Tree tree in forest) {
+                RemoveReferencesToSubstitutedTrees(tree.GetRoot());
+            }
+            
+            /*
+            // Backup of old code 
             for (int i = 0; i < stringifiedTrees.Count - 1; i++) {
                 StringifiedTree st1 = stringifiedTrees[i];
                 if (st1.GetRoot().GetSubstituted()) {
@@ -139,6 +235,7 @@ namespace Spaghetti_Labeling
             foreach (Tree tree in forest) {
                 RemoveReferencesToSubstitutedTrees(tree.GetRoot());
             }
+            */
         }
 
         private bool ContainsEmptySet<T>(List<HashSet<T>> list) {
@@ -167,11 +264,19 @@ namespace Spaghetti_Labeling
         } 
 
         private void SubstituteSubtree(AbstractNode root1, AbstractNode root2,
-                                       List<HashSet<int>> intersectedActionsList) {
+                                       List<HashSet<int>> intersectedActionsList, bool debug=false) {
             // root2 will be substituted with (replaced by) root1
+
+            if (debug) {
+                Console.WriteLine("Possibly about to make an incorrect substitution");
+                Console.WriteLine("Tree 2 has {0} parents.", root2.GetParents().Count);
+            }
 
             // Change the graph structure
             foreach (Node parent in root2.GetParents()) {
+                if (debug) {
+                    Console.WriteLine("Parent of tree 2: {0}", parent.GetCondition());
+                }
                 if (root2.IsLeftChild(parent)) {
                     parent.SetLeft(root1);
                 } else {
