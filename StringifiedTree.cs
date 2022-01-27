@@ -84,6 +84,22 @@ namespace Spaghetti_Labeling
             return actions;
         }
 
+        public static string GetActionsListAsString(List<HashSet<int>> actionsList) {
+            // Used for debugging
+            string actionsAsString = "";
+            foreach (HashSet<int> actionsSet in actionsList) {
+                actionsAsString += "{";
+                foreach (int action in actionsSet) {
+                    actionsAsString += action;
+                    actionsAsString += ", ";
+                }
+                actionsAsString = actionsAsString.Remove(actionsAsString.Length - 2, 2);
+                actionsAsString += "}, ";
+            }
+            actionsAsString = actionsAsString.Remove(actionsAsString.Length - 2, 2);
+            return actionsAsString;
+        }
+
         public class Tests
         {
             public static void Run() {

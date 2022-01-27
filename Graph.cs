@@ -41,49 +41,41 @@ namespace Spaghetti_Labeling
             */
 
             // Merge equal subtrees
-            MergeEqualSubtrees(forest);            // this is working correctly
-
-            Console.WriteLine("\nPRINTING\n");
-            roots[0].InfoDFS();
-
-            
-            //Console.WriteLine("\nPRINTING\n");
-            //roots[0].InfoDFS();
-            // CORRECTION: this is in fact NOT working correctly, as some nodes have over 200 parents, wtf?
-            // UPDATE: WTF! I "fixed" the method and now it's even worse than before, the MergeEqualSubtrees results in incorrect merging.
-            
+            MergeEqualSubtrees(forest);            // this is now working correctly
 
             // Merge equivalent subtrees
-            //MergeEquivalentSubtrees(forest);        // this is not working correctly
-            // ^ currently commented out because I need to first figure out why some nodes have over 200 parents after merging equal subtrees 
+            MergeEquivalentSubtrees(forest);        // this is not working correctly
 
+            /*
+            Example of incorrect behavior: in tree 7, in leaf llrlr (path o-s-p-j-k-leaf), the leaf contains only action 5
+            after merging equal subtrees. However, after performing MergeEquivalentSubtrees(), the set of actions somehow
+            increases to actions 4, 5, 6. This is obviously wrong. 
+            */
+
+            //Console.WriteLine("\nPRINTING\n");
+            //roots[0].InfoDFS();
             
-            // CONFIRMED: During the MergeEquivalentSubtrees procedure, something goes wrong and parts of trees are incorrectly merged.
-            // Fix this ASAP.
+            // URGENT TODO: During the MergeEquivalentSubtrees procedure, something goes wrong and parts of trees are 
+            // incorrectly merged. Fix this ASAP.
         }
 
         public void MergeEqualSubtrees(List<Tree> forest) {
-            /* For each pair of inner nodes, check if their left (right) subtrees are equal. If so, replace 
-            the left (right) subtree of the second node with the left (right) subtree of the first node.
-            */
+            // For each pair of inner nodes, check if they are equal, and if so, substitute one with the other.
             List<AbstractNode> nodes = GetUniqueNodes(forest);
-            //Console.WriteLine("After gathering all unique nodes, I have {0} of them.", nodes.Count);
-
             for (int i = 0; i < nodes.Count - 1; i++) {
                 for (int j = i + 1; j < nodes.Count; j++) {
-                    if (nodes[i].IsEqual(nodes[j])) {
+                    if (nodes[i].IsEqual(nodes[j]) && !nodes[i].GetSubstituted() && !nodes[j].GetSubstituted()) {
                         List<HashSet<int>> actions1 = nodes[i].GatherActions();
+                        SubstituteSubtree(nodes[i], nodes[j], actions1);
+                        /*
                         // Beginning of test code - verify that both lists of actions are the same 
                         List<HashSet<int>> actions2 = nodes[j].GatherActions();
                         Debug.Assert(actions1.Count == actions2.Count);
                         for (int k = 0; k < actions1.Count; k++) {
                             Debug.Assert(actions1[k].SetEquals(actions2[k]));
                         }   // End of test code
-                        
-                        SubstituteSubtree(nodes[i], nodes[j], actions1);
+                        */
                     }
-                    // TODO: Update this method's description
-                    // MORE URGENT TODO: Find out what's wrong and fix it, because my rework of this method made it even less correct.
                 }
             }
 
@@ -162,51 +154,50 @@ namespace Spaghetti_Labeling
 
 
             /*
-            // Get the root of my problematic subtree
+            // Get my problematic leaf
             Node o = ((Node) forest[0].GetRoot());
-            Node j_ = (Node) (o.GetRight());
-            Node p = (Node) (j_.GetLeft());
-            Node k = (Node) (p.GetRight());
+            Node s = (Node) (o.GetLeft());
+            Node p = (Node) (s.GetLeft());
+            Node j_ = (Node) (p.GetRight());
+            Node k = (Node) (j_.GetLeft());
             Node i_ = (Node) (k.GetRight());
-            Node problematicRoot = (Node) (i_.GetLeft());
-            Node problematicRight = (Node) (problematicRoot.GetRight());
+            Leaf leaf = (Leaf) (i_.GetLeft());
+            string actionsOld = StringifiedTree.GetActionsListAsString(leaf.GatherActions());
             */
 
             for (int i = 0; i < stringifiedTrees.Count - 1; i++) {
                 StringifiedTree st1 = stringifiedTrees[i];
 
                 /*
-                // Get the root of my problematic subtree
+                // Get my problematic leaf
                 o = ((Node) forest[0].GetRoot());
-                j_ = (Node) (o.GetRight());
-                p = (Node) (j_.GetLeft());
-                k = (Node) (p.GetRight());
+                s = (Node) (o.GetLeft());
+                p = (Node) (s.GetLeft());
+                j_ = (Node) (p.GetRight());
+                k = (Node) (j_.GetLeft());
                 i_ = (Node) (k.GetRight());
-                problematicRoot = (Node) (i_.GetLeft());
-                */
-                //problematicRoot.AssignVisitedInSubtree(false);
-                //problematicRoot.InfoDFS();
-                /*
-                if (i == 240) {
-                    Console.WriteLine("Start of iteration 240. Problematic subtree:");
-                    problematicRoot.AssignVisitedInSubtree(false);
-                    problematicRoot.InfoDFS();
-                } 
-                */
-                /*
-                if (problematicRoot.GetRight() != problematicRight) {
-                    Console.WriteLine("At the start of iteration {0}, subtree is incorrectly substituted", i);
+                Leaf leaf_new = (Leaf) (i_.GetLeft());
+                if (!leaf_old.GetActions().SetEquals(leaf_new.GetActions())) {
+                    Console.WriteLine("In iteration {0}, action set has changed.", i);
+                    leaf_old = leaf_new;
                 }
                 */
-                /* IMPORTANT OBSERVATION: Starting at iteration 241, both subtrees of the problematic subtree are (incorrectly) equal.
-                Starting at iteration 240, the problematic subtree has the correct structure.
 
-                ANOTHER IMPORTANT OBSERVATION: When I looked at the number of parents the secondary trees have, the numbers seemed WAY too high.
-                I don't think it should be possible for one node to have more than 10 parents but some nodes had over 200 parents. It's possible
-                that the bug is caused by incorrectly keeping track of parent nodes. 
+                /*
+                OBSERVATION: In iteration 219, the action set of tree at index 0 in leaf llrlrl (o-s-p-j-k-i-leaf) changes from {5}
+                to {4, 5, 6}, which is obviously incorrect behavior.
+                TODO: Find the cause and fix it. 
+
+                UPDATE: Something weird is going on. In iteratrion 219, two substitutions happen that change the problematic leaf's actions.
+                First, primary tree has actions {4, 5, 6} and secondary tree has actions {4, 5}, therefore the leaf's actions are changed
+                to {4, 5}. HOWEVER, this is completely wrong, because the primary tree should not be {4, 5, 6}, rather {5}. This must mean
+                that two completely unrelated leaves lead to changing my problematic leaf.
+                The same thing happens further in iteration 219. The same primary tree (with actions {4, 5, 6}) is now merged with a tree
+                with actions {3, 4, 5, 6}, which leads to intersection {4, 5, 6}. Again, these two unrelated leaves lead to the change
+                of a completely different leaf. What is going on?
                 */
 
-                //Console.WriteLine("Iteration {0}. Primary subtree: {1}", i, st1.GetTree());
+                //Console.WriteLine("Iteration {0}, primary tree: {1}", i, st1.GetTree());
 
                 if (st1.GetRoot().GetSubstituted()) {
                     // Skip already substituted primary subtrees
@@ -227,12 +218,30 @@ namespace Spaghetti_Labeling
                         break;
                     }
                     // Skip subtrees with an empty intersection of actions 
+                    Console.WriteLine("Primary tree actions: {0}. Secondary tree actions: {1}", StringifiedTree.GetActionsListAsString(st1.GetActions()),
+                                                                                                StringifiedTree.GetActionsListAsString(st2.GetActions()));
                     List<HashSet<int>> intersectedActionsList = st1.IntersectedActions(st2.GetActions());
                     if (!ContainsEmptySet(intersectedActionsList)) {
                         // Two subtrees are compatible and one can be substituted with the other
-                        //Console.WriteLine("SUBSTITUTING!");
-                        //SubstituteSubtree(st1.GetRoot(), st2.GetRoot(), intersectedActionsList, i == 240);
+                        //Console.WriteLine("SUBSTITUTING! Intersected actions list: {0}", StringifiedTree.GetActionsListAsString(intersectedActionsList));
                         SubstituteSubtree(st1.GetRoot(), st2.GetRoot(), intersectedActionsList);
+
+                        // Get my problematic leaf
+                        /*
+                        o = ((Node) forest[0].GetRoot());
+                        s = (Node) (o.GetLeft());
+                        p = (Node) (s.GetLeft());
+                        j_ = (Node) (p.GetRight());
+                        k = (Node) (j_.GetLeft());
+                        i_ = (Node) (k.GetRight());
+                        leaf = (Leaf) (i_.GetLeft());
+                        string actionsNew = StringifiedTree.GetActionsListAsString(leaf.GatherActions());
+                        if (actionsNew != actionsOld) {
+                            Console.WriteLine("\nIn this exact moment, an incorrect substitution happened. Iteration {0}\n", i);
+                            Console.WriteLine("Old actions list: {0}. New actions list: {1}", actionsOld, actionsNew);
+                            actionsOld = actionsNew;
+                        }
+                        */
                     } else {
                         //Console.WriteLine("Skipping subtree with an empty intersection of actions");
                     }
@@ -367,6 +376,7 @@ namespace Spaghetti_Labeling
                 tree.GetRoot().AssignVisitedInSubtree(false);
             }
 
+            //Console.WriteLine("Forest has {0} unique nodes.", nodes.Count);
             return nodes;
         }
 

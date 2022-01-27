@@ -47,8 +47,16 @@ namespace Spaghetti_Labeling
         }
 
         public override void DFS_Rec() {
-            Console.WriteLine("Leaf node " + GetName() + ": {" + string.Join(", ", actions) + "} - " + nextTreeIndex);
-            //Console.WriteLine("Leaf node " + GetName() + " " + GetID() +  ": {" + string.Join(", ", actions) + "} - " + nextTreeIndex);
+            Console.Write("Leaf node " + GetName() + ": {" + string.Join(", ", actions) + "} - " + nextTreeIndex);
+            if (GetParents().Count > 1) {
+                string parentsMessage = ". This leaf has " + GetParents().Count + " parents:";
+                foreach (Node parent in GetParents()) {
+                    parentsMessage += " " + parent.GetCondition();
+                }
+                Console.WriteLine(parentsMessage);
+            } else {
+                Console.WriteLine("");
+            }
         }
 
         public override int InitNextTreeIndex(int index) {
