@@ -16,7 +16,7 @@ namespace Spaghetti_Labeling
         ...
         */
 
-        private const bool testing = false;
+        private const bool testing = true;
 
         static void Main(string[] args)
         {
@@ -32,14 +32,7 @@ namespace Spaghetti_Labeling
             Graph mainGraph = new Graph(mainForest);
             */
 
-            //ImageProcessor.SpaghettiCCL(Image.TestImages.BinaryImage3().GetMatrix());
-
-            //(List<Tree> mainForest, int _) = ForestCreator.MainForest(ODTree.GetTree);
-            //mainForest[0].GetRoot().InfoDFS();
-
-            //GraphManager gm = new GraphManager();
-            (List<Tree> mainForest, int _) = ForestCreator.MainForest(ODTree.GetTree);
-            Graph g = new Graph(mainForest);
+            ImageProcessor.SpaghettiCCL(Image.TestImages.BinaryImage3().GetMatrix());
 
             if (testing) {
                 RunTests();

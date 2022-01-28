@@ -13,7 +13,6 @@ namespace Spaghetti_Labeling
         }
 
         public Graph(List<Tree> forest) {
-
             /*
             Go through all node pairs (For each node of each tree, go through all nodes of all trees) and
             check equality (NOT equivalence!). If the given subtrees are equal, replace the whole second
@@ -29,35 +28,11 @@ namespace Spaghetti_Labeling
                 this.roots.Add(tree.GetRoot());
             }
 
-            /*
-            // purely for testing
-            for (int i = 0; i < forest.Count; i++) {
-                forest[i].GetRoot().AssignIdInSubtree(i + 1);
-            }
-            List<AbstractNode> nodes = GetUniqueNodes(forest);
-            foreach (AbstractNode an in nodes) {
-                Debug.Assert(an.GetID() != 666);
-            }
-            */
-
             // Merge equal subtrees
-            MergeEqualSubtrees(forest);            // this is now working correctly
+            MergeEqualSubtrees(forest);
 
             // Merge equivalent subtrees
-            MergeEquivalentSubtrees(forest);        // this is not working correctly
-
-            /*
-            Example of incorrect behavior: in tree 7, in leaf llrlr (path o-s-p-j-k-leaf), the leaf contains only action 5
-            after merging equal subtrees. However, after performing MergeEquivalentSubtrees(), the set of actions somehow
-            increases to actions 4, 5, 6. This is obviously wrong. 
-            */
-
-            Console.WriteLine("\nPRINTING\n");
-            roots[0].InfoDFS();
-            
-            // URGENT TODO: During the MergeEquivalentSubtrees procedure, something goes wrong and parts of trees are 
-            // incorrectly merged. Fix this ASAP.
-            // UPDATE: FINALLY FIXED! Now I need to clean up tons of comments and code.
+            MergeEquivalentSubtrees(forest);
         }
 
         public void MergeEqualSubtrees(List<Tree> forest) {
@@ -68,14 +43,6 @@ namespace Spaghetti_Labeling
                     if (nodes[i].IsEqual(nodes[j]) && !nodes[i].GetSubstituted() && !nodes[j].GetSubstituted()) {
                         List<HashSet<int>> actions1 = nodes[i].GatherActions();
                         SubstituteSubtree(nodes[i], nodes[j], actions1);
-                        /*
-                        // Beginning of test code - verify that both lists of actions are the same 
-                        List<HashSet<int>> actions2 = nodes[j].GatherActions();
-                        Debug.Assert(actions1.Count == actions2.Count);
-                        for (int k = 0; k < actions1.Count; k++) {
-                            Debug.Assert(actions1[k].SetEquals(actions2[k]));
-                        }   // End of test code
-                        */
                     }
                 }
             }
@@ -86,30 +53,7 @@ namespace Spaghetti_Labeling
                 RemoveReferencesToSubstitutedTrees(tree.GetRoot());
             }
             // ^^ I'm not sure if this is necessary here. It is necessary when resolving equivalent subtrees but I don't think it is
-            // necessary here. I'll keep it just in case because it shouldn't do any harm.
-            
-
-            /*
-            // Backup of the old code
-            for (int i = 0; i < nodes.Count - 1; i++) {
-                for (int j = i + 1; j < nodes.Count; j++) {
-                    if (nodes[i] is Leaf || nodes[j] is Leaf) {
-                        // Skip leaves
-                        continue;
-                    }
-                    Node node1 = (Node) nodes[i];
-                    Node node2 = (Node) nodes[j];
-                    // THE FOLLOWING IF STATEMENTS NEED TO BE FIXED, AS THEY CURRENTLY DON'T WORK CORRECTLY!
-                    if (node1.GetLeft().IsEqual(node2.GetLeft())) {
-                        //Console.WriteLine("Left subtree of node " + i + " is equal to the left subtree of node " + j);
-                        node2.SetLeft(node1.GetLeft());
-                    }
-                    if (node1.GetRight().IsEqual(node2.GetRight())) {
-                        node2.SetRight(node1.GetRight());
-                    }
-                }
-            }
-            */            
+            // necessary here. I'll keep it just in case because it shouldn't do any harm.          
         }
 
         public void MergeEquivalentSubtrees(List<Tree> forest) {
@@ -137,12 +81,6 @@ namespace Spaghetti_Labeling
             */
 
             List<StringifiedTree> stringifiedTrees = CreateListOfStringifiedSubtrees(forest);
-            /*
-            Console.WriteLine("Before sorting");
-            foreach (StringifiedTree st in stringifiedTrees) {
-                Console.WriteLine(st.GetTree());
-            }
-            */
             stringifiedTrees.Sort();
             /*
             Console.WriteLine("After sorting");
@@ -150,77 +88,17 @@ namespace Spaghetti_Labeling
                 Console.WriteLine("Tree {0}: {1}", i, stringifiedTrees[i].GetTree());
             }
             */
-            
-            // The code above this comment will not be touched
-
-
-            
-            // Get my problematic leaf
-            Node o = ((Node) forest[0].GetRoot());
-            Node s = (Node) (o.GetLeft());
-            Node p = (Node) (s.GetLeft());
-            Node j_ = (Node) (p.GetRight());
-            Node k = (Node) (j_.GetLeft());
-            Node i_ = (Node) (k.GetRight());
-            Leaf leaf = (Leaf) (i_.GetLeft());
-            string actionsOld = StringifiedTree.GetActionsListAsString(leaf.GatherActions());
-            
 
             for (int i = 0; i < stringifiedTrees.Count - 1; i++) {
                 StringifiedTree st1 = stringifiedTrees[i];
-
-                /*
-                // Get my problematic leaf
-                o = ((Node) forest[0].GetRoot());
-                s = (Node) (o.GetLeft());
-                p = (Node) (s.GetLeft());
-                j_ = (Node) (p.GetRight());
-                k = (Node) (j_.GetLeft());
-                i_ = (Node) (k.GetRight());
-                Leaf leaf_new = (Leaf) (i_.GetLeft());
-                if (!leaf_old.GetActions().SetEquals(leaf_new.GetActions())) {
-                    Console.WriteLine("In iteration {0}, action set has changed.", i);
-                    leaf_old = leaf_new;
-                }
-                */
-
-                /*
-                OBSERVATION: In iteration 219, the action set of tree at index 0 in leaf llrlrl (o-s-p-j-k-i-leaf) changes from {5}
-                to {4, 5, 6}, which is obviously incorrect behavior.
-                TODO: Find the cause and fix it. 
-
-                UPDATE: Something weird is going on. In iteratrion 219, two substitutions happen that change the problematic leaf's actions.
-                First, primary tree has actions {4, 5, 6} and secondary tree has actions {4, 5}, therefore the leaf's actions are changed
-                to {4, 5}. HOWEVER, this is completely wrong, because the primary tree should not be {4, 5, 6}, rather {5}. This must mean
-                that two completely unrelated leaves lead to changing my problematic leaf.
-                The same thing happens further in iteration 219. The same primary tree (with actions {4, 5, 6}) is now merged with a tree
-                with actions {3, 4, 5, 6}, which leads to intersection {4, 5, 6}. Again, these two unrelated leaves lead to the change
-                of a completely different leaf. What is going on?
-
-                IDEA: Maybe the SubstituteSubtree method is causing problems? The way I check whether a tree is the left or right subtree
-                seems kinda weird and it could maybe cause problems in some edge cases.
-                UPDATE: No, that wasn't the problem.
-
-                BETTER IDEA: I think I found the problem, or at least a part of it. When I create the stringified trees, I gather actions
-                before any substitutions happen, and these actions in StringifiedTree objects are constant throughout the whole substitution
-                process. However, as substitutions take place, the actions in leaves change, but these changes aren't reflected in my 
-                StringifiedTree objects. This is why a leaf with action 5 can be linked with a StringifiedTree with actions {4, 5, 6}.
-
-                */
-
-                //Console.WriteLine("Iteration {0}, primary tree: {1}", i, st1.GetTree());
-
                 if (st1.GetRoot().GetSubstituted()) {
                     // Skip already substituted primary subtrees
-                    //Console.WriteLine("Skipping already substituted primary subtree");
                     continue;
                 }
                 for (int j = i + 1; j < stringifiedTrees.Count; j++) {
                     StringifiedTree st2 = stringifiedTrees[j];
-                    //Console.WriteLine("Secondary subtree: {0}", st2.GetTree());
                     // Skip already substituted secondary subtrees
                     if (st2.GetRoot().GetSubstituted()) {
-                        //Console.WriteLine("Skipping already substituted secondary subtree");
                         continue;
                     }
                     // Skip all subtrees with different strings
@@ -229,35 +107,10 @@ namespace Spaghetti_Labeling
                         break;
                     }
                     // Skip subtrees with an empty intersection of actions 
-                    /*Console.WriteLine("Primary tree actions: {0}. Secondary tree actions: {1}", StringifiedTree.GetActionsListAsString(st1.GetActions()),
-                                                                                                StringifiedTree.GetActionsListAsString(st2.GetActions()));
-                                                                                                */
-                    //List<HashSet<int>> intersectedActionsList = st1.IntersectedActions(st2.GetActions());
                     List<HashSet<int>> intersectedActionsList = st1.IntersectedActions(st2);
                     if (!ContainsEmptySet(intersectedActionsList)) {
                         // Two subtrees are compatible and one can be substituted with the other
-                        //Console.WriteLine("SUBSTITUTING! Intersected actions list: {0}", StringifiedTree.GetActionsListAsString(intersectedActionsList));
-                        //SubstituteSubtree(st1.GetRoot(), st2.GetRoot(), intersectedActionsList, i == 219);
-                        SubstituteSubtree(st1.GetRoot(), st2.GetRoot(), intersectedActionsList);
-
-                        // Get my problematic leaf
-                        
-                        o = ((Node) forest[0].GetRoot());
-                        s = (Node) (o.GetLeft());
-                        p = (Node) (s.GetLeft());
-                        j_ = (Node) (p.GetRight());
-                        k = (Node) (j_.GetLeft());
-                        i_ = (Node) (k.GetRight());
-                        leaf = (Leaf) (i_.GetLeft());
-                        string actionsNew = StringifiedTree.GetActionsListAsString(leaf.GatherActions());
-                        if (actionsNew != actionsOld) {
-                            Console.WriteLine("\nIn this exact moment, an incorrect substitution happened. Iteration {0}\n", i);
-                            Console.WriteLine("Old actions list: {0}. New actions list: {1}", actionsOld, actionsNew);
-                            actionsOld = actionsNew;
-                        }
-                        
-                    } else {
-                        //Console.WriteLine("Skipping subtree with an empty intersection of actions");
+                        SubstituteSubtree(st1.GetRoot(), st2.GetRoot(), intersectedActionsList);                        
                     }
                 }    
             }
@@ -266,40 +119,6 @@ namespace Spaghetti_Labeling
             foreach (Tree tree in forest) {
                 RemoveReferencesToSubstitutedTrees(tree.GetRoot());
             }
-            
-            
-            /*
-            // Backup of old code 
-            for (int i = 0; i < stringifiedTrees.Count - 1; i++) {
-                StringifiedTree st1 = stringifiedTrees[i];
-                if (st1.GetRoot().GetSubstituted()) {
-                    // Skip already substituted primary subtrees
-                    continue;
-                }
-                for (int j = i + 1; j < stringifiedTrees.Count; j++) {
-                    StringifiedTree st2 = stringifiedTrees[j];
-                    // Skip already substituted secondary subtrees
-                    if (st2.GetRoot().GetSubstituted()) {
-                        continue;
-                    }
-                    // Skip all subtrees with different strings
-                    if (st1.GetTree() != st2.GetTree()) {
-                        break;
-                    }
-                    // Skip subtrees with an empty intersection of actions 
-                    List<HashSet<int>> intersectedActionsList = st1.IntersectedActions(st2.GetActions());
-                    if (!ContainsEmptySet(intersectedActionsList)) {
-                        // Two subtrees are compatible and one can be substituted with the other
-                        SubstituteSubtree(st1.GetRoot(), st2.GetRoot(), intersectedActionsList);
-                    }
-                }    
-            }
-
-            // Remove references (in "parents" lists) to trees which were substituted away
-            foreach (Tree tree in forest) {
-                RemoveReferencesToSubstitutedTrees(tree.GetRoot());
-            }
-            */
         }
 
         private bool ContainsEmptySet<T>(List<HashSet<T>> list) {
