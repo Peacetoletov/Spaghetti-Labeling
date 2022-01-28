@@ -6,8 +6,7 @@ namespace Spaghetti_Labeling
 {
     public static class ImageProcessor
     {
-        private static Image SpaghettiAssignLabels(List<List<int>> input,  
-                                                   List<HashSet<int>> equivalentLabels) {
+        private static Image SpaghettiAssignLabels(Image input, List<HashSet<int>> equivalentLabels) {
             // TODO: this
             /* UPDATED TODO:
                Implement the basic version (only labeling middle rows, requiring the first 2 rows of pixels to
@@ -21,13 +20,15 @@ namespace Spaghetti_Labeling
             of rows must be even.
             Once the special trees are implemented, this condition will disappear.
             */
-            Debug.Assert(input.Count % 2 == 0);
+            List<List<int>> inputMatrix = input.GetMatrix();
+            Debug.Assert(inputMatrix.Count % 2 == 0);
 
             GraphManager gm = new GraphManager();
 
-            int width = input[0].Count;
-            int height = input.Count;
+            int width = inputMatrix[0].Count;
+            int height = inputMatrix.Count;
             Image output = new Image(InitMatrixWithZeroes(width, height));
+            ActionPerformer ap = new ActionPerformer(input, output, equivalentLabels);
             Console.WriteLine("Initiated spaghetti labeling");
 
             for (int y = 0; y < height; y += 2) {
@@ -41,7 +42,7 @@ namespace Spaghetti_Labeling
                     // TODO: ???
                     //SpaghettiLabelBlocksInRow()
                     Console.WriteLine("Beginning labeling blocks in row {0}", y);
-                    SpaghettiLabelBlocksInMiddleRow(gm, input, output, y);
+                    SpaghettiLabelBlocksInMiddleRow(y, gm, input, ap);
                 }
                 else {
                     // Last row (only used in images with an odd number of rows)
@@ -53,9 +54,10 @@ namespace Spaghetti_Labeling
         }
 
 
-        private static void SpaghettiLabelBlocksInMiddleRow(GraphManager gm, List<List<int>> input, Image output, int y) {
+        private static void SpaghettiLabelBlocksInMiddleRow(int y, GraphManager gm, Image input, ActionPerformer ap) {
             // row y means that pixels at positions y and y+1 will be labeled
-            int width = input[0].Count;
+            List<List<int>> inputMatrix = input.GetMatrix();
+            int width = inputMatrix[0].Count;
             int nextTreeIndex = gm.GetStartTreeIndex();
             int action = -1;
             for (int x = 0; x < width; x += 2) {
@@ -84,50 +86,10 @@ namespace Spaghetti_Labeling
             }
         }
 
-        /*
-        // Turns out I don't need this method.
-        private static bool DoesBlockContainForegroundPixels(char block, int x, int y, List<List<int>> input) {
-            //Block layout:
-            //    __________
-            //   | P | Q | R |
-            //   |___|___|___|
-            //   | S | X |
-            //   |___|___|
-            int xOffset;
-            int yOffset;
-            switch (block) {
-                case 'P':
-                    xOffset = -2;
-                    yOffset = -2;
-                    break;
-                case 'Q':
-                    xOffset = 0;
-                    yOffset = -2;
-                    break;
-                case 'R':
-                    xOffset = 2;
-                    yOffset = -2;
-                    break;
-                case 'S':
-                    xOffset = -2;
-                    yOffset = 0;
-                    break;
-                case 'X':
-                    xOffset = 0;
-                    yOffset = 0;
-                    break;
-                default:
-                    throw new NotSupportedException("Critical error: block not found.");
-            }
-            x += xOffset;
-            y += yOffset;
-            return input[y][x] == 1 || input[y + 1][x] == 1 || input[y][x + 1] == 1 || input[y + 1][x + 1] == 1;
-        }
-        */
-
-        private static (int, int) GetActionAndNextTreeIndex(AbstractNode root, List<List<int>> input, int x, int y) {
+        private static (int, int) GetActionAndNextTreeIndex(AbstractNode root, Image input, int x, int y) {
             // Traverses the tree from a given node based on the "input" matrix and returns a tuple containing the 
             // action to be performed and next tree index
+            List<List<int>> inputMatrix = input.GetMatrix();
             AbstractNode curNode = root;
             while (curNode is Node) {
                 if (ConditionToPixelValue(((Node) curNode).GetCondition(), x, y, input) == 0) {
@@ -151,90 +113,82 @@ namespace Spaghetti_Labeling
             throw new IndexOutOfRangeException("Set must not be empty!");
         }
 
-        private static int ConditionToPixelValue(char condition, int x, int y, List<List<int>> input) {
+        private static int ConditionToPixelValue(char condition, int x, int y, Image input) {
             // Takes a node condition (given by a char in range a-t) and the current position of a block (corresponding to the 'o' char
             // of the block) and returns the value of the pixel at the position specified by the condition.
+            List<List<int>> inputMatrix = input.GetMatrix();
             switch (condition) {
                 case 'a':
-                    return input[y - 2][x - 2];
+                    return inputMatrix[y - 2][x - 2];
                 case 'b':
-                    return input[y - 2][x - 1];
+                    return inputMatrix[y - 2][x - 1];
                 case 'c':
-                    return input[y - 2][x];
+                    return inputMatrix[y - 2][x];
                 case 'd':
-                    return input[y - 2][x + 1];
+                    return inputMatrix[y - 2][x + 1];
                 case 'e':
-                    return input[y - 2][x + 2];
+                    return inputMatrix[y - 2][x + 2];
                 case 'f':
-                    return input[y - 2][x + 3];
+                    return inputMatrix[y - 2][x + 3];
                 case 'g':
-                    return input[y - 1][x - 2];
+                    return inputMatrix[y - 1][x - 2];
                 case 'h':
-                    return input[y - 1][x - 1];
+                    return inputMatrix[y - 1][x - 1];
                 case 'i':
-                    return input[y - 1][x];
+                    return inputMatrix[y - 1][x];
                 case 'j':
-                    return input[y - 1][x + 1];
+                    return inputMatrix[y - 1][x + 1];
                 case 'k':
-                    return input[y - 1][x + 2];
+                    return inputMatrix[y - 1][x + 2];
                 case 'l':
-                    return input[y - 1][x + 3];
+                    return inputMatrix[y - 1][x + 3];
                 case 'm':
-                    return input[y][x - 2];
+                    return inputMatrix[y][x - 2];
                 case 'n':
-                    return input[y][x - 1];
+                    return inputMatrix[y][x - 1];
                 case 'o':
-                    return input[y][x];
+                    return inputMatrix[y][x];
                 case 'p':
-                    return input[y][x + 1];
+                    return inputMatrix[y][x + 1];
                 case 'q':
-                    return input[y + 1][x - 2];
+                    return inputMatrix[y + 1][x - 2];
                 case 'r':
-                    return input[y + 1][x - 1];
+                    return inputMatrix[y + 1][x - 1];
                 case 's':
-                    return input[y + 1][x];
+                    return inputMatrix[y + 1][x];
                 case 't':
-                    return input[y + 1][x + 1];
+                    return inputMatrix[y + 1][x + 1];
                 default:
                     throw new NotSupportedException("Critical error: condition not found.");
             }
         }
 
-        /*
-        private static int SpaghettiLabelMiddleBlock(List<List<int>> input, Image image, int treeIndex, int x, int y, int width) {
-            // Labels the 2x2 block, with x and y being the upper left corner of the block.
-            // Returns the index of the next tree to be used.
-
-            return 0;
-        }
-        */
-
-        public static Image SpaghettiCCL(List<List<int>> binaryImage) {
-            return CCL(binaryImage, SpaghettiAssignLabels);
+        public static Image SpaghettiCCL(Image input) {
+            return CCL(input, SpaghettiAssignLabels);
         }
 
         // TODO: override SpaghettiCCL and ClassicCCL methods to work with a path to an image as the argument
 
-        public static Image ClassicCCL(List<List<int>> binaryImage) {
-            return CCL(binaryImage, ClassicCCL_AssignLabels);
+        public static Image ClassicCCL(Image input) {
+            return CCL(input, ClassicCCL_AssignLabels);
         }
 
-        private static Image CCL(List<List<int>> binaryImage, Func<List<List<int>>, List<HashSet<int>>, Image> assignLabels) {
+        private static Image CCL(Image input, Func<Image, List<HashSet<int>>, Image> assignLabels) {
             List<HashSet<int>> equivalentLabels = new List<HashSet<int>>();
-            Image output = assignLabels(binaryImage, equivalentLabels);
+            Image output = assignLabels(input, equivalentLabels);
             //ResolveLabelEquivalencies(output, equivalentLabels);      // TEMPORARILY COMMENTED OUT
             return output;
         }
 
-        private static Image ClassicCCL_AssignLabels(List<List<int>> input,  
-                                                     List<HashSet<int>> equivalentLabels) {
-            int width = input[0].Count;
-            int height = input.Count;
+        private static Image ClassicCCL_AssignLabels(Image input, List<HashSet<int>> equivalentLabels) {
+            List<List<int>> inputMatrix = input.GetMatrix();
+            int width = inputMatrix[0].Count;
+            int height = inputMatrix.Count;
             Image image = new Image(InitMatrixWithZeroes(width, height));
             int highestLabel = 0;
             for (int y = 0; y < height; y++) {
                 for (int x = 0; x < width; x++) {
-                    if (input[y][x] == 1) {
+                    if (inputMatrix[y][x] == 1) {
                         // Assign label if current pixel is foreground 
                         highestLabel = ClassicCCL_LabelPixel(image, x, y, highestLabel, equivalentLabels);
 
@@ -292,7 +246,7 @@ namespace Spaghetti_Labeling
             }
         }
 
-        private static (HashSet<int>, HashSet<int>) FindSetsWithLabels(List<HashSet<int>> equivalentLabels, int label1, int label2) {
+        public static (HashSet<int>, HashSet<int>) FindSetsWithLabels(List<HashSet<int>> equivalentLabels, int label1, int label2) {
             HashSet<int> setWithLabel1 = null;
             HashSet<int> setWithLabel2 = null;
             foreach (HashSet<int> set in equivalentLabels) {
@@ -340,11 +294,11 @@ namespace Spaghetti_Labeling
             }
 
             private static void TestClassicCCL() {
-                Image labeled1 = ClassicCCL(Image.TestImages.BinaryImage1().GetMatrix());
+                Image labeled1 = ClassicCCL(Image.TestImages.BinaryImage1());
                 Image reference1 = Image.TestImages.LabeledImage1();
                 Debug.Assert(labeled1.Equals(reference1));
 
-                Image labeled2 = ClassicCCL(Image.TestImages.BinaryImage2().GetMatrix());
+                Image labeled2 = ClassicCCL(Image.TestImages.BinaryImage2());
                 Image reference2 = Image.TestImages.LabeledImage2();
                 Debug.Assert(labeled2.Equals(reference2));
 

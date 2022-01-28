@@ -32,7 +32,7 @@ namespace Spaghetti_Labeling
             Graph mainGraph = new Graph(mainForest);
             */
 
-            ImageProcessor.SpaghettiCCL(Image.TestImages.BinaryImage3().GetMatrix());
+            ImageProcessor.SpaghettiCCL(Image.TestImages.BinaryImage3());
 
             if (testing) {
                 RunTests();
