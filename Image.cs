@@ -34,12 +34,13 @@ namespace Spaghetti_Labeling
             if (matrix.Count != otherMatrix.Count) {
                 return false;
             }
-            for (int i = 0; i < matrix.Count; i++) {
-                if (matrix[i].Count != otherMatrix[i].Count) {
+            for (int y = 0; y < matrix.Count; y++) {
+                if (matrix[y].Count != otherMatrix[y].Count) {
                     return false;
                 }
-                for (int j = 0; j < matrix.Count; j++) {
-                    if (matrix[i][j] != otherMatrix[i][j]) {
+                for (int x = 0; x < matrix[y].Count; x++) {
+                    //Console.WriteLine("y = {0}, x = {1} ", y, x);
+                    if (matrix[y][x] != otherMatrix[y][x]) {
                         return false;
                     }
                 }
@@ -49,6 +50,16 @@ namespace Spaghetti_Labeling
         
         public override int GetHashCode() {
             return base.GetHashCode();
+        }
+
+        public void Print() {
+            Console.WriteLine("Printing image:");
+            foreach (List<int> row in matrix) {
+                foreach (int pixel in row) {
+                    Console.Write(pixel);
+                }
+                Console.WriteLine();
+            }
         }
 
         public static class TestImages
@@ -129,10 +140,8 @@ namespace Spaghetti_Labeling
                     "....x...", 
                     "....x...",
                     "...x....",     // 12 - merge x = r + s 
-                    "xxx.....",                   
+                    "xxx....."                   
                 }));
-
-                // IMPORTANT - when I run CCL, instead of choosing actions 8 and 12, actions 7 and 11 are chosen instead. FIX ASAP!
             }
 
             public static Image LabeledImage3() {
@@ -146,9 +155,9 @@ namespace Spaghetti_Labeling
                 labeled.Add(new List<int> {0,1,0,1,0,0,0,0});
                 labeled.Add(new List<int> {0,1,0,1,0,0,0,0});
                 labeled.Add(new List<int> {0,0,0,0,0,0,0,0});
-                labeled.Add(new List<int> {0,2,0,2,0,0,0,0});
-                labeled.Add(new List<int> {0,0,2,0,0,0,0,0});
-                labeled.Add(new List<int> {0,0,2,0,0,0,0,0});
+                labeled.Add(new List<int> {0,2,0,0,2,0,0,0});
+                labeled.Add(new List<int> {0,0,2,2,0,0,0,0});
+                labeled.Add(new List<int> {0,0,0,0,0,0,0,0});
                 labeled.Add(new List<int> {0,0,0,0,3,0,0,0});
                 labeled.Add(new List<int> {0,0,0,0,3,0,0,0});
                 labeled.Add(new List<int> {0,0,0,3,0,0,0,0});

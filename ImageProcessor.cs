@@ -9,10 +9,10 @@ namespace Spaghetti_Labeling
         private static Image SpaghettiAssignLabels(Image input, List<HashSet<int>> equivalentLabels) {
             // TODO: this
             /* UPDATED TODO:
-               Implement the basic version (only labeling middle rows, requiring the first 2 rows of pixels to
-               be filled with 0s and the number of rows to be even), then thoroughly test every part of the
-               labeling process. Some tests can be automated, other parts will do with just manual tests.
-               After this is done, I may implement the rest, depending on how much time I will have.
+                Implement the basic version (only labeling middle rows, requiring the first 2 rows of pixels to
+                be filled with 0s and the number of rows to be even), then thoroughly test every part of the
+                labeling process. Some tests can be automated, other parts will do with just manual tests.
+                After this is done, I may implement the rest, depending on how much time I will have.
             */
 
             /* NOTE: Due to the lack of special forests for the first and last row, all images labeled with the
@@ -29,19 +29,16 @@ namespace Spaghetti_Labeling
             int height = inputMatrix.Count;
             Image output = new Image(InitMatrixWithZeroes(width, height));
             ActionPerformer ap = new ActionPerformer(input, output, equivalentLabels);
-            Console.WriteLine("Initiated spaghetti labeling");
+            //Console.WriteLine("Initiated spaghetti labeling");
 
             for (int y = 0; y < height; y += 2) {
                 if (y == 0) {
                     // First row
                     // currently does nothing. First implement middle rows, then this.
-                    Console.WriteLine("Skipping blocks in row 0.");
+                    //Console.WriteLine("Skipping blocks in row 0.");
                 } 
                 else if (y != height - 1) {
                     // Middle rows
-                    // TODO: ???
-                    //SpaghettiLabelBlocksInRow()
-                    Console.WriteLine("Beginning labeling blocks in row {0}", y);
                     SpaghettiLabelBlocksInMiddleRow(y, gm, input, ap);
                 }
                 else {
@@ -50,7 +47,17 @@ namespace Spaghetti_Labeling
                 }
             }
 
-            return null;
+            /*
+            Console.WriteLine("\nEach row contains a set of equivalent labels:");
+            foreach (HashSet<int> labelSet in equivalentLabels) {
+                foreach (int label in labelSet) {
+                    Console.Write("{0} ", label);
+                }
+                Console.WriteLine();
+            }
+            */
+
+            return output;
         }
 
 
@@ -61,18 +68,19 @@ namespace Spaghetti_Labeling
             int nextTreeIndex = gm.GetStartTreeIndex();
             int action = -1;
             for (int x = 0; x < width; x += 2) {
-                Console.Write("Block in column {0}. ", x);
+                //Console.Write("Block in column {0}. ", x);
                 if (x < width - 2) {
                     // Use main tree
-                    Console.Write("Using main tree with index {0}. ", nextTreeIndex);
+                    //Console.Write("Using main tree with index {0}. ", nextTreeIndex);
                     (action, nextTreeIndex) = GetActionAndNextTreeIndex(gm.AdjustIndexAndGetMainGraphRoot(nextTreeIndex), input, x, y);
-                    Console.WriteLine("Chosen action: {0}", action);
+                    //Console.WriteLine("Chosen action: {0}", action);
 
                     // TODO: perform the chosen action (implement class Actions)
+                    ap.Perform(action, x, y);
                     
 
                 } else {
-                    Console.WriteLine("End of row. End trees not implemented yet, doing nothing.");
+                    //Console.WriteLine("End of row. End trees not implemented yet, doing nothing.");
                     if (x == width - 2) {
                         // Use even tree
 
@@ -176,7 +184,7 @@ namespace Spaghetti_Labeling
         private static Image CCL(Image input, Func<Image, List<HashSet<int>>, Image> assignLabels) {
             List<HashSet<int>> equivalentLabels = new List<HashSet<int>>();
             Image output = assignLabels(input, equivalentLabels);
-            //ResolveLabelEquivalencies(output, equivalentLabels);      // TEMPORARILY COMMENTED OUT
+            ResolveLabelEquivalencies(output, equivalentLabels);      // TEMPORARILY COMMENTED OUT
             return output;
         }
 
@@ -222,8 +230,17 @@ namespace Spaghetti_Labeling
 
         private static void ClassicCCL_ManageEquivalencies(Image image, int x, int y, 
                                                            List<HashSet<int>> equivalentLabels) {
-            /* Note that the only pixels which can theoretically be equivalent and haven't been marked
-            as equivalent yet are the ones in the upper left and right corner. */
+            // Note that the only pixels which can theoretically be equivalent are the 'r' pixel and
+            // either the 'p' or 's' pixel.
+            ClassicCCL_ManageEquivalencies(image, 'p', x, y, equivalentLabels);
+            ClassicCCL_ManageEquivalencies(image, 's', x, y, equivalentLabels);
+        }
+
+        private static void ClassicCCL_ManageEquivalencies(Image image, char pixel, int x, int y, 
+                                                           List<HashSet<int>> equivalentLabels) {
+            // Checks if the 'r' pixel and the pixel passed as argument ('p' or 's') are equivalent,
+            // and if so, updates the equivalentLabels list
+            
             // Return if either of the relevant pixels is out of bounds
             List<List<int>> imageMatrix = image.GetMatrix();
             int width = imageMatrix[0].Count;
@@ -232,8 +249,9 @@ namespace Spaghetti_Labeling
             }
 
             // Return if either of the relevant pixels is background, or if they both have the same label
-            int label1 = imageMatrix[y - 1][x - 1];
-            int label2 = imageMatrix[y - 1][x + 1];
+            Debug.Assert(pixel == 'p' || pixel == 's');
+            int label1 = imageMatrix[y - 1][x + 1];
+            int label2 = pixel == 'p' ? imageMatrix[y - 1][x - 1] : imageMatrix[y][x - 1];
             if (label1 == 0 || label2 == 0 || label1 == label2) {
                 return;
             }
@@ -290,7 +308,8 @@ namespace Spaghetti_Labeling
         public static class Tests 
         {
             public static void Run() {
-                //TestClassicCCL();         // TEMPORARILY COMMENTED OUT
+                TestClassicCCL();
+                TestSpaghettiCCL();
             }
 
             private static void TestClassicCCL() {
@@ -302,18 +321,18 @@ namespace Spaghetti_Labeling
                 Image reference2 = Image.TestImages.LabeledImage2();
                 Debug.Assert(labeled2.Equals(reference2));
 
-                /*
-                List<List<int>> labeledMatrix = labeled2.GetMatrix();
-                foreach (List<int> row in labeledMatrix) {
-                    foreach (int label in row) {
-                        Console.Write(label);
-                    }
-                    Console.WriteLine();
-                }
-                */                
-
-                //Console.WriteLine("Classic CCL works");
+                Image labeled3 = ClassicCCL(Image.TestImages.BinaryImage3());
+                Image reference3 = Image.TestImages.LabeledImage3();
+                Debug.Assert(labeled3.Equals(reference3));
             }
+
+            private static void TestSpaghettiCCL() {
+                Image spaghetti = SpaghettiCCL(Image.TestImages.BinaryImage3());
+                Image classic = ClassicCCL(Image.TestImages.BinaryImage3());
+                Debug.Assert(spaghetti.Equals(classic));
+
+                // Console.WriteLine("Poggers");
+            } 
         }
     }
 }

@@ -22,16 +22,19 @@ namespace Spaghetti_Labeling
             this.equivalentLabels = equivalentLabels;
         }
 
-        public void Perform(int action, int x, int y) {
+        public void Perform(int action, int x, int y, bool debug=false) {
             // Performs a given action on a given block and updates the output image and the list of equivalent labels
             switch (action) {
                 case 1:
+                    if (debug) {
+                        Console.WriteLine("Doing nothing.");
+                    }
                     break;      // No action
                 case 2:
-                    NewLabel(x, y);
+                    NewLabel(x, y, debug);
                     break;
                 case 3:
-                    Assign('p', x, y);
+                    Assign('p', x, y, debug);
                     break;
                 case 4:
                 case 7:
@@ -41,41 +44,47 @@ namespace Spaghetti_Labeling
                 case 14:
                 case 16:
                 case 17:
-                    Assign('q', x, y);
+                    Assign('q', x, y, debug);
                     break;
                 case 5:
-                    Assign('r', x, y);
+                    Assign('r', x, y, debug);
                     break;
                 case 6:
                 case 9:
-                    Assign('s', x, y);
+                    Assign('s', x, y, debug);
                     break;
                 case 8:
-                    Merge('p', x, y);
+                    Merge('p', x, y, debug);
                     break;
                 case 12:
                 case 15:
-                    Merge('s', x, y);
+                    Merge('s', x, y, debug);
                     break;
                 default:
                     throw new NotSupportedException("Critical error: action not found.");
             }
         }
 
-        private void NewLabel(int x, int y) {
+        private void NewLabel(int x, int y, bool debug) {
             // Assigns a new label to the current block
             highestLabel++;
             LabelCurrentBlock(highestLabel, x, y);
             equivalentLabels.Add(new HashSet<int> {highestLabel});
+            if (debug) {
+                Console.WriteLine("Assigned new label: {0}", highestLabel);
+            }
         }
 
-        private void Assign(char block, int x, int y) {
+        private void Assign(char block, int x, int y, bool debug) {
             // Assigns the label of the given block (p, q, r, s) to the current block (x)
             int label = GetLabelOfBlock(block, x, y);
             LabelCurrentBlock(label, x, y);
+            if (debug) {
+                Console.WriteLine("Assigned label {0} of block {1}", label, block);
+            }
         }
 
-        private void Merge(char block, int x, int y) {
+        private void Merge(char block, int x, int y, bool debug) {
             // Merges labels on block r and the given block passed as argument (p, s), then
             // arbitrarily assigns one of them to the current block. 
             int label1 = GetLabelOfBlock('r', x, y);
@@ -89,6 +98,9 @@ namespace Spaghetti_Labeling
                     setWithLabel1.UnionWith(setWithLabel2);
                     equivalentLabels.Remove(setWithLabel2);
                 }
+            }
+            if (debug) {
+                Console.WriteLine("Merged block r and {0}, assigned label {1}", block, label1);
             }
         }
 
