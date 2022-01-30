@@ -12,7 +12,9 @@ namespace Spaghetti_Labeling
         4) Add row beginning tree DONE
         5) Add row end trees DONE
         6) Convert trees to DRAGs DONE
-        7) Actions, labeling, label equivalence resolution
+        7) Actions, labeling, label equivalence resolution DONE
+        8) First row labeling
+        9) Last row labeling
         ...
         */
 
@@ -32,7 +34,7 @@ namespace Spaghetti_Labeling
             Graph mainGraph = new Graph(mainForest);
             */
 
-            Image image = ImageProcessor.SpaghettiCCL(Image.TestImages.BinaryImage3());
+            Image image = ImageProcessor.SpaghettiCCL(Image.TestImages.BinaryImage4());
             //image.Print();
 
             if (testing) {

@@ -54,11 +54,12 @@ namespace Spaghetti_Labeling
 
         public void Print() {
             Console.WriteLine("Printing image:");
-            foreach (List<int> row in matrix) {
+            for (int i = 0; i < matrix.Count; i++) {
+                List<int> row = matrix[i];
                 foreach (int pixel in row) {
                     Console.Write(pixel);
                 }
-                Console.WriteLine();
+                Console.WriteLine(" (row {0})", i);
             }
         }
 
@@ -163,6 +164,24 @@ namespace Spaghetti_Labeling
                 labeled.Add(new List<int> {0,0,0,3,0,0,0,0});
                 labeled.Add(new List<int> {3,3,3,0,0,0,0,0});
                 return new Image(labeled);
+            }
+
+            public static Image BinaryImage4() {
+                // This image contains all possible action results in EndForestEven
+                return new Image(StringifiedToBinary(new List<string> {
+                    "....",     // skip the first 2 rows
+                    "....",
+                    "..xx",     // 2 - new label              
+                    "...x",
+                    "...x",     // 4 - assign x = q
+                    "....",
+                    ".xxx",     // 6 - assign x = s
+                    "....",
+                    "....",     // 1 - no action
+                    ".x..",
+                    "..x.",     // 3 - assign x = p
+                    "...."
+                }));
             }
         }
     }

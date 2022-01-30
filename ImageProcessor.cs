@@ -7,12 +7,8 @@ namespace Spaghetti_Labeling
     public static class ImageProcessor
     {
         private static Image SpaghettiAssignLabels(Image input, List<HashSet<int>> equivalentLabels) {
-            // TODO: this
-            /* UPDATED TODO:
-                Implement the basic version (only labeling middle rows, requiring the first 2 rows of pixels to
-                be filled with 0s and the number of rows to be even), then thoroughly test every part of the
-                labeling process. Some tests can be automated, other parts will do with just manual tests.
-                After this is done, I may implement the rest, depending on how much time I will have.
+            /*
+            TODO: Create a special set of main and end trees for the first row, then use it for first row labeling. 
             */
 
             /* NOTE: Due to the lack of special forests for the first and last row, all images labeled with the
@@ -24,6 +20,8 @@ namespace Spaghetti_Labeling
             Debug.Assert(inputMatrix.Count % 2 == 0);
 
             GraphManager gm = new GraphManager();
+            // ^ For better performance, GraphManager could be created once at the start of the program and then 
+            // passed as an argument
 
             int width = inputMatrix[0].Count;
             int height = inputMatrix.Count;
@@ -72,30 +70,24 @@ namespace Spaghetti_Labeling
                 if (x < width - 2) {
                     // Use main tree
                     //Console.Write("Using main tree with index {0}. ", nextTreeIndex);
-                    (action, nextTreeIndex) = GetActionAndNextTreeIndex(gm.AdjustIndexAndGetMainGraphRoot(nextTreeIndex), input, x, y);
-                    //Console.WriteLine("Chosen action: {0}", action);
-
-                    // TODO: perform the chosen action (implement class Actions)
-                    ap.Perform(action, x, y);
-                    
-
+                    (action, nextTreeIndex) = GetActionAndNextTreeIndex(gm.AdjustIndexAndGetRootInMainGraph(nextTreeIndex), input, x, y);
+                         
                 } else {
-                    //Console.WriteLine("End of row. End trees not implemented yet, doing nothing.");
                     if (x == width - 2) {
                         // Use even tree
-
+                        action = GetAction(gm.AdjustIndexAndGetRootInEndGraphEven(nextTreeIndex), input, x, y);
                     } else {
                         // Use odd tree
-
-                        // (...)
+                        action = GetAction(gm.AdjustIndexAndGetRootInEndGraphOdd(nextTreeIndex), input, x, y);
                     }
                 }
-                //SpaghettiLabelMiddleBlock(input, image, 666, x, y, width);
+                //Console.WriteLine("Chosen action: {0}", action);
+                ap.Perform(action, x, y);
             }
         }
 
         private static (int, int) GetActionAndNextTreeIndex(AbstractNode root, Image input, int x, int y) {
-            // Traverses the tree from a given node based on the "input" matrix and returns a tuple containing the 
+            // Traverses the tree from a given root node based on the "input" matrix and returns a tuple containing the 
             // action to be performed and next tree index
             List<List<int>> inputMatrix = input.GetMatrix();
             AbstractNode curNode = root;
@@ -111,6 +103,22 @@ namespace Spaghetti_Labeling
             int nextTreeIndex = ((Leaf) curNode).GetNextTreeIndex();
 
             return (action, nextTreeIndex);
+        }
+
+        private static int GetAction(AbstractNode root, Image input, int x, int y) {
+            // Traverses the tree from a given end root node based on the "input" matrix and returns the action to be performed.
+            // This method is only used for end trees, as no next tree index is returned.
+            List<List<int>> inputMatrix = input.GetMatrix();
+            AbstractNode curNode = root;
+            while (curNode is Node) {
+                if (ConditionToPixelValue(((Node) curNode).GetCondition(), x, y, input) == 0) {
+                    curNode = ((Node) curNode).GetLeft();
+                } else {
+                    curNode = ((Node) curNode).GetRight();
+                }
+            }
+            // curNode now contains the correct leaf based on the pixels in surrounding blocks
+            return GetAnyHashsetElement(((Leaf) curNode).GetActions());
         }
 
         private static T GetAnyHashsetElement<T>(HashSet<T> set) {
@@ -184,7 +192,7 @@ namespace Spaghetti_Labeling
         private static Image CCL(Image input, Func<Image, List<HashSet<int>>, Image> assignLabels) {
             List<HashSet<int>> equivalentLabels = new List<HashSet<int>>();
             Image output = assignLabels(input, equivalentLabels);
-            ResolveLabelEquivalencies(output, equivalentLabels);      // TEMPORARILY COMMENTED OUT
+            ResolveLabelEquivalencies(output, equivalentLabels);
             return output;
         }
 
@@ -327,11 +335,13 @@ namespace Spaghetti_Labeling
             }
 
             private static void TestSpaghettiCCL() {
-                Image spaghetti = SpaghettiCCL(Image.TestImages.BinaryImage3());
-                Image classic = ClassicCCL(Image.TestImages.BinaryImage3());
-                Debug.Assert(spaghetti.Equals(classic));
+                Image spaghetti3 = SpaghettiCCL(Image.TestImages.BinaryImage3());
+                Image classic3 = ClassicCCL(Image.TestImages.BinaryImage3());
+                Debug.Assert(spaghetti3.Equals(classic3));
 
-                // Console.WriteLine("Poggers");
+                Image spaghetti4 = SpaghettiCCL(Image.TestImages.BinaryImage4());
+                Image classic4 = ClassicCCL(Image.TestImages.BinaryImage4());
+                Debug.Assert(spaghetti4.Equals(classic4));
             } 
         }
     }

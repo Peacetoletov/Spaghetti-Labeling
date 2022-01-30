@@ -43,15 +43,17 @@ namespace Spaghetti_Labeling
                 }
             }
 
-            // Manual testing
             /*
-            for (int i = 0; i < endEvenIndices.Count; i++) {
+            // Manual testing
+            if (!isEven) {
+                for (int i = 0; i < endEvenIndices.Count; i++) {
                 Console.WriteLine("Main tree {0} has even end tree {1}", i, endEvenIndices[i]);
+                }
+                for (int i = 0; i < endOddIndices.Count; i++) {
+                    Console.WriteLine("Main tree {0} has odd end tree {1}", i, endOddIndices[i]);
+                }
             }
-            for (int i = 0; i < endOddIndices.Count; i++) {
-                Console.WriteLine("Main tree {0} has odd end tree {1}", i, endOddIndices[i]);
-            }
-            */
+            */ 
         }
 
         public int GetEndTreeEvenIndex(int mainTreeIndex) {

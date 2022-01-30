@@ -18,12 +18,26 @@ namespace Spaghetti_Labeling
             // Create forests
             (List<Tree> mainForest, int startTreeIndex) = ForestCreator.MainForest(ODTree.GetTree);
             this.startTreeIndex = startTreeIndex;
-            (List<Tree> endForestEvenTrees, List<List<int>> endForestEvenIndices) = SplitList(ForestCreator.EndForest(mainForest, true));
-            (List<Tree> endForestOddTrees, List<List<int>> endForestOddIndices) = SplitList(ForestCreator.EndForest(mainForest, false));
+            (List<Tree> endForestEvenTrees, List<List<int>> endForestEvenIndices) = SplitListOfTuples(ForestCreator.EndForest(mainForest, true));
+            (List<Tree> endForestOddTrees, List<List<int>> endForestOddIndices) = SplitListOfTuples(ForestCreator.EndForest(mainForest, false));
 
             // Shift all tree indices such that they start from 0 instead of 1
             DecrementList(endForestEvenIndices);
             DecrementList(endForestOddIndices);
+
+            /*
+            Console.WriteLine("Created GraphManager.");
+            for (int i = 0; i < endForestEvenIndices.Count; i++) {
+                foreach(int j in endForestEvenIndices[i]) {
+                    Console.WriteLine("endForestEvenIndices[{0}] = {1}", i, j);
+                }
+            }
+            for (int i = 0; i < endForestOddIndices.Count; i++) {
+                foreach(int j in endForestOddIndices[i]) {
+                    Console.WriteLine("endForestOddIndices[{0}] = {1}", i, j);
+                }
+            }
+            */
 
             // Create graphs
             this.mainGraph = new MainGraph(mainForest, endForestEvenIndices, endForestOddIndices);
@@ -31,7 +45,7 @@ namespace Spaghetti_Labeling
             this.endGraphOdd = new Graph(endForestOddTrees);
         }
 
-        private (List<Tree>, List<List<int>>) SplitList(List<(Tree, List<int>)> endForest) {
+        private (List<Tree>, List<List<int>>) SplitListOfTuples(List<(Tree, List<int>)> endForest) {
             List<Tree> trees = new List<Tree>();
             List<List<int>> indicesList = new List<List<int>>();
             foreach ((Tree tree, List<int> indices) in endForest) {
@@ -53,16 +67,16 @@ namespace Spaghetti_Labeling
             return startTreeIndex;
         }
 
-        public AbstractNode AdjustIndexAndGetMainGraphRoot(int index) {
+        public AbstractNode AdjustIndexAndGetRootInMainGraph(int index) {
             return mainGraph.GetRoot(index - 1);
         }
 
-        public AbstractNode GetEndGraphEvenRoot(int index) {
-            return endGraphEven.GetRoot(mainGraph.GetEndTreeEvenIndex(index));
+        public AbstractNode AdjustIndexAndGetRootInEndGraphEven(int index) {
+            return endGraphEven.GetRoot(mainGraph.GetEndTreeEvenIndex(index - 1));
         }
 
-        public AbstractNode GetEndGraphOddRoot(int index) {
-            return endGraphOdd.GetRoot(mainGraph.GetEndTreeOddIndex(index));
+        public AbstractNode AdjustIndexAndGetRootInEndGraphOdd(int index) {
+            return endGraphOdd.GetRoot(mainGraph.GetEndTreeOddIndex(index - 1));
         }
 
         public static class Tests 
