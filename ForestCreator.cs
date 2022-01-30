@@ -10,6 +10,7 @@ namespace Spaghetti_Labeling
         // Observations: Main forest is reduced to just 13 trees. End forest even also constains 13 trees, 
         // end forest odd is further reduced to 9 trees. Odd trees also have a very small number of nodes (17 at most).
 
+        /*
         public static (List<Tree>, int) MainForest(Func<Tree> newTree) {
             // Creates a forest of reduced trees with merged identical branches, removes duplicate trees
             // and assigns an index of the next tree to each leaf of each tree.
@@ -19,17 +20,99 @@ namespace Spaghetti_Labeling
             Tree startTree = forest[forest.Count - 1];      // Start tree constraints are added last, therefore start tree will be at the last index
             MergeIdenticalBranches(forest);
             RemoveDuplicateMainTrees(forest);
+  
+            return (forest, GetStartTreeIndex(startTree, forest));
+        }
+        */
 
+        public static (List<Tree>, int) MainForestMiddleRows(Func<Tree> newTree) {
+            // Returns a forest for labeling middle rows, alongside the index of the start tree
+            return MainForest(newTree, MainTreesConstraints(newTree));
+        }
 
-            
+        public static (List<Tree>, int) MainForestFirstRow(Func<Tree> newTree) {
+            // Returns a forest for labeling the first row, alongside the index of the start tree
+            // hmm, what do I do next? I think I should do it the same way as with middle row end trees, meaning that I first
+            // create the basic forest using basic constraint, then perform additional pruning using the additional constraints
+            // ...but will this approach be consistant with the first tree index that I'm returning?
+            // solution: before the additional pruning, store the root of the start tree. After the additional pruning,
+            // find the start tree using by comparing all trees to the stored root.
+
+            // TODO: this
+            //return (null, 0);
+
+            (List<Tree> forest, int startTreeIndex) = MainForest(newTree, MainTreesConstraints(newTree));
+            Tree startTree = forest[startTreeIndex - 1];
+            PruneForest(forest, FirstRowConstraints());
+            RemoveDuplicateMainTrees(forest);
+            return (forest, GetStartTreeIndex(startTree, forest));
+
+            // As I feared, this approach of keeping track of the first tree doesn't work.
+            // Idea: I can modify RemoveDuplicateMainTrees() to take the start tree index as an argument and make it return
+            // a new (possibly modified) start tree index
+        }
+
+        private static (List<Tree>, int) MainForest(Func<Tree> newTree, List<HashSet<(char, bool)>> constraintsList) {
+            // Creates a forest of reduced trees with merged identical branches, removes duplicate trees
+            // and assigns an index of the next tree to each leaf of each tree.
+            List<Tree> forest = CreateForestOfReducedTrees(newTree, constraintsList);
+            Tree startTree = forest[forest.Count - 1];      // Start tree constraints are added last, therefore start tree will be at the last index
+            MergeIdenticalBranches(forest);
+            RemoveDuplicateMainTrees(forest);
+  
             return (forest, GetStartTreeIndex(startTree, forest));
         }
 
-        public static List<(Tree, List<int>)> EndForest(List<Tree> mainForest, bool even) {
+        /*
+        private static List<(Tree, List<int>)> EndForest(List<Tree> mainForest, bool even) {
             // Returns a list of end trees together with indices of all main trees that each 
             // end tree is associated with (these indices start at 1).
-            // Parameter even determined the type of end forest to be created (even/odd).
+            // Parameter even is determined the type of end forest to be created (even/odd).
 
+            
+            //1) Copy main forest.
+            //2) Perform further reduction and branch merging, put all newly reduced trees into 
+            //   a list together with a list containing the index of the associated main tree.
+            //3) Delete duplicate trees, add the deleted tree's index to the list of the other 
+            //   tree (the one that is equal but wasn't deleted).
+            //   Note that only odd constraints result in having duplicate trees. Even trees
+            //  are all different despite reduction.
+            
+
+            List<Tree> endForest = copyForest(mainForest);
+            HashSet<(char, bool)> constraintsList = even ? EndEvenConstraints() : EndOddConstraints();
+            foreach (Tree tree in endForest) {
+                ReduceTree(tree, constraintsList);
+            }
+            MergeIdenticalBranches(endForest);
+
+            //Each end tree is associated with a main tree. Whenever an end tree is removed due to
+              // being a duplicate, the other tree's list of associated main trees must be updated.
+              // This list stores the end trees with their assocaited main trees. 
+            List<(Tree, List<int>)> endTreesWithMainTreeIndices = new List<(Tree, List<int>)>();
+            for (int i = 0; i < endForest.Count; i++) {
+                endTreesWithMainTreeIndices.Add((endForest[i], new List<int> {i + 1}));
+            }
+            RemoveDuplicateEndTrees(endTreesWithMainTreeIndices);
+
+            return endTreesWithMainTreeIndices;
+        }
+        */
+
+        public static List<(Tree, List<int>)> EndForestEvenMiddleRows(List<Tree> mainForest) {
+            // Returns a list of even end trees together with indices of all main trees that each 
+            // end tree is associated with (these indices start at 1).
+            return EndForest(mainForest, true, EndEvenConstraints());
+        }
+
+        public static List<(Tree, List<int>)> EndForestOddMiddleRows(List<Tree> mainForest) {
+            // Returns a list of odd end trees together with indices of all main trees that each 
+            // end tree is associated with (these indices start at 1).
+            return EndForest(mainForest, false, EndOddConstraints());
+        }
+
+        private static List<(Tree, List<int>)> EndForest(List<Tree> mainForest, bool even, HashSet<(char, bool)> constraints) {
+            // Parameter even is determined the type of end forest to be created (even/odd).
             /*
             1) Copy main forest.
             2) Perform further reduction and branch merging, put all newly reduced trees into 
@@ -41,11 +124,13 @@ namespace Spaghetti_Labeling
             */
 
             List<Tree> endForest = copyForest(mainForest);
-            HashSet<(char, bool)> constraintsList = even ? EndEvenConstraints() : EndOddConstraints();
+            /*
             foreach (Tree tree in endForest) {
-                ReduceTree(tree, constraintsList);
+                ReduceTree(tree, constraints);
             }
             MergeIdenticalBranches(endForest);
+            */
+            PruneForest(endForest, constraints);
 
             /* Each end tree is associated with a main tree. Whenever an end tree is removed due to
                being a duplicate, the other tree's list of associated main trees must be updated.
@@ -60,11 +145,19 @@ namespace Spaghetti_Labeling
             return endTreesWithMainTreeIndices;
         }
 
+        private static void PruneForest(List<Tree> forest, HashSet<(char, bool)> constraints) {
+            // Prunes a given forest using a set of constraints, then merges identical branches
+            foreach (Tree tree in forest) {
+                ReduceTree(tree, constraints);
+            }
+            MergeIdenticalBranches(forest);
+        }
+
         private static int GetStartTreeIndex(Tree startTree, List<Tree> forest) {
             for (int i = 0; i < forest.Count; i++) {
                 if (startTree == forest[i]) {
                     //Console.WriteLine("Start tree has index {0}", i);
-                    // Start tree has index 12 (which is the last index, as expected)
+                    // Start tree of main forest middle has index 12 (which is the last index, as expected)
                     // 1 is added to the index to adjust for the fact that in tree leaves, next tree indices start at 1,
                     // therefore 13 is returned
                     return i + 1;
@@ -107,6 +200,14 @@ namespace Spaghetti_Labeling
                 ('m', false), ('n', false), ('q', false), ('r', false)
             };
         }   
+
+        private static HashSet<(char, bool)> FirstRowConstraints() {
+            return new HashSet<(char, bool)> {
+                ('a', false), ('b', false), ('c', false), ('d', false),
+                ('e', false), ('f', false), ('g', false), ('h', false),
+                ('i', false), ('j', false), ('k', false), ('l', false)
+            };
+        }
 
         private static Tree InitIndicesAndReduce(Func<Tree> newTree, HashSet<(char, bool)> constraints) {
             Tree tree = newTree();
@@ -326,7 +427,7 @@ namespace Spaghetti_Labeling
                 from any leaf.
                 */
 
-                (List<Tree> forest, int _) = MainForest(ODTree.GetTree);
+                (List<Tree> forest, int _) = MainForestMiddleRows(ODTree.GetTree);
 
                 HashSet<int> unusedIncides = new HashSet<int>();
                 for (int i = 1; i < forest.Count; i++) {
@@ -359,7 +460,7 @@ namespace Spaghetti_Labeling
 
             private static void TestPage5Tree() {
                 // Tests if one of my reduced trees exactly matches the one on page 5 of the Spaghetti paper
-                (List<Tree> forest, int _) = MainForest(ODTree.GetTree);
+                (List<Tree> forest, int _) = MainForestMiddleRows(ODTree.GetTree);
                 Tree refTree = TestTrees.Tree11();
 
                 bool matches = false;

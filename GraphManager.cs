@@ -16,10 +16,10 @@ namespace Spaghetti_Labeling
 
         public GraphManager() {
             // Create forests
-            (List<Tree> mainForest, int startTreeIndex) = ForestCreator.MainForest(ODTree.GetTree);
+            (List<Tree> mainForest, int startTreeIndex) = ForestCreator.MainForestMiddleRows(ODTree.GetTree);
             this.startTreeIndex = startTreeIndex;
-            (List<Tree> endForestEvenTrees, List<List<int>> endForestEvenIndices) = SplitListOfTuples(ForestCreator.EndForest(mainForest, true));
-            (List<Tree> endForestOddTrees, List<List<int>> endForestOddIndices) = SplitListOfTuples(ForestCreator.EndForest(mainForest, false));
+            (List<Tree> endForestEvenTrees, List<List<int>> endForestEvenIndices) = SplitListOfTuples(ForestCreator.EndForestEvenMiddleRows(mainForest));
+            (List<Tree> endForestOddTrees, List<List<int>> endForestOddIndices) = SplitListOfTuples(ForestCreator.EndForestOddMiddleRows(mainForest));
 
             // Shift all tree indices such that they start from 0 instead of 1
             DecrementList(endForestEvenIndices);

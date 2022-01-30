@@ -23,19 +23,14 @@ namespace Spaghetti_Labeling
         static void Main(string[] args)
         {
             Console.WriteLine("Hello Bolelli!");
-            
-            //Node treeRoot = (Node) (ODTree.GetTree().GetRoot());
-            //treeRoot.InfoDFS();
 
-            /*
-            List<Tree> mainForest = ForestCreator.MainForest(ODTree.GetTree);
-            List<(Tree, List<int>)> endForestEven = ForestCreator.EndForest(mainForest, true);
-            List<(Tree, List<int>)> endForestOdd = ForestCreator.EndForest(mainForest, false);
-            Graph mainGraph = new Graph(mainForest);
-            */
-
-            Image image = ImageProcessor.SpaghettiCCL(Image.TestImages.BinaryImage4());
+            //Image image = ImageProcessor.SpaghettiCCL(Image.TestImages.BinaryImage4());
             //image.Print();
+
+            (List<Tree> forest, int firstTreeIndex) = ForestCreator.MainForestFirstRow(ODTree.GetTree);
+            Console.WriteLine("MainForestFirstRow contains {0} trees. Index of first tree: {1}", forest.Count, firstTreeIndex);
+            Console.WriteLine("First tree:");
+            forest[firstTreeIndex - 1].GetRoot().InfoDFS();
 
             if (testing) {
                 RunTests();
