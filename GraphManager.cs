@@ -14,7 +14,22 @@ namespace Spaghetti_Labeling
         private Graph endGraphEven;
         private Graph endGraphOdd;
 
-        public GraphManager() {
+        public enum GraphType {
+            FirstRow,
+            MiddleRows,
+            LastRow
+        }
+
+        public GraphManager(GraphType type) {
+            if (type == GraphType.FirstRow) {
+                // do something
+            }
+            else if (type == GraphType.MiddleRows) {
+                Construct(ForestCreator.MainForestMiddleRows, ForestCreator.EndForestEvenMiddleRows, 
+                          ForestCreator.EndForestOddMiddleRows);
+            }
+
+            /*
             // Create forests
             (List<Tree> mainForest, int startTreeIndex) = ForestCreator.MainForestMiddleRows(ODTree.GetTree);
             this.startTreeIndex = startTreeIndex;
@@ -24,6 +39,60 @@ namespace Spaghetti_Labeling
             // Shift all tree indices such that they start from 0 instead of 1
             DecrementList(endForestEvenIndices);
             DecrementList(endForestOddIndices);
+
+            // Create forests
+            (List<Tree> mainForest, int startTreeIndex) = ForestCreator.MainForestMiddleRows(ODTree.GetTree);
+            this.startTreeIndex = startTreeIndex;
+            (List<Tree> endForestEvenTrees, List<List<int>> endForestEvenIndices) = SplitListOfTuples(ForestCreator.EndForestEvenMiddleRows(mainForest));
+            (List<Tree> endForestOddTrees, List<List<int>> endForestOddIndices) = SplitListOfTuples(ForestCreator.EndForestOddMiddleRows(mainForest));
+
+            // Shift all tree indices such that they start from 0 instead of 1
+            DecrementList(endForestEvenIndices);
+            DecrementList(endForestOddIndices);
+
+            Console.WriteLine("Created GraphManager.");
+            for (int i = 0; i < endForestEvenIndices.Count; i++) {
+                foreach(int j in endForestEvenIndices[i]) {
+                    Console.WriteLine("endForestEvenIndices[{0}] = {1}", i, j);
+                }
+            }
+            for (int i = 0; i < endForestOddIndices.Count; i++) {
+                foreach(int j in endForestOddIndices[i]) {
+                    Console.WriteLine("endForestOddIndices[{0}] = {1}", i, j);
+                }
+            }
+
+            // Create graphs
+            this.mainGraph = new MainGraph(mainForest, endForestEvenIndices, endForestOddIndices);
+            this.endGraphEven = new Graph(endForestEvenTrees);
+            this.endGraphOdd = new Graph(endForestOddTrees);
+            */
+        }
+
+        public void Construct(Func<Func<Tree>, (List<Tree>, int)> CreateMainForest,
+                              Func<List<Tree>, List<(Tree, List<int>)>> CreateEndForestEven,
+                              Func<List<Tree>, List<(Tree, List<int>)>> CreateEndForestOdd) {
+            (List<Tree> mainForest, int startTreeIndex) = CreateMainForest(ODTree.GetTree);
+            this.startTreeIndex = startTreeIndex;
+            (List<Tree> endForestEvenTrees, List<List<int>> endForestEvenIndices) = SplitListOfTuples(CreateEndForestEven(mainForest));
+            (List<Tree> endForestOddTrees, List<List<int>> endForestOddIndices) = SplitListOfTuples(CreateEndForestOdd(mainForest));
+
+            // Shift all tree indices such that they start from 0 instead of 1
+            DecrementList(endForestEvenIndices);
+            DecrementList(endForestOddIndices);
+
+
+            /*
+            // Create forests
+            (List<Tree> mainForest, int startTreeIndex) = ForestCreator.MainForestMiddleRows(ODTree.GetTree);
+            this.startTreeIndex = startTreeIndex;
+            (List<Tree> endForestEvenTrees, List<List<int>> endForestEvenIndices) = SplitListOfTuples(ForestCreator.EndForestEvenMiddleRows(mainForest));
+            (List<Tree> endForestOddTrees, List<List<int>> endForestOddIndices) = SplitListOfTuples(ForestCreator.EndForestOddMiddleRows(mainForest));
+
+            // Shift all tree indices such that they start from 0 instead of 1
+            DecrementList(endForestEvenIndices);
+            DecrementList(endForestOddIndices);
+            */
 
             /*
             Console.WriteLine("Created GraphManager.");

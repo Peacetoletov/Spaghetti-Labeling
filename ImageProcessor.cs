@@ -19,7 +19,7 @@ namespace Spaghetti_Labeling
             List<List<int>> inputMatrix = input.GetMatrix();
             Debug.Assert(inputMatrix.Count % 2 == 0);
 
-            GraphManager gm = new GraphManager();
+            GraphManager gm = new GraphManager(GraphManager.GraphType.MiddleRows);
             // ^ For better performance, GraphManager could be created once at the start of the program and then 
             // passed as an argument
 

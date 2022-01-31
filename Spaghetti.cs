@@ -28,9 +28,14 @@ namespace Spaghetti_Labeling
             //image.Print();
 
             (List<Tree> forest, int firstTreeIndex) = ForestCreator.MainForestFirstRow(ODTree.GetTree);
-            Console.WriteLine("MainForestFirstRow contains {0} trees. Index of first tree: {1}", forest.Count, firstTreeIndex);
-            Console.WriteLine("First tree:");
-            forest[firstTreeIndex - 1].GetRoot().InfoDFS();
+            //Console.WriteLine("MainForestFirstRow contains {0} trees. Index of first tree: {1}", forest.Count, firstTreeIndex);
+            //Console.WriteLine("First tree:");
+            //forest[firstTreeIndex - 1].GetRoot().InfoDFS();
+
+            /*
+            TODO: Implement end tree creation for first row forest (should be easy, maybe it requires no changes and I can reuse the existing methods,
+            just some renaming may be necessary).
+            */
 
             if (testing) {
                 RunTests();
