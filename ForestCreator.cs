@@ -114,16 +114,32 @@ namespace Spaghetti_Labeling
             return EndForest(mainForest, false, EndOddConstraints());
         }
 
+        public static List<(Tree, List<int>)> EndForestEvenFirstRow(List<Tree> mainForest) {
+            // Returns a list of even end trees together with indices of all main trees that each 
+            // end tree is associated with (these indices start at 1).
+            HashSet<(char, bool)> constraints = EndEvenConstraints();
+            constraints.UnionWith(FirstRowConstraints());
+            return EndForest(mainForest, true, constraints);
+        }
+
+        public static List<(Tree, List<int>)> EndForestOddFirstRow(List<Tree> mainForest) {
+            // Returns a list of even end trees together with indices of all main trees that each 
+            // end tree is associated with (these indices start at 1).
+            HashSet<(char, bool)> constraints = EndOddConstraints();
+            constraints.UnionWith(FirstRowConstraints());
+            return EndForest(mainForest, false, constraints);
+        }
+
         private static List<(Tree, List<int>)> EndForest(List<Tree> mainForest, bool even, HashSet<(char, bool)> constraints) {
             // Parameter even is determined the type of end forest to be created (even/odd).
             /*
             1) Copy main forest.
-            2) Perform further reduction and branch merging, put all newly reduced trees into 
+            2) Perform further reduction and branch merging and put all newly reduced trees into 
                a list together with a list containing the index of the associated main tree.
             3) Delete duplicate trees, add the deleted tree's index to the list of the other 
                tree (the one that is equal but wasn't deleted).
-               Note that only odd constraints result in having duplicate trees. Even trees
-               are all different despite reduction.
+               Note that in middle rows, only odd constraints result in having duplicate trees. 
+               Even trees are all different despite reduction.
             */
 
             List<Tree> endForest = copyForest(mainForest);

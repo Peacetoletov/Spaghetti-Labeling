@@ -183,6 +183,23 @@ namespace Spaghetti_Labeling
                     "...."
                 }));
             }
+
+            public static Image BinaryImage5() {
+                // This image contains some possible action results in the first row 
+                return new Image(StringifiedToBinary(new List<string> {
+                    "..x..x.",      // Main trees: 1 - no action, 2 - new label, 6 - assign x = s
+                    "...xx.x"      // End tree odd: 6 - assign x = s
+                }));
+            }
+
+            public static Image BinaryImage6() {
+                return new Image(StringifiedToBinary(new List<string> {
+                    ".......",
+                    ".......",
+                    "..x..x.",      // Main trees: 1 - no action, 2 - new label, 6 - assign x = s
+                    "...xx.x"      // End tree odd: 6 - assign x = s
+                }));
+            }
         }
     }
 }

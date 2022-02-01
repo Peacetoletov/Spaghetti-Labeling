@@ -140,9 +140,13 @@ namespace Spaghetti_Labeling
         private void LabelCurrentBlock(int label, int x, int y) {
             for (int i = 0; i < 2; i++) {
                 for (int j = 0; j < 2; j++) {
-                    if (inputMatrix[y + j][x + i] == 1) {
-                        outputMatrix[y + j][x + i] = label;
-                    } 
+                    // The following condition must be here in case the input matrix contains an odd
+                    // number of columns or rows
+                    if (y + j < inputMatrix.Count && x + i < inputMatrix[y + j].Count) {
+                        if (inputMatrix[y + j][x + i] == 1) {
+                            outputMatrix[y + j][x + i] = label;
+                        } 
+                    }
                 }
             }
         }

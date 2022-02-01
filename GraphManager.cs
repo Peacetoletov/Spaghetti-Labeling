@@ -22,7 +22,8 @@ namespace Spaghetti_Labeling
 
         public GraphManager(GraphType type) {
             if (type == GraphType.FirstRow) {
-                // do something
+                Construct(ForestCreator.MainForestFirstRow, ForestCreator.EndForestEvenFirstRow,
+                          ForestCreator.EndForestOddFirstRow);
             }
             else if (type == GraphType.MiddleRows) {
                 Construct(ForestCreator.MainForestMiddleRows, ForestCreator.EndForestEvenMiddleRows, 
@@ -80,6 +81,17 @@ namespace Spaghetti_Labeling
             // Shift all tree indices such that they start from 0 instead of 1
             DecrementList(endForestEvenIndices);
             DecrementList(endForestOddIndices);
+
+            // testing
+            /*
+            Console.WriteLine("endForestOdd has {0} trees.", endForestOddTrees.Count);
+            for (int i = 0; i < endForestOddTrees.Count; i++) {
+                Tree tree = endForestOddTrees[i];
+                Console.WriteLine("Tree {0}:", i);
+                tree.GetRoot().AssignVisitedInSubtree(false);
+                tree.GetRoot().InfoDFS();
+            }
+            */
 
 
             /*

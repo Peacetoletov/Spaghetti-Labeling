@@ -18,23 +18,29 @@ namespace Spaghetti_Labeling
         ...
         */
 
-        private const bool testing = true;
+        private const bool testing = false;
 
         static void Main(string[] args)
         {
             Console.WriteLine("Hello Bolelli!");
 
-            //Image image = ImageProcessor.SpaghettiCCL(Image.TestImages.BinaryImage4());
-            //image.Print();
-
-            (List<Tree> forest, int firstTreeIndex) = ForestCreator.MainForestFirstRow(ODTree.GetTree);
+            //(List<Tree> forest, int firstTreeIndex) = ForestCreator.MainForestFirstRow(ODTree.GetTree);
             //Console.WriteLine("MainForestFirstRow contains {0} trees. Index of first tree: {1}", forest.Count, firstTreeIndex);
             //Console.WriteLine("First tree:");
             //forest[firstTreeIndex - 1].GetRoot().InfoDFS();
 
+            Image image = ImageProcessor.SpaghettiCCL(Image.TestImages.BinaryImage5());
+            image.Print();
+
+            //GraphManager gmFirst = new GraphManager(GraphManager.GraphType.FirstRow);
+
             /*
             TODO: Implement end tree creation for first row forest (should be easy, maybe it requires no changes and I can reuse the existing methods,
             just some renaming may be necessary).
+
+            UPDATE: The simple test (BinaryImage5) is failing. Find out why and fix the issue.
+            UPDATE 2: A slightly modified version of the image (BinaryImage6) is working correctly. This means that the problem is
+                not in the end trees in general, rather end trees specifically in the first row. 
             */
 
             if (testing) {

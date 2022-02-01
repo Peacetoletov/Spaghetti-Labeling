@@ -19,7 +19,8 @@ namespace Spaghetti_Labeling
             List<List<int>> inputMatrix = input.GetMatrix();
             Debug.Assert(inputMatrix.Count % 2 == 0);
 
-            GraphManager gm = new GraphManager(GraphManager.GraphType.MiddleRows);
+            GraphManager gmFirst = new GraphManager(GraphManager.GraphType.FirstRow);
+            GraphManager gmMiddle = new GraphManager(GraphManager.GraphType.MiddleRows);
             // ^ For better performance, GraphManager could be created once at the start of the program and then 
             // passed as an argument
 
@@ -32,12 +33,12 @@ namespace Spaghetti_Labeling
             for (int y = 0; y < height; y += 2) {
                 if (y == 0) {
                     // First row
-                    // currently does nothing. First implement middle rows, then this.
-                    //Console.WriteLine("Skipping blocks in row 0.");
+                    Console.WriteLine("Labeling blocks in first row.");
+                    SpaghettiLabelBlocks(y, gmFirst, input, ap);
                 } 
                 else if (y != height - 1) {
                     // Middle rows
-                    SpaghettiLabelBlocksInMiddleRow(y, gm, input, ap);
+                    SpaghettiLabelBlocks(y, gmMiddle, input, ap);
                 }
                 else {
                     // Last row (only used in images with an odd number of rows)
@@ -59,20 +60,21 @@ namespace Spaghetti_Labeling
         }
 
 
-        private static void SpaghettiLabelBlocksInMiddleRow(int y, GraphManager gm, Image input, ActionPerformer ap) {
+        private static void SpaghettiLabelBlocks(int y, GraphManager gm, Image input, ActionPerformer ap) {
             // row y means that pixels at positions y and y+1 will be labeled
             List<List<int>> inputMatrix = input.GetMatrix();
             int width = inputMatrix[0].Count;
             int nextTreeIndex = gm.GetStartTreeIndex();
             int action = -1;
             for (int x = 0; x < width; x += 2) {
-                //Console.Write("Block in column {0}. ", x);
+                Console.Write("Block in column {0}. ", x);
                 if (x < width - 2) {
                     // Use main tree
-                    //Console.Write("Using main tree with index {0}. ", nextTreeIndex);
+                    Console.Write("Using main tree with index {0}. ", nextTreeIndex);
                     (action, nextTreeIndex) = GetActionAndNextTreeIndex(gm.AdjustIndexAndGetRootInMainGraph(nextTreeIndex), input, x, y);
                          
                 } else {
+                    Console.Write("Using end tree with index {0}. ", nextTreeIndex);
                     if (x == width - 2) {
                         // Use even tree
                         action = GetAction(gm.AdjustIndexAndGetRootInEndGraphEven(nextTreeIndex), input, x, y);
@@ -81,7 +83,7 @@ namespace Spaghetti_Labeling
                         action = GetAction(gm.AdjustIndexAndGetRootInEndGraphOdd(nextTreeIndex), input, x, y);
                     }
                 }
-                //Console.WriteLine("Chosen action: {0}", action);
+                Console.WriteLine("Chosen action: {0}", action);
                 ap.Perform(action, x, y);
             }
         }
@@ -342,6 +344,16 @@ namespace Spaghetti_Labeling
                 Image spaghetti4 = SpaghettiCCL(Image.TestImages.BinaryImage4());
                 Image classic4 = ClassicCCL(Image.TestImages.BinaryImage4());
                 Debug.Assert(spaghetti4.Equals(classic4));
+
+                // This test is failing (BinaryImage5)
+                Image spaghetti5 = SpaghettiCCL(Image.TestImages.BinaryImage5());
+                Image classic5 = ClassicCCL(Image.TestImages.BinaryImage5());
+                Debug.Assert(spaghetti5.Equals(classic5));
+                
+
+                Image spaghetti6 = SpaghettiCCL(Image.TestImages.BinaryImage6());
+                Image classic6 = ClassicCCL(Image.TestImages.BinaryImage6());
+                Debug.Assert(spaghetti6.Equals(classic6));
             } 
         }
     }
