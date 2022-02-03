@@ -74,14 +74,18 @@ namespace Spaghetti_Labeling
                     (action, nextTreeIndex) = GetActionAndNextTreeIndex(gm.AdjustIndexAndGetRootInMainGraph(nextTreeIndex), input, x, y);
                          
                 } else {
-                    Console.Write("Using end tree with index {0}. ", nextTreeIndex);
                     if (x == width - 2) {
                         // Use even tree
+                        Console.Write("Using even end tree with index {0}. ", nextTreeIndex);
                         action = GetAction(gm.AdjustIndexAndGetRootInEndGraphEven(nextTreeIndex), input, x, y);
+                        gm.AdjustIndexAndGetRootInEndGraphEven(nextTreeIndex).InfoDFS();
                     } else {
                         // Use odd tree
+                        Console.Write("Using odd end tree with index {0}. ", nextTreeIndex);
                         action = GetAction(gm.AdjustIndexAndGetRootInEndGraphOdd(nextTreeIndex), input, x, y);
+                        gm.AdjustIndexAndGetRootInEndGraphOdd(nextTreeIndex).InfoDFS();
                     }
+                    
                 }
                 Console.WriteLine("Chosen action: {0}", action);
                 ap.Perform(action, x, y);

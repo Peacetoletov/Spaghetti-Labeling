@@ -75,8 +75,8 @@ namespace Spaghetti_Labeling
                               Func<List<Tree>, List<(Tree, List<int>)>> CreateEndForestOdd) {
             (List<Tree> mainForest, int startTreeIndex) = CreateMainForest(ODTree.GetTree);
             this.startTreeIndex = startTreeIndex;
-            (List<Tree> endForestEvenTrees, List<List<int>> endForestEvenIndices) = SplitListOfTuples(CreateEndForestEven(mainForest));
-            (List<Tree> endForestOddTrees, List<List<int>> endForestOddIndices) = SplitListOfTuples(CreateEndForestOdd(mainForest));
+            (List<Tree> endForestEvenTrees, List<List<int>> endForestEvenIndices) = SplitListOfPairs(CreateEndForestEven(mainForest));
+            (List<Tree> endForestOddTrees, List<List<int>> endForestOddIndices) = SplitListOfPairs(CreateEndForestOdd(mainForest));
 
             // Shift all tree indices such that they start from 0 instead of 1
             DecrementList(endForestEvenIndices);
@@ -91,8 +91,15 @@ namespace Spaghetti_Labeling
                 tree.GetRoot().AssignVisitedInSubtree(false);
                 tree.GetRoot().InfoDFS();
             }
+            for (int i = 0; i < endForestOddTrees.Count; i++) {
+                Tree tree = endForestOddTrees[i];
+                Console.Write("Tree {0} will be used with main tree indices: ", i);
+                foreach (int index in endForestOddIndices[i]) {
+                    Console.Write(index + " ");
+                }
+                Console.WriteLine();
+            }
             */
-
 
             /*
             // Create forests
@@ -126,7 +133,7 @@ namespace Spaghetti_Labeling
             this.endGraphOdd = new Graph(endForestOddTrees);
         }
 
-        private (List<Tree>, List<List<int>>) SplitListOfTuples(List<(Tree, List<int>)> endForest) {
+        private (List<Tree>, List<List<int>>) SplitListOfPairs(List<(Tree, List<int>)> endForest) {
             List<Tree> trees = new List<Tree>();
             List<List<int>> indicesList = new List<List<int>>();
             foreach ((Tree tree, List<int> indices) in endForest) {

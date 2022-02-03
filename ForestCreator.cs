@@ -144,6 +144,14 @@ namespace Spaghetti_Labeling
 
             List<Tree> endForest = copyForest(mainForest);
             /*
+            //testing
+            for (int i = 0; i < endForest.Count; i++) {
+                Tree tree = endForest[i];
+                Console.WriteLine("Main tree {0}", i);
+                tree.GetRoot().InfoDFS();
+            }
+            */
+            /*
             foreach (Tree tree in endForest) {
                 ReduceTree(tree, constraints);
             }
