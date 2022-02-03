@@ -29,11 +29,11 @@ namespace Spaghetti_Labeling
             //Console.WriteLine("First tree:");
             //forest[firstTreeIndex - 1].GetRoot().InfoDFS();
 
-            //Image image = ImageProcessor.SpaghettiCCL(Image.TestImages.BinaryImage5());
-            //image.Print();
+            Image image = ImageProcessor.SpaghettiCCL(Image.TestImages.BinaryImage5());
+            image.Print();
 
             //GraphManager gmFirst = new GraphManager(GraphManager.GraphType.FirstRow);
-            (List<Tree> mainForestFirstRow, int startTreeIndex) = ForestCreator.MainForestFirstRow(ODTree.GetTree);
+            //(List<Tree> mainForestFirstRow, int startTreeIndex) = ForestCreator.MainForestFirstRow(ODTree.GetTree());
             /*
             //testing
             for (int i = 0; i < mainForestFirstRow.Count; i++) {

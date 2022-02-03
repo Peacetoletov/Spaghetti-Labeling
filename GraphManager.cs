@@ -70,13 +70,13 @@ namespace Spaghetti_Labeling
             */
         }
 
-        public void Construct(Func<Func<Tree>, (List<Tree>, int)> CreateMainForest,
-                              Func<List<Tree>, List<(Tree, List<int>)>> CreateEndForestEven,
-                              Func<List<Tree>, List<(Tree, List<int>)>> CreateEndForestOdd) {
-            (List<Tree> mainForest, int startTreeIndex) = CreateMainForest(ODTree.GetTree);
+        public void Construct(Func<Tree, (List<Tree>, int)> CreateMainForest,
+                              Func<Tree, List<(Tree, List<int>)>> CreateEndForestEven,
+                              Func<Tree, List<(Tree, List<int>)>> CreateEndForestOdd) {
+            (List<Tree> mainForest, int startTreeIndex) = CreateMainForest(ODTree.GetTree());
             this.startTreeIndex = startTreeIndex;
-            (List<Tree> endForestEvenTrees, List<List<int>> endForestEvenIndices) = SplitListOfPairs(CreateEndForestEven(mainForest));
-            (List<Tree> endForestOddTrees, List<List<int>> endForestOddIndices) = SplitListOfPairs(CreateEndForestOdd(mainForest));
+            (List<Tree> endForestEvenTrees, List<List<int>> endForestEvenIndices) = SplitListOfPairs(CreateEndForestEven(ODTree.GetTree()));
+            (List<Tree> endForestOddTrees, List<List<int>> endForestOddIndices) = SplitListOfPairs(CreateEndForestOdd(ODTree.GetTree()));
 
             // Shift all tree indices such that they start from 0 instead of 1
             DecrementList(endForestEvenIndices);
