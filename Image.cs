@@ -197,7 +197,70 @@ namespace Spaghetti_Labeling
                     ".......",
                     ".......",
                     "..x..x.",      // Main trees: 1 - no action, 2 - new label, 6 - assign x = s
-                    "...xx.x"      // End tree odd: 6 - assign x = s
+                    "...xx.x"       // End tree odd: 6 - assign x = s
+                }));
+            }
+
+            public static Image BinaryImage7() {
+                return new Image(StringifiedToBinary(new List<string> {
+                    ".......",
+                    ".......",
+                    "..x...x",
+                    "...xxxx" 
+                }));
+            }
+
+            public static Image BinaryImage8() {
+                return new Image(StringifiedToBinary(new List<string> {
+                    ".......",
+                    ".......",
+                    "..x...x",
+                    "...xx.x" 
+                }));
+            }
+
+            public static Image BinaryImage9() {
+                return new Image(StringifiedToBinary(new List<string> {
+                    ".......",
+                    ".......",
+                    "..x....",
+                    "...xxx." 
+                }));
+            }
+
+            public static Image BinaryImage10() {
+                return new Image(StringifiedToBinary(new List<string> {
+                    "........",
+                    "........",
+                    "...x..x.",      // Main trees: 1 - no action, 2 - new label, 6 - assign x = s
+                    "....xx.x"       // End tree even: 6 - assign x = s
+                }));
+            }
+
+            public static Image BinaryImage11() {
+                return new Image(StringifiedToBinary(new List<string> {
+                    "........",
+                    "........",
+                    "...x...x",
+                    "....xxxx" 
+                }));
+            }
+
+            public static Image BinaryImage12() {
+                return new Image(StringifiedToBinary(new List<string> {
+                    "........",
+                    "........",
+                    "...x...x",
+                    "....xx.x" 
+                }));
+            }
+
+            public static Image BinaryImage13() {
+                return new Image(StringifiedToBinary(new List<string> {
+                    "........",
+                    "........",
+                    "...x....",
+                    "....xxx." 
                 }));
             }
         }

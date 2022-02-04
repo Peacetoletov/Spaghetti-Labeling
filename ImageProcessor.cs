@@ -33,7 +33,7 @@ namespace Spaghetti_Labeling
             for (int y = 0; y < height; y += 2) {
                 if (y == 0) {
                     // First row
-                    Console.WriteLine("Labeling blocks in first row.");
+                    //Console.WriteLine("Labeling blocks in first row.");
                     SpaghettiLabelBlocks(y, gmFirst, input, ap);
                 } 
                 else if (y != height - 1) {
@@ -67,27 +67,27 @@ namespace Spaghetti_Labeling
             int nextTreeIndex = gm.GetStartTreeIndex();
             int action = -1;
             for (int x = 0; x < width; x += 2) {
-                Console.Write("Block in column {0}. ", x);
+                //Console.Write("Block in column {0}. ", x);
                 if (x < width - 2) {
                     // Use main tree
-                    Console.Write("Using main tree with index {0}. ", nextTreeIndex);
+                    //Console.Write("Using main tree with index {0}. ", nextTreeIndex);
                     (action, nextTreeIndex) = GetActionAndNextTreeIndex(gm.AdjustIndexAndGetRootInMainGraph(nextTreeIndex), input, x, y);
                          
                 } else {
                     if (x == width - 2) {
                         // Use even tree
-                        Console.Write("Using even end tree with index {0}. ", nextTreeIndex);
+                        //Console.Write("Using even end tree with index {0}. ", nextTreeIndex);
                         action = GetAction(gm.AdjustIndexAndGetRootInEndGraphEven(nextTreeIndex), input, x, y);
-                        gm.AdjustIndexAndGetRootInEndGraphEven(nextTreeIndex).InfoDFS();
+                        //gm.AdjustIndexAndGetRootInEndGraphEven(nextTreeIndex).InfoDFS();
                     } else {
                         // Use odd tree
-                        Console.Write("Using odd end tree with index {0}. ", nextTreeIndex);
+                        //Console.Write("Using odd end tree with index {0}. ", nextTreeIndex);
                         action = GetAction(gm.AdjustIndexAndGetRootInEndGraphOdd(nextTreeIndex), input, x, y);
-                        gm.AdjustIndexAndGetRootInEndGraphOdd(nextTreeIndex).InfoDFS();
+                        //gm.AdjustIndexAndGetRootInEndGraphOdd(nextTreeIndex).InfoDFS();
                     }
                     
                 }
-                Console.WriteLine("Chosen action: {0}", action);
+                //Console.WriteLine("Chosen action: {0}", action);
                 ap.Perform(action, x, y);
             }
         }
@@ -349,15 +349,41 @@ namespace Spaghetti_Labeling
                 Image classic4 = ClassicCCL(Image.TestImages.BinaryImage4());
                 Debug.Assert(spaghetti4.Equals(classic4));
 
-                // This test is failing (BinaryImage5)
                 Image spaghetti5 = SpaghettiCCL(Image.TestImages.BinaryImage5());
                 Image classic5 = ClassicCCL(Image.TestImages.BinaryImage5());
                 Debug.Assert(spaghetti5.Equals(classic5));
-                
 
                 Image spaghetti6 = SpaghettiCCL(Image.TestImages.BinaryImage6());
                 Image classic6 = ClassicCCL(Image.TestImages.BinaryImage6());
                 Debug.Assert(spaghetti6.Equals(classic6));
+
+                Image spaghetti7 = SpaghettiCCL(Image.TestImages.BinaryImage7());
+                Image classic7 = ClassicCCL(Image.TestImages.BinaryImage7());
+                Debug.Assert(spaghetti7.Equals(classic7));
+
+                Image spaghetti8 = SpaghettiCCL(Image.TestImages.BinaryImage8());
+                Image classic8 = ClassicCCL(Image.TestImages.BinaryImage8());
+                Debug.Assert(spaghetti8.Equals(classic8));
+
+                Image spaghetti9 = SpaghettiCCL(Image.TestImages.BinaryImage9());
+                Image classic9 = ClassicCCL(Image.TestImages.BinaryImage9());
+                Debug.Assert(spaghetti9.Equals(classic9));
+
+                Image spaghetti10 = SpaghettiCCL(Image.TestImages.BinaryImage10());
+                Image classic10 = ClassicCCL(Image.TestImages.BinaryImage10());
+                Debug.Assert(spaghetti10.Equals(classic10));
+
+                Image spaghetti11 = SpaghettiCCL(Image.TestImages.BinaryImage11());
+                Image classic11 = ClassicCCL(Image.TestImages.BinaryImage11());
+                Debug.Assert(spaghetti11.Equals(classic11));
+
+                Image spaghetti12 = SpaghettiCCL(Image.TestImages.BinaryImage12());
+                Image classic12 = ClassicCCL(Image.TestImages.BinaryImage12());
+                Debug.Assert(spaghetti12.Equals(classic12));
+
+                Image spaghetti13 = SpaghettiCCL(Image.TestImages.BinaryImage13());
+                Image classic13 = ClassicCCL(Image.TestImages.BinaryImage13());
+                Debug.Assert(spaghetti13.Equals(classic13));
             } 
         }
     }

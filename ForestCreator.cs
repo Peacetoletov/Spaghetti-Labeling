@@ -35,6 +35,7 @@ namespace Spaghetti_Labeling
             ReduceTree(seedTree, FirstRowConstraints());
             seedTree.GetRoot().MergeIdenticalBranches();
             (List<Tree> forest, int startTreeIndex) = MainForest(seedTree);
+            //Console.WriteLine("Calling MainForestFirstRow(). Created a forest with {0} trees.", forest.Count);
             startTreeIndex = RemoveDuplicateMainTrees(forest, startTreeIndex);
             return (forest, startTreeIndex);
         }
@@ -56,32 +57,32 @@ namespace Spaghetti_Labeling
         public static List<(Tree, List<int>)> EndForestEvenMiddleRows(Tree seedTree) {
             // Returns a list of even end trees together with indices of all main trees that each 
             // end tree is associated with (these indices start at 1).
-            return EndForest(seedTree, true, EndEvenConstraints());
+            (List<Tree> mainForest, int _) = MainForestMiddleRows(seedTree);
+            return EndForest(mainForest, EndEvenConstraints());
         }
 
         public static List<(Tree, List<int>)> EndForestOddMiddleRows(Tree seedTree) {
             // Returns a list of odd end trees together with indices of all main trees that each 
             // end tree is associated with (these indices start at 1).
-            return EndForest(seedTree, false, EndOddConstraints());
+            (List<Tree> mainForest, int _) = MainForestMiddleRows(seedTree);
+            return EndForest(mainForest, EndOddConstraints());
         }
 
         public static List<(Tree, List<int>)> EndForestEvenFirstRow(Tree seedTree) {
             // Returns a list of even end trees together with indices of all main trees that each 
             // end tree is associated with (these indices start at 1).
-            HashSet<(char, bool)> constraints = EndEvenConstraints();
-            constraints.UnionWith(FirstRowConstraints());
-            return EndForest(seedTree, true, constraints);
+            (List<Tree> mainForest, int _) = MainForestFirstRow(seedTree);
+            return EndForest(mainForest, EndEvenConstraints());
         }
 
         public static List<(Tree, List<int>)> EndForestOddFirstRow(Tree seedTree) {
             // Returns a list of even end trees together with indices of all main trees that each 
             // end tree is associated with (these indices start at 1).
-            HashSet<(char, bool)> constraints = EndOddConstraints();
-            constraints.UnionWith(FirstRowConstraints());
-            return EndForest(seedTree, false, constraints);
+            (List<Tree> mainForest, int _) = MainForestFirstRow(seedTree);
+            return EndForest(mainForest, EndOddConstraints());
         }
 
-        private static List<(Tree, List<int>)> EndForest(Tree seedTree, bool even, HashSet<(char, bool)> constraints) {
+        private static List<(Tree, List<int>)> EndForest(List<Tree> mainForest, HashSet<(char, bool)> constraints) {
             // Parameter even is determined the type of end forest to be created (even/odd).
             /*
             1) Copy main forest.
@@ -93,12 +94,16 @@ namespace Spaghetti_Labeling
                Even trees are all different despite reduction.
 
                // TODO: update the description because it is wrong
+               // UPDATE: no, it was correct. Remove this todo.
             */
 
+            /*
             ReduceTree(seedTree, constraints);
             seedTree.GetRoot().MergeIdenticalBranches();
-            (List<Tree> endForest, int _) = MainForest(seedTree);
-            //List<Tree> endForest = copyForest(mainForest);
+            */
+            //(List<Tree> endForest, int _) = MainForest(seedTree);
+            //Console.WriteLine("Calling EndForest() with even = {0}. Created a MAIN forest with {1} trees.", even, endForest.Count);
+            List<Tree> endForest = copyForest(mainForest);
             /*
             //testing
             for (int i = 0; i < endForest.Count; i++) {
@@ -113,7 +118,7 @@ namespace Spaghetti_Labeling
             }
             MergeIdenticalBranches(endForest);
             */
-            //PruneForest(endForest, constraints);
+            PruneForest(endForest, constraints);
 
             /* Each end tree is associated with a main tree. Whenever an end tree is removed due to
                being a duplicate, the other tree's list of associated main trees must be updated.

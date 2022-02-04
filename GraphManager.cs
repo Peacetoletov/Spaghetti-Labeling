@@ -29,45 +29,6 @@ namespace Spaghetti_Labeling
                 Construct(ForestCreator.MainForestMiddleRows, ForestCreator.EndForestEvenMiddleRows, 
                           ForestCreator.EndForestOddMiddleRows);
             }
-
-            /*
-            // Create forests
-            (List<Tree> mainForest, int startTreeIndex) = ForestCreator.MainForestMiddleRows(ODTree.GetTree);
-            this.startTreeIndex = startTreeIndex;
-            (List<Tree> endForestEvenTrees, List<List<int>> endForestEvenIndices) = SplitListOfTuples(ForestCreator.EndForestEvenMiddleRows(mainForest));
-            (List<Tree> endForestOddTrees, List<List<int>> endForestOddIndices) = SplitListOfTuples(ForestCreator.EndForestOddMiddleRows(mainForest));
-
-            // Shift all tree indices such that they start from 0 instead of 1
-            DecrementList(endForestEvenIndices);
-            DecrementList(endForestOddIndices);
-
-            // Create forests
-            (List<Tree> mainForest, int startTreeIndex) = ForestCreator.MainForestMiddleRows(ODTree.GetTree);
-            this.startTreeIndex = startTreeIndex;
-            (List<Tree> endForestEvenTrees, List<List<int>> endForestEvenIndices) = SplitListOfTuples(ForestCreator.EndForestEvenMiddleRows(mainForest));
-            (List<Tree> endForestOddTrees, List<List<int>> endForestOddIndices) = SplitListOfTuples(ForestCreator.EndForestOddMiddleRows(mainForest));
-
-            // Shift all tree indices such that they start from 0 instead of 1
-            DecrementList(endForestEvenIndices);
-            DecrementList(endForestOddIndices);
-
-            Console.WriteLine("Created GraphManager.");
-            for (int i = 0; i < endForestEvenIndices.Count; i++) {
-                foreach(int j in endForestEvenIndices[i]) {
-                    Console.WriteLine("endForestEvenIndices[{0}] = {1}", i, j);
-                }
-            }
-            for (int i = 0; i < endForestOddIndices.Count; i++) {
-                foreach(int j in endForestOddIndices[i]) {
-                    Console.WriteLine("endForestOddIndices[{0}] = {1}", i, j);
-                }
-            }
-
-            // Create graphs
-            this.mainGraph = new MainGraph(mainForest, endForestEvenIndices, endForestOddIndices);
-            this.endGraphEven = new Graph(endForestEvenTrees);
-            this.endGraphOdd = new Graph(endForestOddTrees);
-            */
         }
 
         public void Construct(Func<Tree, (List<Tree>, int)> CreateMainForest,
@@ -80,52 +41,7 @@ namespace Spaghetti_Labeling
 
             // Shift all tree indices such that they start from 0 instead of 1
             DecrementList(endForestEvenIndices);
-            DecrementList(endForestOddIndices);
-
-            // testing
-            /*
-            Console.WriteLine("endForestOdd has {0} trees.", endForestOddTrees.Count);
-            for (int i = 0; i < endForestOddTrees.Count; i++) {
-                Tree tree = endForestOddTrees[i];
-                Console.WriteLine("Tree {0}:", i);
-                tree.GetRoot().AssignVisitedInSubtree(false);
-                tree.GetRoot().InfoDFS();
-            }
-            for (int i = 0; i < endForestOddTrees.Count; i++) {
-                Tree tree = endForestOddTrees[i];
-                Console.Write("Tree {0} will be used with main tree indices: ", i);
-                foreach (int index in endForestOddIndices[i]) {
-                    Console.Write(index + " ");
-                }
-                Console.WriteLine();
-            }
-            */
-
-            /*
-            // Create forests
-            (List<Tree> mainForest, int startTreeIndex) = ForestCreator.MainForestMiddleRows(ODTree.GetTree);
-            this.startTreeIndex = startTreeIndex;
-            (List<Tree> endForestEvenTrees, List<List<int>> endForestEvenIndices) = SplitListOfTuples(ForestCreator.EndForestEvenMiddleRows(mainForest));
-            (List<Tree> endForestOddTrees, List<List<int>> endForestOddIndices) = SplitListOfTuples(ForestCreator.EndForestOddMiddleRows(mainForest));
-
-            // Shift all tree indices such that they start from 0 instead of 1
-            DecrementList(endForestEvenIndices);
-            DecrementList(endForestOddIndices);
-            */
-
-            /*
-            Console.WriteLine("Created GraphManager.");
-            for (int i = 0; i < endForestEvenIndices.Count; i++) {
-                foreach(int j in endForestEvenIndices[i]) {
-                    Console.WriteLine("endForestEvenIndices[{0}] = {1}", i, j);
-                }
-            }
-            for (int i = 0; i < endForestOddIndices.Count; i++) {
-                foreach(int j in endForestOddIndices[i]) {
-                    Console.WriteLine("endForestOddIndices[{0}] = {1}", i, j);
-                }
-            }
-            */
+            DecrementList(endForestOddIndices);            
 
             // Create graphs
             this.mainGraph = new MainGraph(mainForest, endForestEvenIndices, endForestOddIndices);
@@ -170,7 +86,7 @@ namespace Spaghetti_Labeling
         public static class Tests 
         {
             public static void Run() {
-
+                // Cosmetic tests LUL
             }
         }    
     }
