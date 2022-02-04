@@ -263,6 +263,19 @@ namespace Spaghetti_Labeling
                     "....xxx." 
                 }));
             }
+
+            public static Image BinaryImage14() {
+                // This image contains all possible action results in the last row using main forest
+                return new Image(StringifiedToBinary(new List<string> {
+                    ".....................",
+                    ".....x.x....xx..x...x",
+                    "xxxx.x..x..x..xx.xxx."   
+                //   | | | | | | | | | | |   ... each line visualizes the start of a block
+                    // 2 - new label, 6 - assign x = s, 4 - assign x = q,
+                    // 1 - no action, 3 - assign x = p, 5 - assign x = r,
+                    // 8 - merge x = p + r, 12 - merge x = s + r 
+                }));
+            }
         }
     }
 }

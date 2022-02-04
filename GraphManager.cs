@@ -29,6 +29,10 @@ namespace Spaghetti_Labeling
                 Construct(ForestCreator.MainForestMiddleRows, ForestCreator.EndForestEvenMiddleRows, 
                           ForestCreator.EndForestOddMiddleRows);
             }
+            else {
+                Construct(ForestCreator.MainForestLastRow, ForestCreator.EndForestEvenLastRow, 
+                          ForestCreator.EndForestOddLastRow);
+            }
         }
 
         public void Construct(Func<Tree, (List<Tree>, int)> CreateMainForest,

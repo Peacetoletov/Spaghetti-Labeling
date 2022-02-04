@@ -129,8 +129,12 @@ namespace Spaghetti_Labeling
             }
             for (int i = 0; i < 2; i++) {
                 for (int j = 0; j < 2; j++) {
-                    if (outputMatrix[y + yOffset + j][x + xOffset + i] != 0) {
-                        return outputMatrix[y + yOffset + j][x + xOffset + i];
+                    // The following condition must be here in case the input matrix contains an odd
+                    // number of columns or rows
+                    if (y + yOffset + j < outputMatrix.Count && x + xOffset + i < outputMatrix[y + yOffset + j].Count) {
+                        if (outputMatrix[y + yOffset + j][x + xOffset + i] != 0) {
+                            return outputMatrix[y + yOffset + j][x + xOffset + i];
+                        }
                     }
                 }
             }

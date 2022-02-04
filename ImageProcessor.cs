@@ -17,10 +17,10 @@ namespace Spaghetti_Labeling
             Once the special trees are implemented, this condition will disappear.
             */
             List<List<int>> inputMatrix = input.GetMatrix();
-            Debug.Assert(inputMatrix.Count % 2 == 0);
 
             GraphManager gmFirst = new GraphManager(GraphManager.GraphType.FirstRow);
             GraphManager gmMiddle = new GraphManager(GraphManager.GraphType.MiddleRows);
+            GraphManager gmLast = new GraphManager(GraphManager.GraphType.LastRow);
             // ^ For better performance, GraphManager could be created once at the start of the program and then 
             // passed as an argument
 
@@ -42,7 +42,8 @@ namespace Spaghetti_Labeling
                 }
                 else {
                     // Last row (only used in images with an odd number of rows)
-                    // currently does nothing. First implement middle rows and first row, then this.
+                    //Console.WriteLine("Labeling blocks in last row.");
+                    SpaghettiLabelBlocks(y, gmLast, input, ap);
                 }
             }
 
@@ -384,6 +385,10 @@ namespace Spaghetti_Labeling
                 Image spaghetti13 = SpaghettiCCL(Image.TestImages.BinaryImage13());
                 Image classic13 = ClassicCCL(Image.TestImages.BinaryImage13());
                 Debug.Assert(spaghetti13.Equals(classic13));
+
+                Image spaghetti14 = SpaghettiCCL(Image.TestImages.BinaryImage14());
+                Image classic14 = ClassicCCL(Image.TestImages.BinaryImage14());
+                Debug.Assert(spaghetti14.Equals(classic14));
             } 
         }
     }

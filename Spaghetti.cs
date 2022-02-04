@@ -14,7 +14,7 @@ namespace Spaghetti_Labeling
         6) Convert trees to DRAGs DONE
         7) Actions, labeling, label equivalence resolution DONE
         8) First row labeling DONE
-        9) Last row labeling
+        9) Last row labeling DONE
         ...
         */
 
@@ -23,6 +23,9 @@ namespace Spaghetti_Labeling
         static void Main(string[] args)
         {
             Console.WriteLine("Hello Bolelli!");
+
+            //Image image = ImageProcessor.SpaghettiCCL(Image.TestImages.BinaryImage14());
+            //image.Print();
 
 
             if (testing) {
