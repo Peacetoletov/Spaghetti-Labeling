@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Spaghetti_Labeling
 {
@@ -275,6 +276,46 @@ namespace Spaghetti_Labeling
                     // 1 - no action, 3 - assign x = p, 5 - assign x = r,
                     // 8 - merge x = p + r, 12 - merge x = s + r 
                 }));
+            }
+
+            public static Image BinaryImage15() {
+                // This image was randomly generated and was labeled incorrectly in the bottom right corner.
+                return new Image(StringifiedToBinary(new List<string> {
+                    "x.....x..x",
+                    "........xx",
+                    "xx.xxx.x..",
+                    "xxx.......",
+                    ".x.....x..",
+                    "..xx......",
+                    ".x.....x..",
+                    ".....x.x.x",
+                    "....x..xxx",
+                    "..x....xxx"
+                }));
+            }
+
+            public static Image GenerateRandomImage(int width, int height, double fgProb=0.3, string fileName="") {
+                /* Generates a random image with a given width and height. Probability of a pixel being in the foreground
+                is given by fgProb. If fileName is not empty, the generated image is also written to a file.
+                */
+
+                Random r = new Random();
+                List<string> lines = new List<string>();
+                for (int y = 0; y < height; y++) {
+                    string line = "";
+                    for (int x = 0; x < width; x++) {
+                        if (r.NextDouble() < fgProb) {
+                            line += "x";
+                        } else {
+                            line += ".";
+                        }
+                    }
+                    lines.Add(line);
+                }
+                if (fileName != "") {
+                    File.WriteAllLines("Test images/" + fileName, lines);
+                }
+                return new Image(StringifiedToBinary(lines));
             }
         }
     }

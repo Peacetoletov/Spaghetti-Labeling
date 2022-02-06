@@ -18,14 +18,23 @@ namespace Spaghetti_Labeling
         ...
         */
 
-        private const bool testing = true;
+        private const bool testing = false;
 
         static void Main(string[] args)
         {
             Console.WriteLine("Hello Bolelli!");
 
-            //Image image = ImageProcessor.SpaghettiCCL(Image.TestImages.BinaryImage14());
-            //image.Print();
+            /*
+            CURRENT TODO: Clean up the code, optimize testing, test on big randomized images loaded from a file.
+
+            UPDATE: Randomized images discovered new bugs in labeling. Fix ASAP. Reference image: BinaryImage15.
+            */
+
+            //Image image = ImageProcessor.SpaghettiCCL(Image.TestImages.GenerateRandomImage(10, 10, fileName: "test"));
+            Image image = ImageProcessor.ClassicCCL(Image.TestImages.BinaryImage15());
+            image.Print();
+
+            //Image.TestImages.GenerateRandomImage(50, 50, fileName: "test");
 
 
             if (testing) {
