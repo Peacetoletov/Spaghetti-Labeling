@@ -28,10 +28,20 @@ namespace Spaghetti_Labeling
             CURRENT TODO: Clean up the code, optimize testing, test on big randomized images loaded from a file.
 
             UPDATE: Randomized images discovered new bugs in labeling. Fix ASAP. Reference image: BinaryImage15.
+            UPDATE 2: BinaryImage16 seems to be producing weird results even in ClassicalCCL, wtf? this might be due to 
+            some inconsistencies in equivalent label resolution. 
+            UPDATE 3: Looks like I successfully reach the correct leaf, but the performing the given action gives results
+            in incorrect labels. If I instead used the AND-decision table instead of the OR-decision table, I would get
+            the correct label. Could this be the cause of the problem? I need to study the papers more. 
+            UPDATE 4.1: According to the secret sauce, this appears to be the problem. TODO: Rewrite most of the ActionPerformer
+            class because actions shouldn't be derived from the OR-table, rather from the AND-table.
+            UPDATE 4.2: Actually, it's not the AND-table for the Rosenfeld mask, rather it is an OR-table for the BBDT mask.
+            See https://iris.unimore.it/retrieve/handle/11380/630658/3377/TIP10.pdf (and write a comment about it in the
+            ActionPerformer class).
             */
 
             //Image image = ImageProcessor.SpaghettiCCL(Image.TestImages.GenerateRandomImage(10, 10, fileName: "test"));
-            Image image = ImageProcessor.ClassicCCL(Image.TestImages.BinaryImage15());
+            Image image = ImageProcessor.SpaghettiCCL(Image.TestImages.BinaryImage16());
             image.Print();
 
             //Image.TestImages.GenerateRandomImage(50, 50, fileName: "test");

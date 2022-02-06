@@ -294,6 +294,15 @@ namespace Spaghetti_Labeling
                 }));
             }
 
+            public static Image BinaryImage16() {
+                return new Image(StringifiedToBinary(new List<string> {
+                    ".x.....x..",
+                    ".....x.x.x",
+                    "....x..xxx",
+                    "..x....xxx"
+                }));
+            }
+
             public static Image GenerateRandomImage(int width, int height, double fgProb=0.3, string fileName="") {
                 /* Generates a random image with a given width and height. Probability of a pixel being in the foreground
                 is given by fgProb. If fileName is not empty, the generated image is also written to a file.

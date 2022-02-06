@@ -33,7 +33,7 @@ namespace Spaghetti_Labeling
             for (int y = 0; y < height; y += 2) {
                 if (y == 0) {
                     // First row
-                    //Console.WriteLine("Labeling blocks in first row.");
+                    Console.WriteLine("Labeling blocks in first row.");
                     SpaghettiLabelBlocks(y, gmFirst, input, ap);
                 } 
                 else if (y != height - 1) {
@@ -42,7 +42,7 @@ namespace Spaghetti_Labeling
                 }
                 else {
                     // Last row (only used in images with an odd number of rows)
-                    //Console.WriteLine("Labeling blocks in last row.");
+                    Console.WriteLine("Labeling blocks in last row.");
                     SpaghettiLabelBlocks(y, gmLast, input, ap);
                 }
             }
@@ -71,24 +71,24 @@ namespace Spaghetti_Labeling
                 //Console.Write("Block in column {0}. ", x);
                 if (x < width - 2) {
                     // Use main tree
-                    //Console.Write("Using main tree with index {0}. ", nextTreeIndex);
+                    Console.Write("Using main tree with index {0}. ", nextTreeIndex);
                     (action, nextTreeIndex) = GetActionAndNextTreeIndex(gm.AdjustIndexAndGetRootInMainGraph(nextTreeIndex), input, x, y);
                          
                 } else {
                     if (x == width - 2) {
                         // Use even tree
-                        //Console.Write("Using even end tree with index {0}. ", nextTreeIndex);
+                        Console.Write("Using even end tree with index {0}. ", nextTreeIndex);
                         action = GetAction(gm.AdjustIndexAndGetRootInEndGraphEven(nextTreeIndex), input, x, y);
                         //gm.AdjustIndexAndGetRootInEndGraphEven(nextTreeIndex).InfoDFS();
                     } else {
                         // Use odd tree
-                        //Console.Write("Using odd end tree with index {0}. ", nextTreeIndex);
+                        Console.Write("Using odd end tree with index {0}. ", nextTreeIndex);
                         action = GetAction(gm.AdjustIndexAndGetRootInEndGraphOdd(nextTreeIndex), input, x, y);
                         //gm.AdjustIndexAndGetRootInEndGraphOdd(nextTreeIndex).InfoDFS();
                     }
                     
                 }
-                //Console.WriteLine("Chosen action: {0}", action);
+                Console.WriteLine("Chosen action: {0}", action);
                 ap.Perform(action, x, y);
             }
         }
@@ -389,6 +389,10 @@ namespace Spaghetti_Labeling
                 Image spaghetti14 = SpaghettiCCL(Image.TestImages.BinaryImage14());
                 Image classic14 = ClassicCCL(Image.TestImages.BinaryImage14());
                 Debug.Assert(spaghetti14.Equals(classic14));
+
+                Image spaghetti15 = SpaghettiCCL(Image.TestImages.BinaryImage15());
+                Image classic15 = ClassicCCL(Image.TestImages.BinaryImage15());
+                Debug.Assert(spaghetti15.Equals(classic15));
             } 
         }
     }
