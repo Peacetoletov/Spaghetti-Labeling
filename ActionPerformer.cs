@@ -116,6 +116,8 @@ namespace Spaghetti_Labeling
                 case 16:
                     Merge(new char[] {'q', 'r', 's'}, x, y, debug);
                     break;
+                default:
+                    throw new NotSupportedException("Critical error: action not found.");
             }
         }
 

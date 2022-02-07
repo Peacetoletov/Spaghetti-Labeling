@@ -330,6 +330,46 @@ namespace Spaghetti_Labeling
         }
 
         private static void ResolveLabelEquivalencies(Image image, List<HashSet<int>> equivalentLabels) {
+
+            int[] setIndexToLabel = new int[equivalentLabels.Count];
+            int currentHighestFinalLabel = 0;
+
+            List<List<int>> imageMatrix = image.GetMatrix();
+            int width = imageMatrix[0].Count;
+            int height = imageMatrix.Count;
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    if (imageMatrix[y][x] == 0) {
+                        // Skip background pixels
+                        continue;
+                    }
+                    int setIndex = GetIndexOfSetWithLabel(imageMatrix[y][x], equivalentLabels);
+                    if (setIndexToLabel[setIndex] == 0) {
+                        // This set of equivalent labels wasn't used yet, needs to be added to the map
+                        currentHighestFinalLabel++;
+                        setIndexToLabel[setIndex] = currentHighestFinalLabel;
+                    }
+                    imageMatrix[y][x] = setIndexToLabel[setIndex];
+                    /*
+                    for (int i = 0; i < equivalentLabels.Count; i++) {
+                        HashSet<int> set = equivalentLabels[i];
+                        if (set.Contains(imageMatrix[y][x])) {
+                            if (indexOfSetToLabel[i] == 0) {
+                                // This set of equivalent labels wasn't used yet, needs to be added to the map
+                                currentHighestLabel++;
+                                indexOfSetToLabel[i] = currentHighestLabel;
+                            }
+                            imageMatrix[y][x] = i + 1;
+                            break;
+                        }
+                    }
+                    */
+                }
+            }
+
+
+            // Backup of old implementation
+            /*
             List<List<int>> imageMatrix = image.GetMatrix();
             int width = imageMatrix[0].Count;
             int height = imageMatrix.Count;
@@ -344,6 +384,16 @@ namespace Spaghetti_Labeling
                     }
                 }
             }
+            */
+        }
+
+        private static int GetIndexOfSetWithLabel(int label, List<HashSet<int>> equivalentLabels) {
+            for (int i = 0; i < equivalentLabels.Count; i++) {
+                if (equivalentLabels[i].Contains(label)) {
+                    return i;
+                }
+            }
+            throw new NotSupportedException("Critical error: label " + label + " not found in equivalentLabels.");
         }
 
         public static class Tests 
@@ -416,7 +466,6 @@ namespace Spaghetti_Labeling
                 Image classic14 = ClassicCCL(Image.TestImages.BinaryImage14());
                 Debug.Assert(spaghetti14.Equals(classic14));
 
-                /*
                 Image spaghetti15 = SpaghettiCCL(Image.TestImages.BinaryImage15());
                 Image classic15 = ClassicCCL(Image.TestImages.BinaryImage15());
                 Debug.Assert(spaghetti15.Equals(classic15));
@@ -424,8 +473,6 @@ namespace Spaghetti_Labeling
                 Image spaghetti16 = SpaghettiCCL(Image.TestImages.BinaryImage16());
                 Image classic16 = ClassicCCL(Image.TestImages.BinaryImage16());
                 Debug.Assert(spaghetti16.Equals(classic16));
-                */
-                // TEMPORARILY COMMENTED OUT BECAUSE THESE TESTS WERE FAILING
             } 
         }
     }
