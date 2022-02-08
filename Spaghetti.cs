@@ -18,7 +18,7 @@ namespace Spaghetti_Labeling
         ...
         */
 
-        private const bool testing = false;
+        private const bool testing = true;
 
         static void Main(string[] args)
         {
@@ -28,8 +28,8 @@ namespace Spaghetti_Labeling
             TODO: clean up ForestCreator and do more tests.
             */
 
-            Image image = ImageProcessor.SpaghettiCCL(Image.TestImages.GenerateRandomImage(11, 9, fileName: "test"));
-            image.Print();
+            //Image image = ImageProcessor.SpaghettiCCL(Image.TestImages.GenerateRandomImage(11, 9, fileName: "test"));
+            //image.Print();
 
             //Image image = ImageProcessor.SpaghettiCCL(Image.TestImages.BinaryImage18());
             //image.Print();

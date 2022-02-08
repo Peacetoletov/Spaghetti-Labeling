@@ -481,6 +481,23 @@ namespace Spaghetti_Labeling
                 Image spaghetti18 = SpaghettiCCL(Image.TestImages.BinaryImage18());
                 Image classic18 = ClassicCCL(Image.TestImages.BinaryImage18());
                 Debug.Assert(spaghetti18.Equals(classic18));
+
+
+                for (int i = 1; i < 10; i++) {
+                    Image randomImageEven = Image.TestImages.GenerateRandomImage(20, 19, fileName: "testEven" + i);
+                    Image spaghettiRandomEven = SpaghettiCCL(randomImageEven);
+                    Image classicRandomEven = ClassicCCL(randomImageEven);
+                    Debug.Assert(spaghettiRandomEven.Equals(classicRandomEven));
+                    Console.WriteLine("Random image with even number of columns passed tests. ({0})", i);
+                }
+
+                for (int i = 1; i < 10; i++) {
+                    Image randomImageEven = Image.TestImages.GenerateRandomImage(21, 19, fileName: "testOdd" + i);
+                    Image spaghettiRandomEven = SpaghettiCCL(randomImageEven);
+                    Image classicRandomEven = ClassicCCL(randomImageEven);
+                    Debug.Assert(spaghettiRandomEven.Equals(classicRandomEven));
+                    Console.WriteLine("Random image with odd number of columns passed tests. ({0})", i);
+                }
             } 
         }
     }
