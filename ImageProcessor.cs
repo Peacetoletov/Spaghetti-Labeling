@@ -473,6 +473,14 @@ namespace Spaghetti_Labeling
                 Image spaghetti16 = SpaghettiCCL(Image.TestImages.BinaryImage16());
                 Image classic16 = ClassicCCL(Image.TestImages.BinaryImage16());
                 Debug.Assert(spaghetti16.Equals(classic16));
+
+                Image spaghetti17 = SpaghettiCCL(Image.TestImages.BinaryImage17());
+                Image classic17 = ClassicCCL(Image.TestImages.BinaryImage17());
+                Debug.Assert(spaghetti17.Equals(classic17));
+
+                Image spaghetti18 = SpaghettiCCL(Image.TestImages.BinaryImage18());
+                Image classic18 = ClassicCCL(Image.TestImages.BinaryImage18());
+                Debug.Assert(spaghetti18.Equals(classic18));
             } 
         }
     }

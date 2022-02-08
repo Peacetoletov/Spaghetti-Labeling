@@ -295,6 +295,7 @@ namespace Spaghetti_Labeling
             }
 
             public static Image BinaryImage16() {
+                // Simplified version of image 15
                 return new Image(StringifiedToBinary(new List<string> {
                     ".x.....x..",
                     ".....x.x.x",
@@ -304,6 +305,7 @@ namespace Spaghetti_Labeling
             }
 
             public static Image BinaryImage17() {
+                // This image was randomly generated and was labeled incorrectly in the top right corner.
                 return new Image(StringifiedToBinary(new List<string> {
                     ".......xxx",
                     "......x.x.",
@@ -315,6 +317,14 @@ namespace Spaghetti_Labeling
                     "x......x..",
                     "x........x",
                     "x..x.xxx.x"
+                }));
+            }
+
+            public static Image BinaryImage18() {
+                // Simplified version of image 17
+                return new Image(StringifiedToBinary(new List<string> {
+                    ".xxx..",
+                    "x.x..."
                 }));
             }
 

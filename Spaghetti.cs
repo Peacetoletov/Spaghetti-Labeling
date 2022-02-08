@@ -25,12 +25,30 @@ namespace Spaghetti_Labeling
             Console.WriteLine("Hello Bolelli!");
 
             /*
-            TODO: Randomized tests discovered yet another labeling bug, BinaryImage17 covers the case.
-            Find out what's wrong and fix it.
+            TODO: clean up ForestCreator and do more tests.
             */
 
-            Image image = ImageProcessor.SpaghettiCCL(Image.TestImages.GenerateRandomImage(10, 10, fileName: "test"));
+            Image image = ImageProcessor.SpaghettiCCL(Image.TestImages.GenerateRandomImage(11, 9, fileName: "test"));
             image.Print();
+
+            //Image image = ImageProcessor.SpaghettiCCL(Image.TestImages.BinaryImage18());
+            //image.Print();
+
+            
+            //(List<Tree> forest, int _) = ForestCreator.MainForestFirstRow(ODTree.GetTree());
+            /*
+            for (int i = 0; i < forest.Count; i++) {
+                Console.WriteLine("Tree {0}:", i + 1);
+                forest[i].GetRoot().InfoDFS();
+            }
+            */
+            //forest[0].GetRoot().InfoDFS(); 
+
+            /*
+            GraphManager gm1 = new GraphManager(GraphManager.GraphType.FirstRow);
+            GraphManager gm2 = new GraphManager(GraphManager.GraphType.MiddleRows);
+            GraphManager gm3 = new GraphManager(GraphManager.GraphType.LastRow);
+            */
 
 
             if (testing) {
