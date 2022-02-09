@@ -82,12 +82,6 @@ namespace Spaghetti_Labeling
 
             List<StringifiedTree> stringifiedTrees = CreateListOfStringifiedSubtrees(forest);
             stringifiedTrees.Sort();
-            /*
-            Console.WriteLine("After sorting");
-            for (int i = 0; i < stringifiedTrees.Count; i++) {
-                Console.WriteLine("Tree {0}: {1}", i, stringifiedTrees[i].GetTree());
-            }
-            */
 
             for (int i = 0; i < stringifiedTrees.Count - 1; i++) {
                 StringifiedTree st1 = stringifiedTrees[i];
@@ -103,7 +97,6 @@ namespace Spaghetti_Labeling
                     }
                     // Skip all subtrees with different strings
                     if (st1.GetTree() != st2.GetTree()) {
-                        //Console.WriteLine("Skipping subtree with a different string");
                         break;
                     }
                     // Skip subtrees with an empty intersection of actions 
@@ -173,11 +166,9 @@ namespace Spaghetti_Labeling
 
             // Change the graph structure
             foreach (Node parent in root2.GetParents()) {
-                /*
                 if (debug) {
                     Console.WriteLine("Parent of tree 2: {0}", parent.GetCondition());
                 }
-                */
                 if (root2.IsLeftChild(parent)) {
                     parent.SetLeft(root1);
                 } else {
@@ -218,7 +209,6 @@ namespace Spaghetti_Labeling
                 List<AbstractNode> curTreeNodes = new List<AbstractNode>();
                 AddUniqueNodesOfSubtreeToList(tree.GetRoot(), curTreeNodes);
                 nodes.AddRange(curTreeNodes);
-                //Console.WriteLine("Tree has {0} nodes.", curTreeNodes.Count);
             }
 
             // To preserve the original state, each node's "visited" property is set to false again. This has
@@ -227,7 +217,6 @@ namespace Spaghetti_Labeling
                 tree.GetRoot().AssignVisitedInSubtree(false);
             }
 
-            //Console.WriteLine("Forest has {0} unique nodes.", nodes.Count);
             return nodes;
         }
 
@@ -295,8 +284,6 @@ namespace Spaghetti_Labeling
                 AbstractNode r13 = ((Node) tree13.GetRoot()).GetRight();
                 AbstractNode r14 = ((Node) tree14.GetRoot()).GetRight();
                 Debug.Assert(r13 == r14);
-                
-                //Console.WriteLine(":)");
             }
 
             private static void TestStringifiedTreeSorting() {
@@ -343,7 +330,6 @@ namespace Spaghetti_Labeling
                 StringifiedTree st2 = new StringifiedTree(((Node) tree2.GetRoot()).GetLeft());
                 AbstractNode b = st1.GetRoot();
                 AbstractNode toBeSubstituted = st2.GetRoot();
-                //g.SubstituteSubtree(b, toBeSubstituted, st1.IntersectedActions(st2.GetActions()));
                 g.SubstituteSubtree(b, toBeSubstituted, st1.IntersectedActions(st2));
 
                 Debug.Assert(((Node) tree1.GetRoot()).GetRight() == b);
@@ -361,7 +347,6 @@ namespace Spaghetti_Labeling
                 Debug.Assert(toBeSubstituted.GetSubstituted());
                 Debug.Assert(((Node) toBeSubstituted).GetLeft().GetSubstituted());
                 Debug.Assert(((Node) toBeSubstituted).GetRight().GetSubstituted());
-                //Console.WriteLine("Poggies");
             }
 
             public static void TestGraph() {
@@ -406,7 +391,6 @@ namespace Spaghetti_Labeling
                 Debug.Assert(l9.GetActions().SetEquals(new HashSet<int> {1}));
                 Debug.Assert(l10.GetActions().SetEquals(new HashSet<int> {3}));
 
-                // TODO: check if the structure exactly matches 
                 Debug.Assert(a1.GetLeft() == b1);
                 Debug.Assert(a1.GetRight() == c1);
                 Debug.Assert(a1.GetParents().Count == 0);
@@ -455,8 +439,6 @@ namespace Spaghetti_Labeling
                 Debug.Assert(MatchingParents(e3, new List<AbstractNode> {b3}));
                 Debug.Assert(MatchingParents(l9, new List<AbstractNode> {e3}));
                 Debug.Assert(MatchingParents(l10, new List<AbstractNode> {e3}));
-
-                //Console.WriteLine("Yay!");
             }
 
             private static bool MatchingParents(AbstractNode node, List<AbstractNode> parents) {

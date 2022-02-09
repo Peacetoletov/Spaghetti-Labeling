@@ -10,13 +10,6 @@ namespace Spaghetti_Labeling
         private bool visited = false;   	// whether this node was already visited when working with nodes in graphs
         private bool substituted = false;   // whether this node was already substituted by another node when resolving subtree equivalences
 
-        /*
-        // If this node is the root of a graph and the CCL procedure reaches the last column of the image (therefore the corresponding end graph
-        // must be used), what is the index of the root in the other graph to be used instead of this root?
-        private int endIndexEven = -1;
-        private int endIndexOdd = -1;
-        */
-
 
         // Variables only for testing, used in DFS
         private string name = "";
@@ -38,12 +31,8 @@ namespace Spaghetti_Labeling
         // I cannot override the standard Equals() method because I need to pass additional arguments
         public abstract bool IsEqual(AbstractNode abstractNode, bool showDebugInfo=false);
 
-        //public abstract bool IsEquivalent(AbstractNode abstractNode, bool showDebugInfo=false);
-
         // Prints out information about the tree through DFS traversal (only for testing)
         public void InfoDFS() {
-            //AssignIDsInSubtree();
-            //AssignVisitedInSubtree(false);
             DFS_Rec();
         }
 
@@ -127,24 +116,6 @@ namespace Spaghetti_Labeling
         public int GetID() {
             return id;
         }
-
-        /*
-        public void SetEndIndexEven(int endIndexEven) {
-            this.endIndexEven = endIndexEven;
-        }
-
-        public int GetEndIndexEven() {
-            return endIndexEven;
-        }
-
-        public void SetEndIndexOdd(int endIndexOdd) {
-            this.endIndexOdd = endIndexEven;
-        }
-
-        public int GetEndIndexOdd() {
-            return endIndexOdd;
-        }
-        */
 
         public abstract void AssignIdInSubtree(int id);
 

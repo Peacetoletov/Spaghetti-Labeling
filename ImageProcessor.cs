@@ -200,15 +200,6 @@ namespace Spaghetti_Labeling
             List<HashSet<int>> equivalentLabels = new List<HashSet<int>>();
             Image output = assignLabels(input, equivalentLabels);
             ResolveLabelEquivalencies(output, equivalentLabels);
-            /*
-            foreach (HashSet<int> set in equivalentLabels) {
-                Console.Write("Equivalent labels: ");
-                foreach (int label in set) {
-                    Console.Write("{0} ", label);
-                }
-                Console.WriteLine();
-            }
-            */
             return output;
         }
 
@@ -288,22 +279,6 @@ namespace Spaghetti_Labeling
             }
         }
 
-        /*
-        public static (HashSet<int>, HashSet<int>) FindSetsWithLabels(List<HashSet<int>> equivalentLabels, int label1, int label2) {
-            HashSet<int> setWithLabel1 = null;
-            HashSet<int> setWithLabel2 = null;
-            foreach (HashSet<int> set in equivalentLabels) {
-                if (set.Contains(label1)) {
-                    setWithLabel1 = set;
-                }
-                if (set.Contains(label2)) {
-                    setWithLabel2 = set;
-                }
-            }
-            return (setWithLabel1, setWithLabel2);
-        }
-        */
-
         public static (HashSet<int>, HashSet<int>) FindSetsWithLabels(List<HashSet<int>> equivalentLabels, int label1, int label2) {
             HashSet<int> setWithLabel1 = null;
             HashSet<int> setWithLabel2 = null;
@@ -350,41 +325,8 @@ namespace Spaghetti_Labeling
                         setIndexToLabel[setIndex] = currentHighestFinalLabel;
                     }
                     imageMatrix[y][x] = setIndexToLabel[setIndex];
-                    /*
-                    for (int i = 0; i < equivalentLabels.Count; i++) {
-                        HashSet<int> set = equivalentLabels[i];
-                        if (set.Contains(imageMatrix[y][x])) {
-                            if (indexOfSetToLabel[i] == 0) {
-                                // This set of equivalent labels wasn't used yet, needs to be added to the map
-                                currentHighestLabel++;
-                                indexOfSetToLabel[i] = currentHighestLabel;
-                            }
-                            imageMatrix[y][x] = i + 1;
-                            break;
-                        }
-                    }
-                    */
                 }
             }
-
-
-            // Backup of old implementation
-            /*
-            List<List<int>> imageMatrix = image.GetMatrix();
-            int width = imageMatrix[0].Count;
-            int height = imageMatrix.Count;
-            for (int y = 0; y < height; y++) {
-                for (int x = 0; x < width; x++) {
-                    for (int i = 0; i < equivalentLabels.Count; i++) {
-                        HashSet<int> set = equivalentLabels[i];
-                        if (set.Contains(imageMatrix[y][x])) {
-                            imageMatrix[y][x] = i + 1;
-                            break;
-                        }
-                    }
-                }
-            }
-            */
         }
 
         private static int GetIndexOfSetWithLabel(int label, List<HashSet<int>> equivalentLabels) {

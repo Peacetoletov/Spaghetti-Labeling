@@ -19,48 +19,7 @@ namespace Spaghetti_Labeling
             // Returns a forest for labeling the first row, alongside the index of the start tree
             ReduceTree(seedTree, FirstRowConstraints());
             seedTree.GetRoot().MergeIdenticalBranches();
-            (List<Tree> forest, int startTreeIndex) = MainForest(seedTree);
-            //Console.WriteLine("Number of trees before duplicates removal: {0}", forest.Count);
-            //forest[0].GetRoot().InfoDFS();
-            //startTreeIndex = RemoveDuplicateMainTrees(forest, startTreeIndex);
-            /*
-            UPDATE: Wtf is going on here? MainForest() already calls RemoveDuplicateMainTrees() which
-            I didn't realize before, so calling it here makes no sense, but what makes even less sense
-            is that I have a forest with 5 trees returned from MainForest(), but after performing
-            the seemingly pointless second removal, I have only 4 trees left. What happened?!
-
-            Hypothesis: there might be a problem in the way next tree indices are created and subsequently
-            shifted. What happens is that I have a list of constraints, which respect the order of leaves,
-            and the further tree manipulation relies on this assumption. The idea is that the first leaf
-            will leaf to a reduced tree with stored in a list at index 0, therefore the first leaf has
-            nextTreeIndex 1 (1 higher than the index), second leaf has nextTreeIndex 2 because the corresponding
-            reduced tree will be stored at index 1 and so on.
-            However, this assumption might break when the start tree is introduced. As it isn't associated with 
-            any leaf, it is given the last index in the list of reduced trees. This happens to work for middle
-            row trees, because the start tree has no duplicates there. However, in the first row, the start tree
-            happens to have a duplicate, which causes weird nextTreeIndex shifting and breaks the whole thing.
-
-            TODO: Confirm that this is the cause and figure out a way to fix this.
-            One way to verify it is by temporarily removing the start tree constraint and look at the created
-            forest. 
-            
-            After this is fixed, make sure LastRow is working correctly too.
-
-            UPDATE 2: Hypothesis rejected. Even after commenting out first column constraints, I was getting 5 trees
-            after first duplicates deletion and 4 trees after second duplicates deletion. Now I need to figure out
-            why this is happening.
-            Another hypothesis is that the problem is caused by merging equal branches after reducing each tree.
-            I will try to remove this part to see if it helps.
-
-            */
-            //Console.WriteLine("I have {0} main trees in total.", forest.Count);
-            /*
-            for (int i = 0; i < forest.Count; i++) {
-                Console.WriteLine("\nTree {0}:", i);
-                forest[i].GetRoot().InfoDFS();
-            } 
-            */           
-            return (forest, startTreeIndex);
+            return MainForest(seedTree);     
         }
 
         public static (List<Tree>, int) MainForestLastRow(Tree seedTree) {
@@ -68,9 +27,7 @@ namespace Spaghetti_Labeling
             // alongside the index of the start tree
             ReduceTree(seedTree, LastRowConstraints());
             seedTree.GetRoot().MergeIdenticalBranches();
-            (List<Tree> forest, int startTreeIndex) = MainForest(seedTree);
-            //startTreeIndex = RemoveDuplicateMainTrees(forest, startTreeIndex);
-            return (forest, startTreeIndex);
+            return MainForest(seedTree);
         }
 
         private static (List<Tree>, int) MainForest(Tree seedTree) {
@@ -79,15 +36,7 @@ namespace Spaghetti_Labeling
             List<HashSet<(char, bool)>> constraintsList = MainTreesConstraints(seedTree);
             List<Tree> forest = CreateForestOfReducedTrees(seedTree, constraintsList);
             int startTreeIndex = forest.Count;
-            //MergeIdenticalBranches(forest);       // TEMPORARILY (?) COMMENTED OUT        // UPDATE: PREMANENTLY COMMENTED OUT
-            //Console.WriteLine("Number of trees before duplicates removal: {0}", forest.Count);
-            startTreeIndex = RemoveDuplicateMainTrees(forest, startTreeIndex);
-            //Console.WriteLine("Number of trees after duplicates removal: {0}", forest.Count);
-            
-            //startTreeIndex = RemoveDuplicateMainTrees(forest, startTreeIndex);
-            //Console.WriteLine("Number of trees after second duplicates removal: {0}", forest.Count);
-            
-  
+            startTreeIndex = RemoveDuplicateMainTrees(forest, startTreeIndex);       
             return (forest, startTreeIndex);
         }
 
@@ -158,16 +107,6 @@ namespace Spaghetti_Labeling
 
             return endTreesWithMainTreeIndices;
         }
-
-        /*
-        private static void PruneForest(List<Tree> forest, HashSet<(char, bool)> constraints) {
-            // Prunes a given forest using a set of constraints, then merges identical branches
-            foreach (Tree tree in forest) {
-                ReduceTree(tree, constraints);
-            }
-            //MergeIdenticalBranches(forest);
-        }
-        */
 
         private static int GetStartTreeIndex(Tree startTree, List<Tree> forest) {
             for (int i = 0; i < forest.Count; i++) {
@@ -248,31 +187,26 @@ namespace Spaghetti_Labeling
             // Removes duplicate trees from a forest of main trees and returns the (possibly modified) index of the start tree.
             // Note that startTreeIndex starts at 1 as opposed to 0, so it must be first normalized.
             int startTreeIndexNormalized = startTreeIndex - 1;
-
-            //Console.WriteLine("Number of trees before the removal of duplicates: {0}. startTreeIndexNormalized = {1}", forest.Count, startTreeIndexNormalized);
-            
+        
             for (int i = 0; i < forest.Count - 1; i++) {
                 for (int j = i + 1; j < forest.Count; j++) {
                     if (forest[i].IsEqual(forest[j])) {
-                        //Console.WriteLine("Reduced trees " + i + " and " + j + " are equal.");
                         // Adjust next tree indices in tree leaves if needed
                         foreach (Tree tree in forest) {
-                            tree.GetRoot().AdjustNextTreeIndicesAfterDeletion(i + 1, j + 1);      // TEMPORARILY COMMENTED OUT
+                            tree.GetRoot().AdjustNextTreeIndicesAfterDeletion(i + 1, j + 1);
                             // Arguments need to be incremented by 1 because these nested loops start indexing from 0,
                             // but next tree indices in leaves start indexing from 1 (to stay consistent with the Spaghetti paper)
                         }
                         // Adjust startTreeIndexNormalized if needed
                         if (startTreeIndexNormalized > j) {
-                            // first tree index is higher than the deleted tree's index, must be decremented
+                            // start tree index is higher than the deleted tree's index, must be decremented
                             startTreeIndexNormalized--;
-                            //Console.WriteLine("Updated startTreeIndexNormalized: {0}", startTreeIndexNormalized);
                         } else if (startTreeIndexNormalized == j) {
-                            // first tree index is equal to the deleted tree's index, meaning that the forest[i] tree is now
-                            // the first tree
+                            // start tree index is equal to the deleted tree's index, meaning that the forest[i] tree is now
+                            // the start tree
                             startTreeIndexNormalized = i;
-                            //Console.WriteLine("Updated startTreeIndexNormalized: {0}", startTreeIndexNormalized);
                         }
-                        // do nothing with the first tree index if startTreeIndexNormalized < j
+                        // do nothing with the start tree index if startTreeIndexNormalized < j
 
                         // Remove the duplicate tree
                         forest.RemoveAt(j);
@@ -280,23 +214,17 @@ namespace Spaghetti_Labeling
                     }
                 }
             }
-            //Console.WriteLine("Number of trees after the removal of duplicates: " + forest.Count);
-
             return startTreeIndexNormalized + 1;        // Add 1 to remove the effect of normalizing
         }
 
         private static void RemoveDuplicateEndTrees(List<(Tree, List<int>)> endTreesWithMainTreeIndices) {
-            //Console.WriteLine("Number of trees before the removal of duplicates: " + endTreesWithMainTreeIndices.Count);
             for (int i = 0; i < endTreesWithMainTreeIndices.Count - 1; i++) {
                 Tree tree1 = endTreesWithMainTreeIndices[i].Item1;
-                //Console.WriteLine("Tree " + i + " has " + tree1.GetRoot().CountNodes() + " nodes.");
                 for (int j = i + 1; j < endTreesWithMainTreeIndices.Count; j++) {
                     Tree tree2 = endTreesWithMainTreeIndices[j].Item1;
                     if (tree1.IsEqual(tree2)) {
                         // Add the duplicate tree's index to the other tree's indices
                         endTreesWithMainTreeIndices[i].Item2.Add(endTreesWithMainTreeIndices[j].Item2[0]);
-
-                        //Console.WriteLine("Tree " + j + " was a duplicate of tree " + i + " and was removed.");
 
                         // Delete the duplicate 
                         endTreesWithMainTreeIndices.RemoveAt(j);
@@ -304,8 +232,6 @@ namespace Spaghetti_Labeling
                     }
                 }
             }
-            //Console.WriteLine("Tree " + (endTreesWithMainTreeIndices.Count - 1) + " has " + endTreesWithMainTreeIndices[endTreesWithMainTreeIndices.Count - 1].Item1.GetRoot().CountNodes() + " nodes.");
-            //Console.WriteLine("Number of trees after the removal of duplicates: " + endTreesWithMainTreeIndices.Count);
         }
 
         private static List<Tree> CreateForestOfReducedTrees(Tree seedTree, 
@@ -387,7 +313,6 @@ namespace Spaghetti_Labeling
                 TestCreateForestOfReducedTrees();
                 TestReduceTreeAndMergeBranches();
                 TestRemoveDuplicateMainTrees();
-                TestFinalForest();
                 TestRangeOfNextTreeIndicesInReducedTrees();
                 //TestPage5Tree();      // Commented out because it was failing, see TestPage5Tree() documentation for more info
 
@@ -452,16 +377,6 @@ namespace Spaghetti_Labeling
                 Debug.Assert(forest[0].IsEqual(ref0));
                 Debug.Assert(forest[1].IsEqual(ref1));
                 Debug.Assert(forest[2].IsEqual(ref2));
-            }
-
-            private static void TestFinalForest() {
-                /*
-                Console.WriteLine("ODTree test");
-                FinalForest(ODTree.GetTree);
-
-                // TODO: actual tests
-                // UPDATE: this can wait, as manual testing was good enough for now
-                */
             }
 
             private static void TestRangeOfNextTreeIndicesInReducedTrees() {

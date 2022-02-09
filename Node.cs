@@ -11,8 +11,6 @@ namespace Spaghetti_Labeling
         private AbstractNode left;
         private AbstractNode right;
 
-        // private char condition { get; set; }
-
         /* character describing the position of the pixel to check in this node (a-t)
         ('a', 'f', 'l', 'q' are never used)
         If the condition evaluates to true (pixel is in foreground), left subtree is used.
@@ -57,20 +55,11 @@ namespace Spaghetti_Labeling
             // Merges identical branches of this node and all subtrees.
             // If both subtrees are identical, this node is replaced by one of them
 
-            //Console.WriteLine("In node " + GetName());
-
             left.MergeIdenticalBranches();
-            //Console.WriteLine("Returned from left subtree to node " + GetName() + ". Going into the right subtree");
             right.MergeIdenticalBranches();
-            //Console.WriteLine("Returned from right subtree to node " + GetName() + ". Checking subtree equality");
 
-            //if (left.Equals(right)) {
             if (left.IsEqualIgnoringLeafIndices(right)) {
                 ReplaceByLeft();            // arbitarily chosen child 
-                //Console.WriteLine("Merging! node " + GetName());
-            }
-            else {
-                //Console.WriteLine("Left subtree of node " + GetName() + " is NOT equal to the right subtree");
             }
         }
 
@@ -95,11 +84,9 @@ namespace Spaghetti_Labeling
                 } else {
                     parent.SetRight(replacement);
                 }
-                //Console.WriteLine("Has parent.");
             } 
             else {
                 // This node doesn't have a parent
-                //Console.WriteLine("No parent, setting new root to the tree.");
                 Tree tree = GetTree();
                 tree.SetRoot(replacement);
                 replacement.SetTree(tree);
@@ -194,7 +181,6 @@ namespace Spaghetti_Labeling
         } 
 
         public override string Stringify() {
-            //return condition.ToString() + "(" + left.Stringify() + ")(" + right.Stringify() + ")";
             return String.Format("{0}({1})({2})", condition, left.Stringify(), right.Stringify());        
         }
 

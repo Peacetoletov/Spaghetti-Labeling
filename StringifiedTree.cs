@@ -8,24 +8,10 @@ namespace Spaghetti_Labeling
     {
         private readonly string tree;
         private readonly AbstractNode root;
-        //private readonly List<HashSet<int>> actions;
         public StringifiedTree(AbstractNode abstractNode) {
             this.tree = abstractNode.Stringify();
             this.root = abstractNode;
-            //this.actions = abstractNode.GatherActions();
-            //AddActionsToList(abstractNode, actions);
         }
-
-        /*
-        private void AddActionsToList(AbstractNode abstractNode, List<HashSet<int>> actions) {
-            if (abstractNode is Leaf) {
-                actions.Add(((Leaf) abstractNode).GetActions());
-            } else {
-                AddActionsToList(((Node) abstractNode).GetLeft(), actions); 
-                AddActionsToList(((Node) abstractNode).GetRight(), actions);
-            }
-        }
-        */
 
         public int CompareTo(object obj) {
             if (obj == null) {
@@ -51,7 +37,6 @@ namespace Spaghetti_Labeling
             return 0;
         }
 
-        //public List<HashSet<int>> IntersectedActions(List<HashSet<int>> otherActions) {
         public List<HashSet<int>> IntersectedActions(StringifiedTree otherTree) {
             // Returns a new list containing intersections of this tree's actions with another tree's actions
             List<HashSet<int>> actions = GetActions();
@@ -84,7 +69,6 @@ namespace Spaghetti_Labeling
         } 
 
         public List<HashSet<int>> GetActions() {
-            //return actions;
             return root.GatherActions();
         }
 
@@ -154,14 +138,12 @@ namespace Spaghetti_Labeling
                 Tree tree21 = TestTrees.Tree21();
                 StringifiedTree st1 = new StringifiedTree(tree20.GetRoot());
                 StringifiedTree st2 = new StringifiedTree(tree21.GetRoot());
-                //List<HashSet<int>> intersected = st1.IntersectedActions(st2.GetActions());
                 List<HashSet<int>> intersected = st1.IntersectedActions(st2);
 
                 Debug.Assert(intersected.Count == 3);
                 Debug.Assert(intersected[0].SetEquals(new HashSet<int> {1}));
                 Debug.Assert(intersected[1].SetEquals(new HashSet<int> {2, 4}));
                 Debug.Assert(intersected[2].SetEquals(new HashSet<int> {}));
-                //Console.WriteLine("Hi Life");
             }
         }
     }
