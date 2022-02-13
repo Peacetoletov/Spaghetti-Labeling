@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
+
 namespace Spaghetti_Labeling
 {
     class Spaghetti
@@ -18,7 +19,7 @@ namespace Spaghetti_Labeling
         ...
         */
 
-        private const bool testing = true;
+        private const bool testing = false;
 
         static void Main(string[] args)
         {
@@ -27,6 +28,11 @@ namespace Spaghetti_Labeling
             /*
             TODO: implement external binary image reading and create an executable file. 
             */
+
+            Image input = new Image("Test images/pngImage.png");
+            Image labeled = ImageProcessor.SpaghettiCCL(input);
+            labeled.Print();
+
 
 
             if (testing) {

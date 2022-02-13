@@ -7,15 +7,6 @@ namespace Spaghetti_Labeling
     public static class ImageProcessor
     {
         private static Image SpaghettiAssignLabels(Image input, List<HashSet<int>> equivalentLabels) {
-            /*
-            TODO: Create a special set of main and end trees for the first row, then use it for first row labeling. 
-            */
-
-            /* NOTE: Due to the lack of special forests for the first and last row, all images labeled with the
-            Spaghetti algortihm are required to have first 2 rows filled with background pixels and the number
-            of rows must be even.
-            Once the special trees are implemented, this condition will disappear.
-            */
             List<List<int>> inputMatrix = input.GetMatrix();
 
             GraphManager gmFirst = new GraphManager(GraphManager.GraphType.FirstRow);

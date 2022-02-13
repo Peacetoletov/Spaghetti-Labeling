@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.IO;
+using System.Drawing;
 
 namespace Spaghetti_Labeling
 {
@@ -16,6 +17,30 @@ namespace Spaghetti_Labeling
 
         public Image(string path) {
             // TODO: Load the image and convert it to BinaryImage
+
+            /*
+            Note: using Bitmap requires the installation of System.Drawing.Common package
+            (dotnet add package System.Drawing.Common).
+            Note 2: Bitmap is only supported on Windows.
+            */
+
+            Bitmap img = new Bitmap(path);
+            List<List<int>> matrix = new List<List<int>>();
+            for (int y = 0; y < img.Height; y++) {
+                List<int> row = new List<int>();
+                for (int x = 0; x < img.Width; x++) {
+                    Color pixel = img.GetPixel(x, y);
+                    if (pixel.R == 0 && pixel.G == 0 && pixel.B == 0) {
+                        // Pixel is background
+                        row.Add(0);
+                    } else {
+                        // Pixel is foreground
+                        row.Add(1);
+                    }
+                }
+                matrix.Add(row);
+            } 
+            this.matrix = matrix;
         }
 
         public Image(List<List<int>> matrix) {
