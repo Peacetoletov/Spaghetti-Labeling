@@ -181,8 +181,6 @@ namespace Spaghetti_Labeling
             return CCL(input, SpaghettiAssignLabels);
         }
 
-        // TODO: override SpaghettiCCL and ClassicCCL methods to work with a path to an image as the argument
-
         public static Image ClassicCCL(Image input) {
             return CCL(input, ClassicCCL_AssignLabels);
         }
@@ -417,7 +415,8 @@ namespace Spaghetti_Labeling
 
 
                 for (int i = 1; i < 10; i++) {
-                    Image randomImageEven = Image.TestImages.GenerateRandomImage(20, 19, fileName: "testEven" + i);
+                    //Image randomImageEven = Image.TestImages.GenerateRandomImage(20, 19, fileName: "testEven" + i);
+                    Image randomImageEven = Image.TestImages.GenerateRandomImage(20, 19);
                     Image spaghettiRandomEven = SpaghettiCCL(randomImageEven);
                     Image classicRandomEven = ClassicCCL(randomImageEven);
                     Debug.Assert(spaghettiRandomEven.Equals(classicRandomEven));
@@ -425,7 +424,8 @@ namespace Spaghetti_Labeling
                 }
 
                 for (int i = 1; i < 10; i++) {
-                    Image randomImageEven = Image.TestImages.GenerateRandomImage(21, 19, fileName: "testOdd" + i);
+                    //Image randomImageEven = Image.TestImages.GenerateRandomImage(21, 19, fileName: "testOdd" + i);
+                    Image randomImageEven = Image.TestImages.GenerateRandomImage(21, 19);
                     Image spaghettiRandomEven = SpaghettiCCL(randomImageEven);
                     Image classicRandomEven = ClassicCCL(randomImageEven);
                     Debug.Assert(spaghettiRandomEven.Equals(classicRandomEven));

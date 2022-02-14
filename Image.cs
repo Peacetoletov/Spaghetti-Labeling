@@ -12,11 +12,11 @@ namespace Spaghetti_Labeling
 
         public Image() {
             // Default image for testing
-            //this.matrix = TestImages.BinaryImage1();
         }
 
         public Image(string path) {
-            // TODO: Load the image and convert it to BinaryImage
+            // Loads an image from a file, interpreting black pixels (RGB 0, 0, 0) as background
+            // and non-black pixels as foreground.
 
             /*
             Note: using Bitmap requires the installation of System.Drawing.Common package
@@ -65,7 +65,6 @@ namespace Spaghetti_Labeling
                     return false;
                 }
                 for (int x = 0; x < matrix[y].Count; x++) {
-                    //Console.WriteLine("y = {0}, x = {1} ", y, x);
                     if (matrix[y][x] != otherMatrix[y][x]) {
                         return false;
                     }
@@ -78,14 +77,18 @@ namespace Spaghetti_Labeling
             return base.GetHashCode();
         }
 
-        public void Print() {
-            Console.WriteLine("Printing image:");
+        public void Print(bool debug=false) {
+            // Console.WriteLine("Printing image:");
             for (int i = 0; i < matrix.Count; i++) {
                 List<int> row = matrix[i];
                 foreach (int pixel in row) {
                     Console.Write(pixel);
                 }
-                Console.WriteLine(" (row {0})", i);
+                if (debug) {
+                    Console.WriteLine(" (row {0})", i);
+                } else {
+                    Console.WriteLine();
+                }
             }
         }
 
