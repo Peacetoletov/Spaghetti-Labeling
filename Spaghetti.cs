@@ -17,26 +17,21 @@ namespace Spaghetti_Labeling
         8) First row labeling DONE
         9) Last row labeling DONE
         10) Test, read images from files, create an executable file DONE
-        11) Final polish
+        11) Final polish, comparison of different CCL approaches
         */
 
-        private const bool testing = false;
+        private const bool testing = true;
 
         static void Main(string[] args)
         {
-            // Console.WriteLine("Hello Bolelli!");     // RIP
+             Console.WriteLine("Hello Bolelli!");     // RIP
 
             /*
-            TODO: implement external binary image reading and create an executable file. 
-
-            Creating the exe file: 
-            https://docs.microsoft.com/en-us/dotnet/core/tutorials/publishing-with-visual-studio-code?pivots=dotnet-6-0
+            TODO: bfs flood fill ccl DONE
             */
 
-            //Image input = new Image("Test images/pngImage.png");
-            //Image labeled = ImageProcessor.SpaghettiCCL(input);
-            //labeled.Print();
 
+            /*
             if (args.Length == 0) {
                 Console.WriteLine("Specify the path to the image to be labeled.");
             } else if (args.Length == 1) {
@@ -46,15 +41,15 @@ namespace Spaghetti_Labeling
             } else {
                 Console.WriteLine("Only 1 argument is allowed.");
             }
+            */
 
-
-            /*
+            
             if (testing) {
                 RunTests();
             } else {
                 Console.WriteLine("WARNING: Tests are turned off.");
             }
-            */            
+                    
         }
 
         private static void RunTests() {

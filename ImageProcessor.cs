@@ -327,11 +327,48 @@ namespace Spaghetti_Labeling
             throw new NotSupportedException("Critical error: label " + label + " not found in equivalentLabels.");
         }
 
+        public static Image FloodFillCCL(Image input) {
+            // Labels an input image using bfs flood fill
+            List<List<int>> inputMatrix = input.GetMatrix();
+            int width = inputMatrix[0].Count;
+            int height = inputMatrix.Count;
+            List<List<int>> outputMatrix = InitMatrixWithZeroes(width, height);
+            int highestLabel = 0;
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    // If a pixel is foreground and not labeled yet, label it and all 
+                    // connected foreground pixels
+                    if (inputMatrix[y][x] != 0 && outputMatrix[y][x] == 0) {
+                        highestLabel++;
+                        Queue<(int, int)> q = new Queue<(int, int)>();
+                        q.Enqueue((y, x));
+                        while (q.Count != 0) {
+                            (int yFlood, int xFlood) = q.Dequeue();
+                            if (xFlood >= 0 && xFlood < width && yFlood >= 0 && yFlood < height &&
+                                    inputMatrix[yFlood][xFlood] != 0 && outputMatrix[yFlood][xFlood] == 0) {
+                                outputMatrix[yFlood][xFlood] = highestLabel;
+                                q.Enqueue((yFlood - 1, xFlood - 1));
+                                q.Enqueue((yFlood - 1, xFlood));
+                                q.Enqueue((yFlood - 1, xFlood + 1));
+                                q.Enqueue((yFlood, xFlood - 1));
+                                q.Enqueue((yFlood, xFlood + 1));
+                                q.Enqueue((yFlood + 1, xFlood - 1));
+                                q.Enqueue((yFlood + 1, xFlood));
+                                q.Enqueue((yFlood + 1, xFlood + 1));
+                            }
+                        }
+                    }
+                }
+            }
+            return new Image(outputMatrix);
+        }
+
         public static class Tests 
         {
             public static void Run() {
                 TestClassicCCL();
                 TestSpaghettiCCL();
+                TestFloodFillCCL();
             }
 
             private static void TestClassicCCL() {
@@ -413,7 +450,7 @@ namespace Spaghetti_Labeling
                 Image classic18 = ClassicCCL(Image.TestImages.BinaryImage18());
                 Debug.Assert(spaghetti18.Equals(classic18));
 
-
+                
                 for (int i = 1; i < 10; i++) {
                     //Image randomImageEven = Image.TestImages.GenerateRandomImage(20, 19, fileName: "testEven" + i);
                     Image randomImageEven = Image.TestImages.GenerateRandomImage(20, 19);
@@ -424,14 +461,25 @@ namespace Spaghetti_Labeling
                 }
 
                 for (int i = 1; i < 10; i++) {
-                    //Image randomImageEven = Image.TestImages.GenerateRandomImage(21, 19, fileName: "testOdd" + i);
-                    Image randomImageEven = Image.TestImages.GenerateRandomImage(21, 19);
-                    Image spaghettiRandomEven = SpaghettiCCL(randomImageEven);
-                    Image classicRandomEven = ClassicCCL(randomImageEven);
-                    Debug.Assert(spaghettiRandomEven.Equals(classicRandomEven));
+                    //Image randomImageOdd = Image.TestImages.GenerateRandomImage(21, 19, fileName: "testOdd" + i);
+                    Image randomImageOdd = Image.TestImages.GenerateRandomImage(21, 19);
+                    Image spaghettiRandomOdd = SpaghettiCCL(randomImageOdd);
+                    Image classicRandomOdd = ClassicCCL(randomImageOdd);
+                    Debug.Assert(spaghettiRandomOdd.Equals(classicRandomOdd));
                     Console.WriteLine("Random image with odd number of columns passed tests. ({0})", i);
                 }
+                
             } 
+        }
+
+        private static void TestFloodFillCCL() {
+            for (int i = 1; i < 10; i++) {
+                Image randomImage = Image.TestImages.GenerateRandomImage(20, 20);
+                Image classicRandom = ClassicCCL(randomImage);
+                Image floodFillRandom = ClassicCCL(randomImage);
+                Debug.Assert(floodFillRandom.Equals(classicRandom));
+                Console.WriteLine("Flood fill test passed on a random image. ({0})", i);
+            }
         }
     }
 }
