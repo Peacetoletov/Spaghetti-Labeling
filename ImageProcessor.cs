@@ -464,7 +464,7 @@ namespace Spaghetti_Labeling
                     //Image randomImageOdd = Image.TestImages.GenerateRandomImage(21, 19, fileName: "testOdd" + i);
                     Image randomImageOdd = Image.TestImages.GenerateRandomImage(21, 19);
                     Image spaghettiRandomOdd = SpaghettiCCL(randomImageOdd);
-                    Image classicRandomOdd = ClassicCCL(randomImageOdd);
+                    Image classicRandomOdd = FloodFillCCL(randomImageOdd);
                     Debug.Assert(spaghettiRandomOdd.Equals(classicRandomOdd));
                     Console.WriteLine("Random image with odd number of columns passed tests. ({0})", i);
                 }
