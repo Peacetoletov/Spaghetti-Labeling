@@ -134,9 +134,9 @@ namespace Spaghetti_Labeling
                 return new Image(StringifiedToBinary(new List<string> {
                     "..............",
                     "..............",
-                    "x.x.x.x.x.x.x.",
-                    ".x...x.x...x..",
-                    "..x.x...x.x...",
+                    "x.x.x.x.x...x.",
+                    ".x...x.x..xx..",
+                    "..x.x...x.....",
                     "x..x.........."
                 }));
             }
@@ -145,9 +145,9 @@ namespace Spaghetti_Labeling
                 List<List<int>> labeled = new List<List<int>>();
                 labeled.Add(new List<int> {0,0,0,0,0,0,0,0,0,0,0,0,0,0});
                 labeled.Add(new List<int> {0,0,0,0,0,0,0,0,0,0,0,0,0,0});
-                labeled.Add(new List<int> {1,0,1,0,1,0,1,0,1,0,2,0,2,0});
-                labeled.Add(new List<int> {0,1,0,0,0,1,0,1,0,0,0,2,0,0});
-                labeled.Add(new List<int> {0,0,1,0,1,0,0,0,1,0,2,0,0,0});
+                labeled.Add(new List<int> {1,0,1,0,1,0,1,0,1,0,0,0,2,0});
+                labeled.Add(new List<int> {0,1,0,0,0,1,0,1,0,0,2,2,0,0});
+                labeled.Add(new List<int> {0,0,1,0,1,0,0,0,1,0,0,0,0,0});
                 labeled.Add(new List<int> {3,0,0,1,0,0,0,0,0,0,0,0,0,0});
                 return new Image(labeled);
             }

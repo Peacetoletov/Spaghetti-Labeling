@@ -178,41 +178,96 @@ namespace Spaghetti_Labeling
         }
 
         public static Image SpaghettiCCL(Image input) {
-            return CCL(input, SpaghettiAssignLabels);
+            //return CCL(input, SpaghettiAssignLabels);
+            return null;
         }
 
         public static Image ClassicCCL(Image input) {
             return CCL(input, ClassicCCL_AssignLabels);
         }
 
+        private static Image CCL(Image input, Func<Image, (Image, int, HashSet<(int, int)>)> assignLabels) {
+            (Image output, int highestLabel, HashSet<(int, int)> equivalenceTable) = assignLabels(input);
+            ResolveLabelEquivalencies(output, highestLabel, equivalenceTable);
+            return output;
+        }
+
+        /*
         private static Image CCL(Image input, Func<Image, List<HashSet<int>>, Image> assignLabels) {
             List<HashSet<int>> equivalentLabels = new List<HashSet<int>>();
             Image output = assignLabels(input, equivalentLabels);
             ResolveLabelEquivalencies(output, equivalentLabels);
             return output;
         }
+        */
 
-        private static Image ClassicCCL_AssignLabels(Image input, List<HashSet<int>> equivalentLabels) {
+        private static (Image, int, HashSet<(int, int)>) ClassicCCL_AssignLabels(Image input) {
             List<List<int>> inputMatrix = input.GetMatrix();
             int width = inputMatrix[0].Count;
             int height = inputMatrix.Count;
             Image image = new Image(InitMatrixWithZeroes(width, height));
+            HashSet<(int, int)> equivalenceTable = new HashSet<(int, int)>();
             int highestLabel = 0;
             for (int y = 0; y < height; y++) {
                 for (int x = 0; x < width; x++) {
                     if (inputMatrix[y][x] == 1) {
+                        /*
                         // Assign label if current pixel is foreground 
                         highestLabel = ClassicCCL_LabelPixel(image, x, y, highestLabel, equivalentLabels);
 
                         // Store information about equivalent labels
                         ClassicCCL_ManageEquivalencies(image, x, y, equivalentLabels);
+                        */
+
+                        // Assign label if current pixel is foreground and track equivalent labels
+                        highestLabel = ClassicCCL_LabelPixel(image, x, y, highestLabel, equivalenceTable);
                     }
                 }
             }
 
-            return image;
+            return (image, highestLabel, equivalenceTable);
         }
 
+        private static int ClassicCCL_LabelPixel(Image image, int x, int y, int highestLabel, HashSet<(int, int)> equivalentLabels) {
+            List<List<int>> imageMatrix = image.GetMatrix();
+            int width = imageMatrix[0].Count;
+            HashSet<int> neighboringLabels = new HashSet<int>(); 
+            if (x - 1 >= 0 && y - 1 >= 0 && imageMatrix[y - 1][x - 1] != 0) {
+                neighboringLabels.Add(imageMatrix[y - 1][x - 1]);
+            } 
+            if (y - 1 >= 0 && imageMatrix[y - 1][x] != 0) {
+                neighboringLabels.Add(imageMatrix[y - 1][x]);
+            } 
+            if (x + 1 < width && y - 1 >= 0 && imageMatrix[y - 1][x + 1] != 0) {
+                neighboringLabels.Add(imageMatrix[y - 1][x + 1]);
+            } 
+            if (x - 1 >= 0 && imageMatrix[y][x - 1] != 0) {
+                neighboringLabels.Add(imageMatrix[y][x - 1]);
+            }
+
+            //Console.WriteLine("x = {0}, y = {1}, neighboringLabels.Count = {2}", x, y, neighboringLabels.Count);
+
+            if (neighboringLabels.Count == 0) {
+                // New label
+                highestLabel++;
+                imageMatrix[y][x] = highestLabel;
+            } else if (neighboringLabels.Count == 1) {
+                // Assign label
+                imageMatrix[y][x] = GetAnyHashsetElement(neighboringLabels);
+            } else {
+                // Merge labels
+                //Console.WriteLine("x = {0}, y = {1}, neighboringLabels.Count = {2}", x, y, neighboringLabels.Count);
+                List<int> labels = new List<int>(neighboringLabels);
+                imageMatrix[y][x] = labels[0];
+                for (int i = 1; i < labels.Count; i++) {
+                    equivalentLabels.Add((labels[0], labels[i]));
+                }
+            }
+
+            return highestLabel;
+        }
+
+        /*
         private static int ClassicCCL_LabelPixel(Image image, int x, int y, int highestLabel, List<HashSet<int>> equivalentLabels) {
             List<List<int>> imageMatrix = image.GetMatrix();
             int width = imageMatrix[0].Count;
@@ -267,6 +322,7 @@ namespace Spaghetti_Labeling
                 equivalentLabels.Remove(setWithLabel2);
             }
         }
+        */
 
         public static (HashSet<int>, HashSet<int>) FindSetsWithLabels(List<HashSet<int>> equivalentLabels, int label1, int label2) {
             HashSet<int> setWithLabel1 = null;
@@ -293,8 +349,8 @@ namespace Spaghetti_Labeling
             return matrix;
         }
 
+        /*
         private static void ResolveLabelEquivalencies(Image image, List<HashSet<int>> equivalentLabels) {
-
             int[] setIndexToLabel = new int[equivalentLabels.Count];
             int currentHighestFinalLabel = 0;
 
@@ -314,6 +370,86 @@ namespace Spaghetti_Labeling
                         setIndexToLabel[setIndex] = currentHighestFinalLabel;
                     }
                     imageMatrix[y][x] = setIndexToLabel[setIndex];
+                }
+            }
+        }
+        */
+
+        private static void ResolveLabelEquivalencies(Image image, int highestLabel, HashSet<(int, int)> equivalenceTable) {
+            /*
+            Console.WriteLine("Called ResolveLabelEquivalencies");
+            foreach ((int a, int b) in equivalentLabels) {
+                Console.WriteLine("Equivalent labels: <{0}, {1}>", a, b);
+            }
+            */
+
+            // Create a partitioning of equivalenceTable as a list of sets, one set for each label
+            List<HashSet<int>> equivalentLabels = new List<HashSet<int>>();
+            for (int i = 1; i <= highestLabel; i++) {
+                equivalentLabels.Add(new HashSet<int> { i });
+            }
+
+            // Merge sets with equivalent labels together
+            /* 
+            For each collision, find the sets in equivalentLabels that contain the labels.
+            If these sets are different, union set1 with set2 and clear set2.
+            */
+            foreach ((int label1, int label2) in equivalenceTable) {
+                HashSet<int> set1 = null;
+                HashSet<int> set2 = null;
+                foreach (HashSet<int> s in equivalentLabels) {
+                    if (s.Contains(label1)) {
+                        set1 = s;
+                    }
+                    if (s.Contains(label2)) {
+                        set2 = s;
+                    }
+                }
+                Debug.Assert(set1 != null);
+                Debug.Assert(set2 != null);
+                if (set1 != set2) {
+                    set1.UnionWith(set2);
+                    set2.Clear();
+                }
+            }
+
+            // Remove empty sets
+            // This part is not in the book but I feel like it should help performance
+            for (int i = equivalentLabels.Count - 1; i >= 0; i--) {
+                if (equivalentLabels[i].Count == 0) {
+                    equivalentLabels.RemoveAt(i);
+                }
+            }
+
+            /*
+            Console.WriteLine("equivalentLabels:");
+            foreach (HashSet<int> s in equivalentLabels) {
+                foreach (int label in s) {
+                    Console.Write(label + " ");
+                }
+                Console.WriteLine();
+            }
+            */
+
+            // Relabel the image
+            RelabelImage(image, equivalentLabels);
+        }
+
+        private static void RelabelImage(Image image, List<HashSet<int>> equivalentLabels) {
+            // Replaces preliminary labels with final labels
+            // This is straight from the pseudocode in Digital Image Processing by Burger W., Burge M. J.
+            List<List<int>> imageMatrix = image.GetMatrix();
+            int width = imageMatrix[0].Count;
+            int height = imageMatrix.Count;
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    if (imageMatrix[y][x] != 0) {
+                        foreach (HashSet<int> s in equivalentLabels) {
+                            if (s.Contains(imageMatrix[y][x])) {
+                                imageMatrix[y][x] = GetAnyHashsetElement(s);
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -464,7 +600,7 @@ namespace Spaghetti_Labeling
                     //Image randomImageOdd = Image.TestImages.GenerateRandomImage(21, 19, fileName: "testOdd" + i);
                     Image randomImageOdd = Image.TestImages.GenerateRandomImage(21, 19);
                     Image spaghettiRandomOdd = SpaghettiCCL(randomImageOdd);
-                    Image classicRandomOdd = FloodFillCCL(randomImageOdd);
+                    Image classicRandomOdd = ClassicCCL(randomImageOdd);
                     Debug.Assert(spaghettiRandomOdd.Equals(classicRandomOdd));
                     Console.WriteLine("Random image with odd number of columns passed tests. ({0})", i);
                 }
@@ -476,7 +612,7 @@ namespace Spaghetti_Labeling
             for (int i = 1; i < 10; i++) {
                 Image randomImage = Image.TestImages.GenerateRandomImage(20, 20);
                 Image classicRandom = ClassicCCL(randomImage);
-                Image floodFillRandom = ClassicCCL(randomImage);
+                Image floodFillRandom = FloodFillCCL(randomImage);
                 Debug.Assert(floodFillRandom.Equals(classicRandom));
                 Console.WriteLine("Flood fill test passed on a random image. ({0})", i);
             }

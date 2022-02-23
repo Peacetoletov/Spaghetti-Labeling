@@ -13,9 +13,9 @@ namespace Spaghetti_Labeling
             // Uncomment one of the algorithms and note down memory usage, then repeat this process
             // for other algorithms. Memory usage cannot be measured for multiple algorithms at once!
 
-            Image randomImage = Image.TestImages.GenerateRandomImage(100, 100);
-            Image spaghetti = ImageProcessor.SpaghettiCCL(randomImage);
-            //Image classic = ImageProcessor.ClassicCCL(randomImage);
+            Image randomImage = Image.TestImages.GenerateRandomImage(1000, 1000);
+            //Image spaghetti = ImageProcessor.SpaghettiCCL(randomImage);
+            Image classic = ImageProcessor.ClassicCCL(randomImage);
             //Image flood = ImageProcessor.FloodFillCCL(randomImage);
 
 

@@ -27,10 +27,13 @@ namespace Spaghetti_Labeling
              Console.WriteLine("Hello Bolelli!");     // RIP
 
             /*
-            TODO: measure (peak) memory usage.
-            https://stackoverflow.com/questions/2342023/how-to-measure-the-total-memory-consumption-of-the-current-process-programmatica
-            https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.process.peakworkingset64?view=net-6.0#system-diagnostics-process-peakworkingset64
+            TODO: optimize equivalent label resolving
+
+            TODO: rename equivalentLabels to equivalenceTable where necessary
             */
+
+            //Image image = ImageProcessor.ClassicCCL(Image.TestImages.BinaryImage2());
+            //image.Print();
 
 
             /*
