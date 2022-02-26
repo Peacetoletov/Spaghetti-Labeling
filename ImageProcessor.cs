@@ -6,7 +6,7 @@ namespace Spaghetti_Labeling
 {
     public static class ImageProcessor
     {
-        private static Image SpaghettiAssignLabels(Image input, List<HashSet<int>> equivalentLabels) {
+        private static (Image, int, HashSet<(int, int)>) SpaghettiAssignLabels(Image input) {
             List<List<int>> inputMatrix = input.GetMatrix();
 
             GraphManager gmFirst = new GraphManager(GraphManager.GraphType.FirstRow);
@@ -18,7 +18,8 @@ namespace Spaghetti_Labeling
             int width = inputMatrix[0].Count;
             int height = inputMatrix.Count;
             Image output = new Image(InitMatrixWithZeroes(width, height));
-            ActionPerformer ap = new ActionPerformer(input, output, equivalentLabels);
+            HashSet<(int, int)> equivalenceTable = new HashSet<(int, int)>();
+            ActionPerformer ap = new ActionPerformer(input, output, equivalenceTable);
             //Console.WriteLine("Initiated spaghetti labeling");
 
             for (int y = 0; y < height; y += 2) {
@@ -38,17 +39,7 @@ namespace Spaghetti_Labeling
                 }
             }
 
-            /*
-            Console.WriteLine("\nEach row contains a set of equivalent labels:");
-            foreach (HashSet<int> labelSet in equivalentLabels) {
-                foreach (int label in labelSet) {
-                    Console.Write("{0} ", label);
-                }
-                Console.WriteLine();
-            }
-            */
-
-            return output;
+            return (output, ap.getHighestLabel(), equivalenceTable);
         }
 
 
@@ -178,8 +169,7 @@ namespace Spaghetti_Labeling
         }
 
         public static Image SpaghettiCCL(Image input) {
-            //return CCL(input, SpaghettiAssignLabels);
-            return null;
+            return CCL(input, SpaghettiAssignLabels);
         }
 
         public static Image ClassicCCL(Image input) {
@@ -192,43 +182,27 @@ namespace Spaghetti_Labeling
             return output;
         }
 
-        /*
-        private static Image CCL(Image input, Func<Image, List<HashSet<int>>, Image> assignLabels) {
-            List<HashSet<int>> equivalentLabels = new List<HashSet<int>>();
-            Image output = assignLabels(input, equivalentLabels);
-            ResolveLabelEquivalencies(output, equivalentLabels);
-            return output;
-        }
-        */
 
         private static (Image, int, HashSet<(int, int)>) ClassicCCL_AssignLabels(Image input) {
             List<List<int>> inputMatrix = input.GetMatrix();
             int width = inputMatrix[0].Count;
             int height = inputMatrix.Count;
-            Image image = new Image(InitMatrixWithZeroes(width, height));
+            Image output = new Image(InitMatrixWithZeroes(width, height));
             HashSet<(int, int)> equivalenceTable = new HashSet<(int, int)>();
             int highestLabel = 0;
             for (int y = 0; y < height; y++) {
                 for (int x = 0; x < width; x++) {
                     if (inputMatrix[y][x] == 1) {
-                        /*
-                        // Assign label if current pixel is foreground 
-                        highestLabel = ClassicCCL_LabelPixel(image, x, y, highestLabel, equivalentLabels);
-
-                        // Store information about equivalent labels
-                        ClassicCCL_ManageEquivalencies(image, x, y, equivalentLabels);
-                        */
-
                         // Assign label if current pixel is foreground and track equivalent labels
-                        highestLabel = ClassicCCL_LabelPixel(image, x, y, highestLabel, equivalenceTable);
+                        highestLabel = ClassicCCL_LabelPixel(output, x, y, highestLabel, equivalenceTable);
                     }
                 }
             }
 
-            return (image, highestLabel, equivalenceTable);
+            return (output, highestLabel, equivalenceTable);
         }
 
-        private static int ClassicCCL_LabelPixel(Image image, int x, int y, int highestLabel, HashSet<(int, int)> equivalentLabels) {
+        private static int ClassicCCL_LabelPixel(Image image, int x, int y, int highestLabel, HashSet<(int, int)> equivalenceTable) {
             List<List<int>> imageMatrix = image.GetMatrix();
             int width = imageMatrix[0].Count;
             HashSet<int> neighboringLabels = new HashSet<int>(); 
@@ -260,82 +234,11 @@ namespace Spaghetti_Labeling
                 List<int> labels = new List<int>(neighboringLabels);
                 imageMatrix[y][x] = labels[0];
                 for (int i = 1; i < labels.Count; i++) {
-                    equivalentLabels.Add((labels[0], labels[i]));
+                    equivalenceTable.Add((labels[0], labels[i]));
                 }
             }
 
             return highestLabel;
-        }
-
-        /*
-        private static int ClassicCCL_LabelPixel(Image image, int x, int y, int highestLabel, List<HashSet<int>> equivalentLabels) {
-            List<List<int>> imageMatrix = image.GetMatrix();
-            int width = imageMatrix[0].Count;
-            if (x - 1 >= 0 && y - 1 >= 0 && imageMatrix[y - 1][x - 1] != 0) {
-                imageMatrix[y][x] = imageMatrix[y - 1][x - 1];
-            } else if (y - 1 >= 0 && imageMatrix[y - 1][x] != 0) {
-                imageMatrix[y][x] = imageMatrix[y - 1][x];
-            } else if (x + 1 < width && y - 1 >= 0 && imageMatrix[y - 1][x + 1] != 0) {
-                imageMatrix[y][x] = imageMatrix[y - 1][x + 1];
-            } else if (x - 1 >= 0 && imageMatrix[y][x - 1] != 0) {
-                imageMatrix[y][x] = imageMatrix[y][x - 1];
-            } else {
-                highestLabel++;
-                imageMatrix[y][x] = highestLabel;
-                equivalentLabels.Add(new HashSet<int> {highestLabel});
-            }
-            return highestLabel;
-        }
-
-        private static void ClassicCCL_ManageEquivalencies(Image image, int x, int y, 
-                                                           List<HashSet<int>> equivalentLabels) {
-            // Note that the only pixels which can theoretically be equivalent are the 'r' pixel and
-            // either the 'p' or 's' pixel.
-            ClassicCCL_ManageEquivalencies(image, 'p', x, y, equivalentLabels);
-            ClassicCCL_ManageEquivalencies(image, 's', x, y, equivalentLabels);
-        }
-
-        private static void ClassicCCL_ManageEquivalencies(Image image, char pixel, int x, int y, 
-                                                           List<HashSet<int>> equivalentLabels) {
-            // Checks if the 'r' pixel and the pixel passed as argument ('p' or 's') are equivalent,
-            // and if so, updates the equivalentLabels list
-            
-            // Return if either of the relevant pixels is out of bounds
-            List<List<int>> imageMatrix = image.GetMatrix();
-            int width = imageMatrix[0].Count;
-            if (x == 0 || y == 0 || x == width - 1) {
-                return;
-            }
-
-            // Return if either of the relevant pixels is background, or if they both have the same label
-            Debug.Assert(pixel == 'p' || pixel == 's');
-            int label1 = imageMatrix[y - 1][x + 1];
-            int label2 = pixel == 'p' ? imageMatrix[y - 1][x - 1] : imageMatrix[y][x - 1];
-            if (label1 == 0 || label2 == 0 || label1 == label2) {
-                return;
-            }
-
-            // If both labels are in different sets, join the sets together
-            (HashSet<int> setWithLabel1, HashSet<int> setWithLabel2) = FindSetsWithLabels(equivalentLabels, label1, label2);
-            if (setWithLabel1 != setWithLabel2) {
-                setWithLabel1.UnionWith(setWithLabel2);
-                equivalentLabels.Remove(setWithLabel2);
-            }
-        }
-        */
-
-        public static (HashSet<int>, HashSet<int>) FindSetsWithLabels(List<HashSet<int>> equivalentLabels, int label1, int label2) {
-            HashSet<int> setWithLabel1 = null;
-            HashSet<int> setWithLabel2 = null;
-            foreach (HashSet<int> set in equivalentLabels) {
-                if (set.Contains(label1)) {
-                    setWithLabel1 = set;
-                }
-                if (set.Contains(label2)) {
-                    setWithLabel2 = set;
-                }
-            }
-            return (setWithLabel1, setWithLabel2);
         }
 
         private static List<List<int>> InitMatrixWithZeroes(int width, int height) {
@@ -349,40 +252,7 @@ namespace Spaghetti_Labeling
             return matrix;
         }
 
-        /*
-        private static void ResolveLabelEquivalencies(Image image, List<HashSet<int>> equivalentLabels) {
-            int[] setIndexToLabel = new int[equivalentLabels.Count];
-            int currentHighestFinalLabel = 0;
-
-            List<List<int>> imageMatrix = image.GetMatrix();
-            int width = imageMatrix[0].Count;
-            int height = imageMatrix.Count;
-            for (int y = 0; y < height; y++) {
-                for (int x = 0; x < width; x++) {
-                    if (imageMatrix[y][x] == 0) {
-                        // Skip background pixels
-                        continue;
-                    }
-                    int setIndex = GetIndexOfSetWithLabel(imageMatrix[y][x], equivalentLabels);
-                    if (setIndexToLabel[setIndex] == 0) {
-                        // This set of equivalent labels wasn't used yet, needs to be added to the map
-                        currentHighestFinalLabel++;
-                        setIndexToLabel[setIndex] = currentHighestFinalLabel;
-                    }
-                    imageMatrix[y][x] = setIndexToLabel[setIndex];
-                }
-            }
-        }
-        */
-
         private static void ResolveLabelEquivalencies(Image image, int highestLabel, HashSet<(int, int)> equivalenceTable) {
-            /*
-            Console.WriteLine("Called ResolveLabelEquivalencies");
-            foreach ((int a, int b) in equivalentLabels) {
-                Console.WriteLine("Equivalent labels: <{0}, {1}>", a, b);
-            }
-            */
-
             // Create a partitioning of equivalenceTable as a list of sets, one set for each label
             List<HashSet<int>> equivalentLabels = new List<HashSet<int>>();
             for (int i = 1; i <= highestLabel; i++) {
@@ -421,16 +291,6 @@ namespace Spaghetti_Labeling
                 }
             }
 
-            /*
-            Console.WriteLine("equivalentLabels:");
-            foreach (HashSet<int> s in equivalentLabels) {
-                foreach (int label in s) {
-                    Console.Write(label + " ");
-                }
-                Console.WriteLine();
-            }
-            */
-
             // Relabel the image
             RelabelImage(image, equivalentLabels);
         }
@@ -452,15 +312,6 @@ namespace Spaghetti_Labeling
                     }
                 }
             }
-        }
-
-        private static int GetIndexOfSetWithLabel(int label, List<HashSet<int>> equivalentLabels) {
-            for (int i = 0; i < equivalentLabels.Count; i++) {
-                if (equivalentLabels[i].Contains(label)) {
-                    return i;
-                }
-            }
-            throw new NotSupportedException("Critical error: label " + label + " not found in equivalentLabels.");
         }
 
         public static Image FloodFillCCL(Image input) {
@@ -499,6 +350,46 @@ namespace Spaghetti_Labeling
             return new Image(outputMatrix);
         }
 
+        private static Image NormalizeLabels(Image input) {
+            /* Used purely for testing, this method replaces labels in a labeled image such that
+            when iterating through pixels from top left to bottom right, the first encountered 
+            label is 1, second 2, third 3 etc.
+            */
+
+            // Implementation is similar to flood fill CCL
+            List<List<int>> inputMatrix = input.GetMatrix();
+            int width = inputMatrix[0].Count;
+            int height = inputMatrix.Count;
+            List<List<int>> outputMatrix = InitMatrixWithZeroes(width, height);
+            int highestOutputLabel = 0;
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    if (inputMatrix[y][x] != 0 && outputMatrix[y][x] == 0) {
+                        highestOutputLabel++;
+                        int curInputLabel = inputMatrix[y][x];
+                        Queue<(int, int)> q = new Queue<(int, int)>();
+                        q.Enqueue((y, x));
+                        while (q.Count != 0) {
+                            (int yFlood, int xFlood) = q.Dequeue();
+                            if (xFlood >= 0 && xFlood < width && yFlood >= 0 && yFlood < height &&
+                                    inputMatrix[yFlood][xFlood] == curInputLabel && outputMatrix[yFlood][xFlood] == 0) {
+                                outputMatrix[yFlood][xFlood] = highestOutputLabel;
+                                q.Enqueue((yFlood - 1, xFlood - 1));
+                                q.Enqueue((yFlood - 1, xFlood));
+                                q.Enqueue((yFlood - 1, xFlood + 1));
+                                q.Enqueue((yFlood, xFlood - 1));
+                                q.Enqueue((yFlood, xFlood + 1));
+                                q.Enqueue((yFlood + 1, xFlood - 1));
+                                q.Enqueue((yFlood + 1, xFlood));
+                                q.Enqueue((yFlood + 1, xFlood + 1));
+                            }
+                        }
+                    }
+                }
+            }
+            return new Image(outputMatrix);
+        }
+
         public static class Tests 
         {
             public static void Run() {
@@ -506,17 +397,25 @@ namespace Spaghetti_Labeling
                 TestSpaghettiCCL();
                 TestFloodFillCCL();
             }
+            
+            private static void TestLabeledImageEquivalency(Image image1, Image image2) {
+                // Asserts equivalency of two labeled images by first normalizing them,
+                // then asserting their equality
+                Image normalized1 = NormalizeLabels(image1);
+                Image normalized2 = NormalizeLabels(image2);
+                Debug.Assert(normalized1.Equals(normalized2));
+            }
 
             private static void TestClassicCCL() {
-                Image labeled1 = ClassicCCL(Image.TestImages.BinaryImage1());
+                Image labeled1 = NormalizeLabels(ClassicCCL(Image.TestImages.BinaryImage1()));
                 Image reference1 = Image.TestImages.LabeledImage1();
                 Debug.Assert(labeled1.Equals(reference1));
 
-                Image labeled2 = ClassicCCL(Image.TestImages.BinaryImage2());
+                Image labeled2 = NormalizeLabels(ClassicCCL(Image.TestImages.BinaryImage2()));
                 Image reference2 = Image.TestImages.LabeledImage2();
                 Debug.Assert(labeled2.Equals(reference2));
 
-                Image labeled3 = ClassicCCL(Image.TestImages.BinaryImage3());
+                Image labeled3 = NormalizeLabels(ClassicCCL(Image.TestImages.BinaryImage3()));
                 Image reference3 = Image.TestImages.LabeledImage3();
                 Debug.Assert(labeled3.Equals(reference3));
             }
@@ -524,67 +423,67 @@ namespace Spaghetti_Labeling
             private static void TestSpaghettiCCL() {
                 Image spaghetti3 = SpaghettiCCL(Image.TestImages.BinaryImage3());
                 Image classic3 = ClassicCCL(Image.TestImages.BinaryImage3());
-                Debug.Assert(spaghetti3.Equals(classic3));
+                TestLabeledImageEquivalency(spaghetti3, classic3);
 
                 Image spaghetti4 = SpaghettiCCL(Image.TestImages.BinaryImage4());
                 Image classic4 = ClassicCCL(Image.TestImages.BinaryImage4());
-                Debug.Assert(spaghetti4.Equals(classic4));
+                TestLabeledImageEquivalency(spaghetti4, classic4);
 
                 Image spaghetti5 = SpaghettiCCL(Image.TestImages.BinaryImage5());
                 Image classic5 = ClassicCCL(Image.TestImages.BinaryImage5());
-                Debug.Assert(spaghetti5.Equals(classic5));
+                TestLabeledImageEquivalency(spaghetti5, classic5);
 
                 Image spaghetti6 = SpaghettiCCL(Image.TestImages.BinaryImage6());
                 Image classic6 = ClassicCCL(Image.TestImages.BinaryImage6());
-                Debug.Assert(spaghetti6.Equals(classic6));
+                TestLabeledImageEquivalency(spaghetti6, classic6);
 
                 Image spaghetti7 = SpaghettiCCL(Image.TestImages.BinaryImage7());
                 Image classic7 = ClassicCCL(Image.TestImages.BinaryImage7());
-                Debug.Assert(spaghetti7.Equals(classic7));
+                TestLabeledImageEquivalency(spaghetti7, classic7);
 
                 Image spaghetti8 = SpaghettiCCL(Image.TestImages.BinaryImage8());
                 Image classic8 = ClassicCCL(Image.TestImages.BinaryImage8());
-                Debug.Assert(spaghetti8.Equals(classic8));
+                TestLabeledImageEquivalency(spaghetti8, classic8);
 
                 Image spaghetti9 = SpaghettiCCL(Image.TestImages.BinaryImage9());
                 Image classic9 = ClassicCCL(Image.TestImages.BinaryImage9());
-                Debug.Assert(spaghetti9.Equals(classic9));
+                TestLabeledImageEquivalency(spaghetti9, classic9);
 
                 Image spaghetti10 = SpaghettiCCL(Image.TestImages.BinaryImage10());
                 Image classic10 = ClassicCCL(Image.TestImages.BinaryImage10());
-                Debug.Assert(spaghetti10.Equals(classic10));
+                TestLabeledImageEquivalency(spaghetti10, classic10);
 
                 Image spaghetti11 = SpaghettiCCL(Image.TestImages.BinaryImage11());
                 Image classic11 = ClassicCCL(Image.TestImages.BinaryImage11());
-                Debug.Assert(spaghetti11.Equals(classic11));
+                TestLabeledImageEquivalency(spaghetti11, classic11);
 
                 Image spaghetti12 = SpaghettiCCL(Image.TestImages.BinaryImage12());
                 Image classic12 = ClassicCCL(Image.TestImages.BinaryImage12());
-                Debug.Assert(spaghetti12.Equals(classic12));
+                TestLabeledImageEquivalency(spaghetti12, classic12);
 
                 Image spaghetti13 = SpaghettiCCL(Image.TestImages.BinaryImage13());
                 Image classic13 = ClassicCCL(Image.TestImages.BinaryImage13());
-                Debug.Assert(spaghetti13.Equals(classic13));
+                TestLabeledImageEquivalency(spaghetti13, classic13);
 
                 Image spaghetti14 = SpaghettiCCL(Image.TestImages.BinaryImage14());
                 Image classic14 = ClassicCCL(Image.TestImages.BinaryImage14());
-                Debug.Assert(spaghetti14.Equals(classic14));
+                TestLabeledImageEquivalency(spaghetti14, classic14);
 
                 Image spaghetti15 = SpaghettiCCL(Image.TestImages.BinaryImage15());
                 Image classic15 = ClassicCCL(Image.TestImages.BinaryImage15());
-                Debug.Assert(spaghetti15.Equals(classic15));
+                TestLabeledImageEquivalency(spaghetti15, classic15);
 
                 Image spaghetti16 = SpaghettiCCL(Image.TestImages.BinaryImage16());
                 Image classic16 = ClassicCCL(Image.TestImages.BinaryImage16());
-                Debug.Assert(spaghetti16.Equals(classic16));
+                TestLabeledImageEquivalency(spaghetti16, classic16);
 
                 Image spaghetti17 = SpaghettiCCL(Image.TestImages.BinaryImage17());
                 Image classic17 = ClassicCCL(Image.TestImages.BinaryImage17());
-                Debug.Assert(spaghetti17.Equals(classic17));
+                TestLabeledImageEquivalency(spaghetti17, classic17);
 
                 Image spaghetti18 = SpaghettiCCL(Image.TestImages.BinaryImage18());
                 Image classic18 = ClassicCCL(Image.TestImages.BinaryImage18());
-                Debug.Assert(spaghetti18.Equals(classic18));
+                TestLabeledImageEquivalency(spaghetti18, classic18);
 
                 
                 for (int i = 1; i < 10; i++) {
@@ -592,7 +491,7 @@ namespace Spaghetti_Labeling
                     Image randomImageEven = Image.TestImages.GenerateRandomImage(20, 19);
                     Image spaghettiRandomEven = SpaghettiCCL(randomImageEven);
                     Image classicRandomEven = ClassicCCL(randomImageEven);
-                    Debug.Assert(spaghettiRandomEven.Equals(classicRandomEven));
+                    TestLabeledImageEquivalency(spaghettiRandomEven, classicRandomEven);
                     Console.WriteLine("Random image with even number of columns passed tests. ({0})", i);
                 }
 
@@ -601,20 +500,20 @@ namespace Spaghetti_Labeling
                     Image randomImageOdd = Image.TestImages.GenerateRandomImage(21, 19);
                     Image spaghettiRandomOdd = SpaghettiCCL(randomImageOdd);
                     Image classicRandomOdd = ClassicCCL(randomImageOdd);
-                    Debug.Assert(spaghettiRandomOdd.Equals(classicRandomOdd));
+                    TestLabeledImageEquivalency(spaghettiRandomOdd, classicRandomOdd);
                     Console.WriteLine("Random image with odd number of columns passed tests. ({0})", i);
                 }
                 
             } 
-        }
 
-        private static void TestFloodFillCCL() {
-            for (int i = 1; i < 10; i++) {
-                Image randomImage = Image.TestImages.GenerateRandomImage(20, 20);
-                Image classicRandom = ClassicCCL(randomImage);
-                Image floodFillRandom = FloodFillCCL(randomImage);
-                Debug.Assert(floodFillRandom.Equals(classicRandom));
-                Console.WriteLine("Flood fill test passed on a random image. ({0})", i);
+            private static void TestFloodFillCCL() {
+                for (int i = 1; i < 10; i++) {
+                    Image randomImage = Image.TestImages.GenerateRandomImage(20, 20);
+                    Image classicRandom = ClassicCCL(randomImage);
+                    Image floodFillRandom = FloodFillCCL(randomImage);
+                    TestLabeledImageEquivalency(classicRandom, floodFillRandom);
+                    Console.WriteLine("Flood fill test passed on a random image. ({0})", i);
+                }
             }
         }
     }

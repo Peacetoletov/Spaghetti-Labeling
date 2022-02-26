@@ -20,17 +20,11 @@ namespace Spaghetti_Labeling
         11) Final polish, comparison of different CCL approaches
         */
 
-        private const bool testing = false;
+        private const bool testing = true;
 
         static void Main(string[] args)
         {
-             Console.WriteLine("Hello Bolelli!");     // RIP
-
-            /*
-            TODO: optimize equivalent label resolving
-
-            TODO: rename equivalentLabels to equivalenceTable where necessary
-            */
+            // Console.WriteLine("Hello Bolelli!");     // RIP
 
             //Image image = ImageProcessor.ClassicCCL(Image.TestImages.BinaryImage2());
             //image.Print();
@@ -48,7 +42,7 @@ namespace Spaghetti_Labeling
             }
             */
 
-            Measurements.PrintPeakMemory();
+            //Measurements.PrintPeakMemory();
 
             
             if (testing) {

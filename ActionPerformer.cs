@@ -15,12 +15,12 @@ namespace Spaghetti_Labeling
         int highestLabel = 0;
         List<List<int>> inputMatrix;
         List<List<int>> outputMatrix;
-        List<HashSet<int>> equivalentLabels;
+        HashSet<(int, int)> equivalenceTable;
 
-        public ActionPerformer(Image input, Image output, List<HashSet<int>> equivalentLabels) {
+        public ActionPerformer(Image input, Image output, HashSet<(int, int)> equivalenceTable) {
             this.inputMatrix = input.GetMatrix();
             this.outputMatrix = output.GetMatrix();
-            this.equivalentLabels = equivalentLabels;
+            this.equivalenceTable = equivalenceTable;
         }
 
         public void Perform(int action, int x, int y, bool debug=false) {
@@ -83,7 +83,6 @@ namespace Spaghetti_Labeling
             // Assigns a new label to the current block
             highestLabel++;
             LabelCurrentBlock(highestLabel, x, y);
-            equivalentLabels.Add(new HashSet<int> {highestLabel});
             if (debug) {
                 Console.WriteLine("Assigned new label: {0}", highestLabel);
             }
@@ -101,28 +100,18 @@ namespace Spaghetti_Labeling
         private void Merge(char[] blocks, int x, int y, bool debug) {
             // Arbitrarily assigns the label of the first block to the current block, then merges labels
             // of all given blocks
-            LabelCurrentBlock(GetLabelOfBlock(blocks[0], x, y), x, y);
-            if (debug) {
-                Console.WriteLine("Assigned label {0}.", GetLabelOfBlock(blocks[0], x, y));
+            HashSet<int> neighboringLabels = new HashSet<int>(); 
+            foreach (char block in blocks) {
+                neighboringLabels.Add(GetLabelOfBlock(block, x, y));
+            }
+            List<int> labelsList = new List<int>(neighboringLabels);
+            LabelCurrentBlock(labelsList[0], x, y);
+            for (int i = 1; i < labelsList.Count; i++) {
+                equivalenceTable.Add((labelsList[0], labelsList[i]));
             }
 
-            // For each pair of labels to be merged, check if they are different and if they belong to different sets.
-            // If so, join the sets together. 
-            for (int i = 0; i < blocks.Length - 1; i++) {
-                for (int j = i + 1; j < blocks.Length; j++) {
-                    int label1 = GetLabelOfBlock(blocks[i], x, y);
-                    int label2 = GetLabelOfBlock(blocks[j], x, y);
-                    if (label1 != label2) { 
-                        (HashSet<int> setWithLabel1, HashSet<int> setWithLabel2) = ImageProcessor.FindSetsWithLabels(equivalentLabels, label1, label2);
-                        if (setWithLabel1 != setWithLabel2) {
-                            setWithLabel1.UnionWith(setWithLabel2);
-                            equivalentLabels.Remove(setWithLabel2);
-                            if (debug) {
-                                Console.WriteLine("Merged blocks {0} and {1} (labels {2}, {3}).", blocks[i], blocks[j], label1, label2);
-                            }
-                        }
-                    }
-                }
+            if (debug) {
+                Console.WriteLine("Assigned label {0}.", GetLabelOfBlock(blocks[0], x, y));
             }
         }
 
@@ -175,6 +164,10 @@ namespace Spaghetti_Labeling
                     }
                 }
             }
+        }
+
+        public int getHighestLabel() {
+            return highestLabel;
         }
     }
 }
