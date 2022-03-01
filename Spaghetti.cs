@@ -17,40 +17,66 @@ namespace Spaghetti_Labeling
         8) First row labeling DONE
         9) Last row labeling DONE
         10) Test, read images from files, create an executable file DONE
-        11) Final polish, comparison of different CCL approaches
+        11) Final polish, comparison of different CCL approaches DONE
         */
 
-        private const bool testing = true;
+        private const bool testing = false;
 
         static void Main(string[] args)
         {
             // Console.WriteLine("Hello Bolelli!");     // RIP
 
-            //Image image = ImageProcessor.ClassicCCL(Image.TestImages.BinaryImage2());
-            //image.Print();
+            //Image image = ImageProcessor.ClassicCCL(Image.TestImages.GenerateRandomImage(1000, 1000, fgProb: 0.95));
+            //image.Save("Test images/b_saved");
 
-
-            /*
-            if (args.Length == 0) {
-                Console.WriteLine("Specify the path to the image to be labeled.");
-            } else if (args.Length == 1) {
+            
+            if (args.Length < 2 || args.Length > 3) {
+                PrintUsage();
+            } else if (args.Length == 2) {
                 Image input = new Image(args[0]);
                 Image labeled = ImageProcessor.SpaghettiCCL(input);
-                labeled.Print();
+                labeled.Save(args[1]);
             } else {
-                Console.WriteLine("Only 1 argument is allowed.");
+                if (args[0] != "S" && args[0] != "T" && args[0] != "F") {
+                    Console.WriteLine(@"Unrecognized labeling algorithm. Possible options:
+                                     'S', 'T', 'F'.");
+                    return;
+                }
+                Image input = new Image(args[1]);
+                Image labeled = null;
+                if (args[0] == "S") {
+                    labeled = ImageProcessor.SpaghettiCCL(input);
+                } else if (args[0] == "T") {
+                    labeled = ImageProcessor.ClassicCCL(input);
+                } else {
+                    labeled = ImageProcessor.FloodFillCCL(input);
+                }
+                labeled.Save(args[2]);
             }
-            */
+            
 
             //Measurements.PrintPeakMemory();
 
-            
+            /*
             if (testing) {
                 RunTests();
             } else {
                 Console.WriteLine("WARNING: Tests are turned off.");
             }
+            */
                     
+        }
+
+        private static void PrintUsage() {
+            Console.WriteLine(@"Usage: .\Spaghetti-Labeling [CCL algorithm] input_image output_image");
+            Console.WriteLine(@"[CCL algorithm] is a voluntary argument which specifies what 
+                              labeling algorithm will be used. Option 'S' is for the spaghetti 
+                              algorithm and is used by default. Other options include 'T' for
+                              two-pass algorithm with equivalence table and 'F' for flood fill
+                              algorithm.");
+            Console.WriteLine(@"input_image specifies the path to an existing image.");
+            Console.WriteLine(@"output_image specifies the path where a labeled image will be 
+                              created");
         }
 
         private static void RunTests() {

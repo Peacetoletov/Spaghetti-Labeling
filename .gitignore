@@ -7,3 +7,4 @@
 *.csproj
 obj/*
 Test images/*
+bin/*
