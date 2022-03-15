@@ -314,7 +314,6 @@ namespace Spaghetti_Labeling
                 TestReduceTreeAndMergeBranches();
                 TestRemoveDuplicateMainTrees();
                 TestRangeOfNextTreeIndicesInReducedTrees();
-                //TestPage5Tree();      // Commented out because it was failing, see TestPage5Tree() documentation for more info
 
                 // The creation of end forests *seems* to be working correctly. As testing it is hard to automate, I did a couple of manual tests instead.
             }

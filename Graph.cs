@@ -47,7 +47,8 @@ namespace Spaghetti_Labeling
                 }
             }
 
-            
+            // The following part is only for testing
+
             // Remove references (in "parents" lists) to trees which were substituted away
             foreach (Tree tree in forest) {
                 RemoveReferencesToSubstitutedTrees(tree.GetRoot());

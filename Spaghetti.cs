@@ -24,12 +24,14 @@ namespace Spaghetti_Labeling
 
         static void Main(string[] args)
         {
-            // Console.WriteLine("Hello Bolelli!");     // RIP
+            Console.WriteLine("Hello Bolelli!");     // RIP
 
-            //Image image = ImageProcessor.ClassicCCL(Image.TestImages.GenerateRandomImage(1000, 1000, fgProb: 0.95));
-            //image.Save("Test images/b_saved");
+            Image image = ImageProcessor.ClassicCCL(Image.TestImages.GenerateRandomImage(1000, 1000, fgProb: 0.3));
+            image.Save("Test images/b_saved");
 
-            
+            // TODO: update Spaghetti ccl to the new label equivalence resolution (basic ClassicCCL tests passed)
+
+            /*
             if (args.Length < 2 || args.Length > 3) {
                 PrintUsage();
             } else if (args.Length == 2) {
@@ -53,17 +55,17 @@ namespace Spaghetti_Labeling
                 }
                 labeled.Save(args[2]);
             }
-            
+            */
 
             //Measurements.PrintPeakMemory();
 
-            /*
+            
             if (testing) {
                 RunTests();
             } else {
                 Console.WriteLine("WARNING: Tests are turned off.");
             }
-            */
+            
                     
         }
 
