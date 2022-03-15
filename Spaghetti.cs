@@ -26,10 +26,8 @@ namespace Spaghetti_Labeling
         {
             Console.WriteLine("Hello Bolelli!");     // RIP
 
-            Image image = ImageProcessor.ClassicCCL(Image.TestImages.GenerateRandomImage(1000, 1000, fgProb: 0.3));
-            image.Save("Test images/b_saved");
-
-            // TODO: update Spaghetti ccl to the new label equivalence resolution (basic ClassicCCL tests passed)
+            //Image image = ImageProcessor.ClassicCCL(Image.TestImages.GenerateRandomImage(1000, 1000, fgProb: 0.3));
+            // image.Save("Test images/b_saved");
 
             /*
             if (args.Length < 2 || args.Length > 3) {

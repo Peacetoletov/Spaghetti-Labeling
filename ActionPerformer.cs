@@ -15,12 +15,12 @@ namespace Spaghetti_Labeling
         int highestLabel = 0;
         List<List<int>> inputMatrix;
         List<List<int>> outputMatrix;
-        HashSet<(int, int)> equivalenceTable;
+        Dictionary<int, HashSet<int>> equivalentLabels;
 
-        public ActionPerformer(Image input, Image output, HashSet<(int, int)> equivalenceTable) {
+        public ActionPerformer(Image input, Image output, Dictionary<int, HashSet<int>> equivalentLabels) {
             this.inputMatrix = input.GetMatrix();
             this.outputMatrix = output.GetMatrix();
-            this.equivalenceTable = equivalenceTable;
+            this.equivalentLabels = equivalentLabels;
         }
 
         public void Perform(int action, int x, int y, bool debug=false) {
@@ -83,6 +83,7 @@ namespace Spaghetti_Labeling
             // Assigns a new label to the current block
             highestLabel++;
             LabelCurrentBlock(highestLabel, x, y);
+            equivalentLabels[highestLabel] = new HashSet<int> {highestLabel};
             if (debug) {
                 Console.WriteLine("Assigned new label: {0}", highestLabel);
             }
@@ -104,10 +105,11 @@ namespace Spaghetti_Labeling
             foreach (char block in blocks) {
                 neighboringLabels.Add(GetLabelOfBlock(block, x, y));
             }
-            List<int> labelsList = new List<int>(neighboringLabels);
-            LabelCurrentBlock(labelsList[0], x, y);
-            for (int i = 1; i < labelsList.Count; i++) {
-                equivalenceTable.Add((labelsList[0], labelsList[i]));
+            List<int> labels = new List<int>(neighboringLabels);
+            LabelCurrentBlock(labels[0], x, y);
+            for (int i = 1; i < labels.Count; i++) {
+                equivalentLabels[labels[0]].Add(labels[i]);
+                equivalentLabels[labels[i]].Add(labels[0]);
             }
 
             if (debug) {
