@@ -1,3 +1,9 @@
+/*
+Created by Lukáš Osouch for bachelor's thesis Connected Component Labeling Using Directed Acyclic Graphs.
+Masaryk University
+2022
+*/
+
 using System;
 using System.Diagnostics;
 
@@ -25,13 +31,51 @@ namespace Spaghetti_Labeling
         }
 
         public static void PrintAverageLabelingTime() {
-            // TODO: this
-            /* UPDATE: resolving label equivalencies is extremely inefficient and renders measuring time
-               complexity pointless.
-               When I commented out everything related to equivalent labels, the labeling time went down
-               significantly. 
-               I have no idea how to fix this so it will probably be best to just note it down and move on.
-               */
+            int numberOfImages = 10;
+            Image[] randomImages = new Image[numberOfImages];
+            //Image[] labeled = new Image[numberOfImages];
+            for (int i = 0; i < numberOfImages; i++) {
+                randomImages[i] = Image.TestImages.GenerateRandomImage(1000, 1000);
+                Console.WriteLine("Generated random image {0}", i);
+            }
+
+            Console.WriteLine("Flood fill:");
+            PrintAverageLabelingTime(ImageProcessor.FloodFillCCL, randomImages);
+            Console.WriteLine("Classic:");
+            PrintAverageLabelingTime(ImageProcessor.ClassicCCL, randomImages);
+            Console.WriteLine("Spaghetti:");
+            PrintAverageLabelingTimeSpaghetti(randomImages);
+        }
+
+        private static void PrintAverageLabelingTime(Func<Image, Image> CCL_Function, Image[] images) {
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            for (int i = 0; i < images.Length; i++) {
+                //labeled[i] = ImageProcessor.FloodFillCCL(randomImages[i]);
+                CCL_Function(images[i]);
+                Console.WriteLine("Finished labeling image {0}", i);
+            }
+            sw.Stop();
+
+            Console.WriteLine("Elapsed time: {0}", sw.Elapsed);
+            Console.WriteLine("Average time: {0}", sw.Elapsed / images.Length);
+        }
+
+        private static void PrintAverageLabelingTimeSpaghetti(Image[] images) {
+            // Time necessary to create graphs does not count towards labeling time
+            GraphManager[] gms = GraphManager.CreateManagers();
+
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            for (int i = 0; i < images.Length; i++) {
+                //labeled[i] = ImageProcessor.FloodFillCCL(randomImages[i]);
+                ImageProcessor.SpaghettiCCL(images[i], gms);
+                Console.WriteLine("Finished labeling image {0}", i);
+            }
+            sw.Stop();
+
+            Console.WriteLine("Elapsed time: {0}", sw.Elapsed);
+            Console.WriteLine("Average time: {0}", sw.Elapsed / images.Length);
         }
     }
 }

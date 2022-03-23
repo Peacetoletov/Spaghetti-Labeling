@@ -1,3 +1,9 @@
+/*
+Created by Lukáš Osouch for bachelor's thesis Connected Component Labeling Using Directed Acyclic Graphs.
+Masaryk University
+2022
+*/
+
 using System;
 using System.Diagnostics;
 using System.Collections.Generic;
@@ -6,14 +12,18 @@ namespace Spaghetti_Labeling
 {
     public static class ImageProcessor
     {
-        private static (Image, Dictionary<int, HashSet<int>>) SpaghettiAssignLabels(Image input) {
+        private static (Image, Dictionary<int, HashSet<int>>) SpaghettiAssignLabels(Image input, GraphManager[] gms) {
+            // gms[0] is first row, gms[1] middle rows, gms[2] last row
+
             List<List<int>> inputMatrix = input.GetMatrix();
 
+            /*
             GraphManager gmFirst = new GraphManager(GraphManager.GraphType.FirstRow);
             GraphManager gmMiddle = new GraphManager(GraphManager.GraphType.MiddleRows);
             GraphManager gmLast = new GraphManager(GraphManager.GraphType.LastRow);
             // ^ For better performance, GraphManager could be created once at the start of the program and then 
             // passed as an argument
+            */
 
             int width = inputMatrix[0].Count;
             int height = inputMatrix.Count;
@@ -26,16 +36,16 @@ namespace Spaghetti_Labeling
                 if (y == 0) {
                     // First row
                     //Console.WriteLine("Labeling blocks in first row.");
-                    SpaghettiLabelBlocks(y, gmFirst, input, ap);
+                    SpaghettiLabelBlocks(y, gms[0], input, ap);
                 } 
                 else if (y != height - 1) {
                     // Middle rows
-                    SpaghettiLabelBlocks(y, gmMiddle, input, ap);
+                    SpaghettiLabelBlocks(y, gms[1], input, ap);
                 }
                 else {
                     // Last row (only used in images with an odd number of rows)
                     //Console.WriteLine("Labeling blocks in last row.");
-                    SpaghettiLabelBlocks(y, gmLast, input, ap);
+                    SpaghettiLabelBlocks(y, gms[2], input, ap);
                 }
             }
 
@@ -167,19 +177,25 @@ namespace Spaghetti_Labeling
             }
         }
 
-        public static Image SpaghettiCCL(Image input) {
-            return CCL(input, SpaghettiAssignLabels);
+        public static Image SpaghettiCCL(Image input, GraphManager[] gms) {
+            (Image output, Dictionary<int, HashSet<int>> equivalentLabels) = SpaghettiAssignLabels(input, gms);
+            ResolveLabelEquivalencies(output, equivalentLabels);
+            return output;
         }
 
         public static Image ClassicCCL(Image input) {
-            return CCL(input, ClassicCCL_AssignLabels);
+            (Image output, Dictionary<int, HashSet<int>> equivalentLabels) = ClassicCCL_AssignLabels(input);
+            ResolveLabelEquivalencies(output, equivalentLabels);
+            return output;
         }
 
+        /*
         private static Image CCL(Image input, Func<Image, (Image, Dictionary<int, HashSet<int>>)> assignLabels) {
             (Image output, Dictionary<int, HashSet<int>> equivalentLabels) = assignLabels(input);
             ResolveLabelEquivalencies(output, equivalentLabels);
             return output;
         }
+        */
 
         private static (Image, Dictionary<int, HashSet<int>>) ClassicCCL_AssignLabels(Image input) {
             List<List<int>> inputMatrix = input.GetMatrix();
@@ -412,67 +428,69 @@ namespace Spaghetti_Labeling
             }
 
             private static void TestSpaghettiCCL() {
-                Image spaghetti3 = SpaghettiCCL(Image.TestImages.BinaryImage3());
+                GraphManager[] gms = GraphManager.CreateManagers();
+
+                Image spaghetti3 = SpaghettiCCL(Image.TestImages.BinaryImage3(), gms);
                 Image classic3 = ClassicCCL(Image.TestImages.BinaryImage3());
                 TestLabeledImageEquivalency(spaghetti3, classic3);
 
-                Image spaghetti4 = SpaghettiCCL(Image.TestImages.BinaryImage4());
+                Image spaghetti4 = SpaghettiCCL(Image.TestImages.BinaryImage4(), gms);
                 Image classic4 = ClassicCCL(Image.TestImages.BinaryImage4());
                 TestLabeledImageEquivalency(spaghetti4, classic4);
 
-                Image spaghetti5 = SpaghettiCCL(Image.TestImages.BinaryImage5());
+                Image spaghetti5 = SpaghettiCCL(Image.TestImages.BinaryImage5(), gms);
                 Image classic5 = ClassicCCL(Image.TestImages.BinaryImage5());
                 TestLabeledImageEquivalency(spaghetti5, classic5);
 
-                Image spaghetti6 = SpaghettiCCL(Image.TestImages.BinaryImage6());
+                Image spaghetti6 = SpaghettiCCL(Image.TestImages.BinaryImage6(), gms);
                 Image classic6 = ClassicCCL(Image.TestImages.BinaryImage6());
                 TestLabeledImageEquivalency(spaghetti6, classic6);
 
-                Image spaghetti7 = SpaghettiCCL(Image.TestImages.BinaryImage7());
+                Image spaghetti7 = SpaghettiCCL(Image.TestImages.BinaryImage7(), gms);
                 Image classic7 = ClassicCCL(Image.TestImages.BinaryImage7());
                 TestLabeledImageEquivalency(spaghetti7, classic7);
 
-                Image spaghetti8 = SpaghettiCCL(Image.TestImages.BinaryImage8());
+                Image spaghetti8 = SpaghettiCCL(Image.TestImages.BinaryImage8(), gms);
                 Image classic8 = ClassicCCL(Image.TestImages.BinaryImage8());
                 TestLabeledImageEquivalency(spaghetti8, classic8);
 
-                Image spaghetti9 = SpaghettiCCL(Image.TestImages.BinaryImage9());
+                Image spaghetti9 = SpaghettiCCL(Image.TestImages.BinaryImage9(), gms);
                 Image classic9 = ClassicCCL(Image.TestImages.BinaryImage9());
                 TestLabeledImageEquivalency(spaghetti9, classic9);
 
-                Image spaghetti10 = SpaghettiCCL(Image.TestImages.BinaryImage10());
+                Image spaghetti10 = SpaghettiCCL(Image.TestImages.BinaryImage10(), gms);
                 Image classic10 = ClassicCCL(Image.TestImages.BinaryImage10());
                 TestLabeledImageEquivalency(spaghetti10, classic10);
 
-                Image spaghetti11 = SpaghettiCCL(Image.TestImages.BinaryImage11());
+                Image spaghetti11 = SpaghettiCCL(Image.TestImages.BinaryImage11(), gms);
                 Image classic11 = ClassicCCL(Image.TestImages.BinaryImage11());
                 TestLabeledImageEquivalency(spaghetti11, classic11);
 
-                Image spaghetti12 = SpaghettiCCL(Image.TestImages.BinaryImage12());
+                Image spaghetti12 = SpaghettiCCL(Image.TestImages.BinaryImage12(), gms);
                 Image classic12 = ClassicCCL(Image.TestImages.BinaryImage12());
                 TestLabeledImageEquivalency(spaghetti12, classic12);
 
-                Image spaghetti13 = SpaghettiCCL(Image.TestImages.BinaryImage13());
+                Image spaghetti13 = SpaghettiCCL(Image.TestImages.BinaryImage13(), gms);
                 Image classic13 = ClassicCCL(Image.TestImages.BinaryImage13());
                 TestLabeledImageEquivalency(spaghetti13, classic13);
 
-                Image spaghetti14 = SpaghettiCCL(Image.TestImages.BinaryImage14());
+                Image spaghetti14 = SpaghettiCCL(Image.TestImages.BinaryImage14(), gms);
                 Image classic14 = ClassicCCL(Image.TestImages.BinaryImage14());
                 TestLabeledImageEquivalency(spaghetti14, classic14);
 
-                Image spaghetti15 = SpaghettiCCL(Image.TestImages.BinaryImage15());
+                Image spaghetti15 = SpaghettiCCL(Image.TestImages.BinaryImage15(), gms);
                 Image classic15 = ClassicCCL(Image.TestImages.BinaryImage15());
                 TestLabeledImageEquivalency(spaghetti15, classic15);
 
-                Image spaghetti16 = SpaghettiCCL(Image.TestImages.BinaryImage16());
+                Image spaghetti16 = SpaghettiCCL(Image.TestImages.BinaryImage16(), gms);
                 Image classic16 = ClassicCCL(Image.TestImages.BinaryImage16());
                 TestLabeledImageEquivalency(spaghetti16, classic16);
 
-                Image spaghetti17 = SpaghettiCCL(Image.TestImages.BinaryImage17());
+                Image spaghetti17 = SpaghettiCCL(Image.TestImages.BinaryImage17(), gms);
                 Image classic17 = ClassicCCL(Image.TestImages.BinaryImage17());
                 TestLabeledImageEquivalency(spaghetti17, classic17);
 
-                Image spaghetti18 = SpaghettiCCL(Image.TestImages.BinaryImage18());
+                Image spaghetti18 = SpaghettiCCL(Image.TestImages.BinaryImage18(), gms);
                 Image classic18 = ClassicCCL(Image.TestImages.BinaryImage18());
                 TestLabeledImageEquivalency(spaghetti18, classic18);
 
@@ -480,7 +498,7 @@ namespace Spaghetti_Labeling
                 for (int i = 1; i < 10; i++) {
                     //Image randomImageEven = Image.TestImages.GenerateRandomImage(20, 19, fileName: "testEven" + i);
                     Image randomImageEven = Image.TestImages.GenerateRandomImage(20, 19);
-                    Image spaghettiRandomEven = SpaghettiCCL(randomImageEven);
+                    Image spaghettiRandomEven = SpaghettiCCL(randomImageEven, gms);
                     Image classicRandomEven = ClassicCCL(randomImageEven);
                     TestLabeledImageEquivalency(spaghettiRandomEven, classicRandomEven);
                     Console.WriteLine("Random image with even number of columns passed tests. ({0})", i);
@@ -489,7 +507,7 @@ namespace Spaghetti_Labeling
                 for (int i = 1; i < 10; i++) {
                     //Image randomImageOdd = Image.TestImages.GenerateRandomImage(21, 19, fileName: "testOdd" + i);
                     Image randomImageOdd = Image.TestImages.GenerateRandomImage(21, 19);
-                    Image spaghettiRandomOdd = SpaghettiCCL(randomImageOdd);
+                    Image spaghettiRandomOdd = SpaghettiCCL(randomImageOdd, gms);
                     Image classicRandomOdd = ClassicCCL(randomImageOdd);
                     TestLabeledImageEquivalency(spaghettiRandomOdd, classicRandomOdd);
                     Console.WriteLine("Random image with odd number of columns passed tests. ({0})", i);

@@ -1,4 +1,10 @@
-﻿using System;
+﻿/*
+Created by Lukáš Osouch for bachelor's thesis Connected Component Labeling Using Directed Acyclic Graphs.
+Masaryk University
+2022
+*/
+
+using System;
 using System.Collections.Generic;
 
 
@@ -56,6 +62,7 @@ namespace Spaghetti_Labeling
             */
 
             //Measurements.PrintPeakMemory();
+            Measurements.PrintAverageLabelingTime();
 
             
             if (testing) {

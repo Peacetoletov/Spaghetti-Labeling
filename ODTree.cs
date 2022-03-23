@@ -1,3 +1,9 @@
+/*
+Created by Lukáš Osouch for bachelor's thesis Connected Component Labeling Using Directed Acyclic Graphs.
+Masaryk University
+2022
+*/
+
 using System.Collections.Generic;
 
 namespace Spaghetti_Labeling

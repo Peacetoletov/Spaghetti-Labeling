@@ -1,3 +1,9 @@
+/*
+Created by Lukáš Osouch for bachelor's thesis Connected Component Labeling Using Directed Acyclic Graphs.
+Masaryk University
+2022
+*/
+
 using System;
 using System.Diagnostics;
 using System.Collections.Generic;
@@ -85,6 +91,13 @@ namespace Spaghetti_Labeling
 
         public AbstractNode AdjustIndexAndGetRootInEndGraphOdd(int index) {
             return endGraphOdd.GetRoot(mainGraph.GetEndTreeOddIndex(index - 1));
+        }
+
+        public static GraphManager[] CreateManagers() {
+            GraphManager gmFirst = new GraphManager(GraphManager.GraphType.FirstRow);
+            GraphManager gmMiddle = new GraphManager(GraphManager.GraphType.MiddleRows);
+            GraphManager gmLast = new GraphManager(GraphManager.GraphType.LastRow);
+            return new GraphManager[] { gmFirst, gmMiddle, gmLast };
         }
 
         public static class Tests 
