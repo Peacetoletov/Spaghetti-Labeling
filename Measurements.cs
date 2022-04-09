@@ -19,10 +19,19 @@ namespace Spaghetti_Labeling
             // Uncomment one of the algorithms and note down memory usage, then repeat this process
             // for other algorithms. Memory usage cannot be measured for multiple algorithms at once!
 
+            /*
             Image randomImage = Image.TestImages.GenerateRandomImage(1000, 1000);
-            //Image spaghetti = ImageProcessor.SpaghettiCCL(randomImage);
-            Image classic = ImageProcessor.ClassicCCL(randomImage);
+            Image spaghetti = ImageProcessor.SpaghettiCCL(randomImage, GraphManager.CreateManagers());
+            //Image classic = ImageProcessor.ClassicCCL(randomImage);
             //Image flood = ImageProcessor.FloodFillCCL(randomImage);
+            */
+
+            //Image testImage = new Image("Test images/a_lines.png");
+            //Image testImage = new Image("Test images/a_lol.png");
+            Image testImage = new Image("Test images/a_tail.png");
+            //Image spaghetti = ImageProcessor.SpaghettiCCL(testImage, GraphManager.CreateManagers());
+            Image classic = ImageProcessor.ClassicCCL(testImage);
+            //Image flood = ImageProcessor.FloodFillCCL(testImage);
 
 
             long peakMemory = currentProcess.PeakWorkingSet64;
@@ -30,13 +39,20 @@ namespace Spaghetti_Labeling
             Console.WriteLine("Peak memory usage in kilobytes: {0}", peakMemory / 1000);
         }
 
-        public static void PrintAverageLabelingTime() {
+        public static async void PrintAverageLabelingTime() {
             int numberOfImages = 10;
             Image[] randomImages = new Image[numberOfImages];
-            //Image[] labeled = new Image[numberOfImages];
             for (int i = 0; i < numberOfImages; i++) {
-                randomImages[i] = Image.TestImages.GenerateRandomImage(1000, 1000);
-                Console.WriteLine("Generated random image {0}", i);
+                // randomImages[i] = Image.TestImages.GenerateRandomImage(1000, 1000);
+                // Console.WriteLine("Generated random image {0}", i);
+                if (i % 3 == 0) {
+                    randomImages[i] = new Image("Test images/a_lines.png");
+                } else if (i % 3 == 1) {
+                    randomImages[i] = new Image("Test images/a_lol.png");
+                } else {
+                    randomImages[i] = new Image("Test images/a_tail.png");
+                }
+                Console.WriteLine("Loaded image {0}", i);
             }
 
             Console.WriteLine("Flood fill:");

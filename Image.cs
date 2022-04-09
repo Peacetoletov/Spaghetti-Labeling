@@ -55,10 +55,8 @@ namespace Spaghetti_Labeling
 
         public void Save(string path) {
             // Saves this image as a file
-            // TODO: this
             int width = matrix[0].Count;
             int height = matrix.Count;
-            //Bitmap bm = new Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format16bppGrayScale);
             Bitmap bm = new Bitmap(width, height);
             for (int y = 0; y < height; y++) {
                 for (int x = 0; x < width; x++) {
@@ -66,8 +64,28 @@ namespace Spaghetti_Labeling
                     int g = (matrix[y][x] / 256) % 256;
                     int b = (matrix[y][x] / (256*256)) % 256;
                     Color c = Color.FromArgb(0, r, g, b);
-                    //Color c = Color.FromArgb(0);
-                    // ^^ hopefully this works
+                    bm.SetPixel(x, y, c);
+                }
+            }
+            bm.Save(path, System.Drawing.Imaging.ImageFormat.Bmp);
+        }
+
+        public void SaveAsBinary(string path) {
+            // Saves this image as a binary image
+            int width = matrix[0].Count;
+            int height = matrix.Count;
+            Bitmap bm = new Bitmap(width, height);
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    int r = 0;
+                    int g = 0;
+                    int b = 0;
+                    if (matrix[y][x] != 0) {
+                        r = 255;
+                        g = 255;
+                        b = 255;
+                    }
+                    Color c = Color.FromArgb(0, r, g, b);
                     bm.SetPixel(x, y, c);
                 }
             }
