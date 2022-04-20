@@ -5,7 +5,6 @@ Masaryk University
 */
 
 using System;
-using System.Collections.Generic;
 
 
 namespace Spaghetti_Labeling
@@ -18,32 +17,43 @@ namespace Spaghetti_Labeling
         {
             // Console.WriteLine("Hello Bolelli!");
 
-            //Image image = ImageProcessor.ClassicCCL(Image.TestImages.GenerateRandomImage(1000, 1000, fgProb: 0.3));
-            // image.Save("Test images/b_saved");
+            //Image image = ImageProcessor.SpaghettiCCL(Image.TestImages.GenerateRandomImage(1000, 1000, fgProb: 0.3), GraphManager.CreateManagers());
+            //Image image = Image.TestImages.GenerateRandomImage(1000, 1000, fgProb: 0.3);
+            //image.SaveAsBinary("Test images/c_random.png");
 
             
             if (args.Length < 2 || args.Length > 3) {
                 PrintUsage();
-            } else if (args.Length == 2) {
-                Image input = new Image(args[0]);
-                Image labeled = ImageProcessor.SpaghettiCCL(input, GraphManager.CreateManagers());
-                labeled.Save(args[1]);
-            } else {
-                if (args[0] != "S" && args[0] != "T" && args[0] != "F") {
-                    Console.WriteLine(@"Unrecognized labeling algorithm. Possible options:
-                                     'S', 'T', 'F'.");
-                    return;
+            } 
+            else {
+                try {
+                    if (args.Length == 2) {
+                        Image input = new Image(args[0]);
+                        Image labeled = ImageProcessor.SpaghettiCCL(input, GraphManager.CreateManagers());
+                        labeled.Save(args[1]);
+                    } else {
+                        if (args[0] != "S" && args[0] != "T" && args[0] != "F") {
+                            Console.WriteLine("Unrecognized labeling algorithm. Possible options: " +
+                                              "'S', 'T', 'F'.");
+                            return;
+                        }
+                        Image input = new Image(args[1]);
+                        Image labeled = null;
+                        if (args[0] == "S") {
+                            labeled = ImageProcessor.SpaghettiCCL(input, GraphManager.CreateManagers());
+                        } else if (args[0] == "T") {
+                            labeled = ImageProcessor.ClassicCCL(input);
+                        } else {
+                            labeled = ImageProcessor.FloodFillCCL(input);
+                        }
+                        labeled.Save(args[2]);
+                    }
+                } catch (ArgumentException) {
+                    Console.WriteLine("Input file does not exist!");
+                } catch (ApplicationException) {
+                    Console.WriteLine("Input file contains too many connected components, " +
+                                      "cannot save as an RGB file.");
                 }
-                Image input = new Image(args[1]);
-                Image labeled = null;
-                if (args[0] == "S") {
-                    labeled = ImageProcessor.SpaghettiCCL(input, GraphManager.CreateManagers());
-                } else if (args[0] == "T") {
-                    labeled = ImageProcessor.ClassicCCL(input);
-                } else {
-                    labeled = ImageProcessor.FloodFillCCL(input);
-                }
-                labeled.Save(args[2]);
             }
             
 
@@ -80,8 +90,8 @@ namespace Spaghetti_Labeling
                               "algorithm and is used by default. Other options include 'T' for " +
                               "two-pass algorithm with equivalence table and 'F' for flood fill " +
                               "algorithm.");
-            Console.WriteLine("input_image specifies the path to an existing image.");
-            Console.WriteLine("output_image specifies the path where a labeled image will be " +
+            Console.WriteLine("input_image specifies the name of an existing image.");
+            Console.WriteLine("output_image specifies the name of the labeled image which will be " +
                               "created.");
         }
 

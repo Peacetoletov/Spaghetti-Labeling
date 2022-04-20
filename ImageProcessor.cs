@@ -310,7 +310,7 @@ namespace Spaghetti_Labeling
             }
         }
 
-        private static List<List<int>> InitMatrixWithZeroes(int width, int height) {
+        public static List<List<int>> InitMatrixWithZeroes(int width, int height) {
             List<List<int>> matrix = new List<List<int>>();
             for (int row = 0; row < height; row++) {
                 matrix.Add(new List<int>());
@@ -357,46 +357,6 @@ namespace Spaghetti_Labeling
             return new Image(outputMatrix);
         }
 
-        private static Image NormalizeLabels(Image input) {
-            /* Used purely for testing, this method replaces labels in a labeled image such that
-            when iterating through pixels from top left to bottom right, the first encountered 
-            label is 1, second 2, third 3 etc.
-            */
-
-            // Implementation is similar to flood fill CCL
-            List<List<int>> inputMatrix = input.GetMatrix();
-            int width = inputMatrix[0].Count;
-            int height = inputMatrix.Count;
-            List<List<int>> outputMatrix = InitMatrixWithZeroes(width, height);
-            int highestOutputLabel = 0;
-            for (int y = 0; y < height; y++) {
-                for (int x = 0; x < width; x++) {
-                    if (inputMatrix[y][x] != 0 && outputMatrix[y][x] == 0) {
-                        highestOutputLabel++;
-                        int curInputLabel = inputMatrix[y][x];
-                        Queue<(int, int)> q = new Queue<(int, int)>();
-                        q.Enqueue((y, x));
-                        while (q.Count != 0) {
-                            (int yFlood, int xFlood) = q.Dequeue();
-                            if (xFlood >= 0 && xFlood < width && yFlood >= 0 && yFlood < height &&
-                                    inputMatrix[yFlood][xFlood] == curInputLabel && outputMatrix[yFlood][xFlood] == 0) {
-                                outputMatrix[yFlood][xFlood] = highestOutputLabel;
-                                q.Enqueue((yFlood - 1, xFlood - 1));
-                                q.Enqueue((yFlood - 1, xFlood));
-                                q.Enqueue((yFlood - 1, xFlood + 1));
-                                q.Enqueue((yFlood, xFlood - 1));
-                                q.Enqueue((yFlood, xFlood + 1));
-                                q.Enqueue((yFlood + 1, xFlood - 1));
-                                q.Enqueue((yFlood + 1, xFlood));
-                                q.Enqueue((yFlood + 1, xFlood + 1));
-                            }
-                        }
-                    }
-                }
-            }
-            return new Image(outputMatrix);
-        }
-
         public static class Tests 
         {
             public static void Run() {
@@ -405,24 +365,27 @@ namespace Spaghetti_Labeling
                 TestFloodFillCCL();
             }
             
-            private static void TestLabeledImageEquivalency(Image image1, Image image2) {
+            private static void TestLabeledImageEquivalence(Image image1, Image image2) {
                 // Asserts equivalency of two labeled images by first normalizing them,
                 // then asserting their equality
-                Image normalized1 = NormalizeLabels(image1);
-                Image normalized2 = NormalizeLabels(image2);
-                Debug.Assert(normalized1.Equals(normalized2));
+                image1.NormalizeLabels();
+                image2.NormalizeLabels();
+                Debug.Assert(image1.Equals(image2));
             }
 
             private static void TestClassicCCL() {
-                Image labeled1 = NormalizeLabels(ClassicCCL(Image.TestImages.BinaryImage1()));
+                Image labeled1 = ClassicCCL(Image.TestImages.BinaryImage1());
+                labeled1.NormalizeLabels();
                 Image reference1 = Image.TestImages.LabeledImage1();
                 Debug.Assert(labeled1.Equals(reference1));
 
-                Image labeled2 = NormalizeLabels(ClassicCCL(Image.TestImages.BinaryImage2()));
+                Image labeled2 = ClassicCCL(Image.TestImages.BinaryImage2());
+                labeled2.NormalizeLabels();
                 Image reference2 = Image.TestImages.LabeledImage2();
                 Debug.Assert(labeled2.Equals(reference2));
 
-                Image labeled3 = NormalizeLabels(ClassicCCL(Image.TestImages.BinaryImage3()));
+                Image labeled3 = ClassicCCL(Image.TestImages.BinaryImage3());
+                labeled3.NormalizeLabels();
                 Image reference3 = Image.TestImages.LabeledImage3();
                 Debug.Assert(labeled3.Equals(reference3));
             }
@@ -432,67 +395,67 @@ namespace Spaghetti_Labeling
 
                 Image spaghetti3 = SpaghettiCCL(Image.TestImages.BinaryImage3(), gms);
                 Image classic3 = ClassicCCL(Image.TestImages.BinaryImage3());
-                TestLabeledImageEquivalency(spaghetti3, classic3);
+                TestLabeledImageEquivalence(spaghetti3, classic3);
 
                 Image spaghetti4 = SpaghettiCCL(Image.TestImages.BinaryImage4(), gms);
                 Image classic4 = ClassicCCL(Image.TestImages.BinaryImage4());
-                TestLabeledImageEquivalency(spaghetti4, classic4);
+                TestLabeledImageEquivalence(spaghetti4, classic4);
 
                 Image spaghetti5 = SpaghettiCCL(Image.TestImages.BinaryImage5(), gms);
                 Image classic5 = ClassicCCL(Image.TestImages.BinaryImage5());
-                TestLabeledImageEquivalency(spaghetti5, classic5);
+                TestLabeledImageEquivalence(spaghetti5, classic5);
 
                 Image spaghetti6 = SpaghettiCCL(Image.TestImages.BinaryImage6(), gms);
                 Image classic6 = ClassicCCL(Image.TestImages.BinaryImage6());
-                TestLabeledImageEquivalency(spaghetti6, classic6);
+                TestLabeledImageEquivalence(spaghetti6, classic6);
 
                 Image spaghetti7 = SpaghettiCCL(Image.TestImages.BinaryImage7(), gms);
                 Image classic7 = ClassicCCL(Image.TestImages.BinaryImage7());
-                TestLabeledImageEquivalency(spaghetti7, classic7);
+                TestLabeledImageEquivalence(spaghetti7, classic7);
 
                 Image spaghetti8 = SpaghettiCCL(Image.TestImages.BinaryImage8(), gms);
                 Image classic8 = ClassicCCL(Image.TestImages.BinaryImage8());
-                TestLabeledImageEquivalency(spaghetti8, classic8);
+                TestLabeledImageEquivalence(spaghetti8, classic8);
 
                 Image spaghetti9 = SpaghettiCCL(Image.TestImages.BinaryImage9(), gms);
                 Image classic9 = ClassicCCL(Image.TestImages.BinaryImage9());
-                TestLabeledImageEquivalency(spaghetti9, classic9);
+                TestLabeledImageEquivalence(spaghetti9, classic9);
 
                 Image spaghetti10 = SpaghettiCCL(Image.TestImages.BinaryImage10(), gms);
                 Image classic10 = ClassicCCL(Image.TestImages.BinaryImage10());
-                TestLabeledImageEquivalency(spaghetti10, classic10);
+                TestLabeledImageEquivalence(spaghetti10, classic10);
 
                 Image spaghetti11 = SpaghettiCCL(Image.TestImages.BinaryImage11(), gms);
                 Image classic11 = ClassicCCL(Image.TestImages.BinaryImage11());
-                TestLabeledImageEquivalency(spaghetti11, classic11);
+                TestLabeledImageEquivalence(spaghetti11, classic11);
 
                 Image spaghetti12 = SpaghettiCCL(Image.TestImages.BinaryImage12(), gms);
                 Image classic12 = ClassicCCL(Image.TestImages.BinaryImage12());
-                TestLabeledImageEquivalency(spaghetti12, classic12);
+                TestLabeledImageEquivalence(spaghetti12, classic12);
 
                 Image spaghetti13 = SpaghettiCCL(Image.TestImages.BinaryImage13(), gms);
                 Image classic13 = ClassicCCL(Image.TestImages.BinaryImage13());
-                TestLabeledImageEquivalency(spaghetti13, classic13);
+                TestLabeledImageEquivalence(spaghetti13, classic13);
 
                 Image spaghetti14 = SpaghettiCCL(Image.TestImages.BinaryImage14(), gms);
                 Image classic14 = ClassicCCL(Image.TestImages.BinaryImage14());
-                TestLabeledImageEquivalency(spaghetti14, classic14);
+                TestLabeledImageEquivalence(spaghetti14, classic14);
 
                 Image spaghetti15 = SpaghettiCCL(Image.TestImages.BinaryImage15(), gms);
                 Image classic15 = ClassicCCL(Image.TestImages.BinaryImage15());
-                TestLabeledImageEquivalency(spaghetti15, classic15);
+                TestLabeledImageEquivalence(spaghetti15, classic15);
 
                 Image spaghetti16 = SpaghettiCCL(Image.TestImages.BinaryImage16(), gms);
                 Image classic16 = ClassicCCL(Image.TestImages.BinaryImage16());
-                TestLabeledImageEquivalency(spaghetti16, classic16);
+                TestLabeledImageEquivalence(spaghetti16, classic16);
 
                 Image spaghetti17 = SpaghettiCCL(Image.TestImages.BinaryImage17(), gms);
                 Image classic17 = ClassicCCL(Image.TestImages.BinaryImage17());
-                TestLabeledImageEquivalency(spaghetti17, classic17);
+                TestLabeledImageEquivalence(spaghetti17, classic17);
 
                 Image spaghetti18 = SpaghettiCCL(Image.TestImages.BinaryImage18(), gms);
                 Image classic18 = ClassicCCL(Image.TestImages.BinaryImage18());
-                TestLabeledImageEquivalency(spaghetti18, classic18);
+                TestLabeledImageEquivalence(spaghetti18, classic18);
 
                 
                 for (int i = 1; i < 10; i++) {
@@ -500,7 +463,7 @@ namespace Spaghetti_Labeling
                     Image randomImageEven = Image.TestImages.GenerateRandomImage(20, 19);
                     Image spaghettiRandomEven = SpaghettiCCL(randomImageEven, gms);
                     Image classicRandomEven = ClassicCCL(randomImageEven);
-                    TestLabeledImageEquivalency(spaghettiRandomEven, classicRandomEven);
+                    TestLabeledImageEquivalence(spaghettiRandomEven, classicRandomEven);
                     Console.WriteLine("Random image with even number of columns passed tests. ({0})", i);
                 }
 
@@ -509,7 +472,7 @@ namespace Spaghetti_Labeling
                     Image randomImageOdd = Image.TestImages.GenerateRandomImage(21, 19);
                     Image spaghettiRandomOdd = SpaghettiCCL(randomImageOdd, gms);
                     Image classicRandomOdd = ClassicCCL(randomImageOdd);
-                    TestLabeledImageEquivalency(spaghettiRandomOdd, classicRandomOdd);
+                    TestLabeledImageEquivalence(spaghettiRandomOdd, classicRandomOdd);
                     Console.WriteLine("Random image with odd number of columns passed tests. ({0})", i);
                 }
                 
@@ -520,7 +483,7 @@ namespace Spaghetti_Labeling
                     Image randomImage = Image.TestImages.GenerateRandomImage(20, 20);
                     Image classicRandom = ClassicCCL(randomImage);
                     Image floodFillRandom = FloodFillCCL(randomImage);
-                    TestLabeledImageEquivalency(classicRandom, floodFillRandom);
+                    TestLabeledImageEquivalence(classicRandom, floodFillRandom);
                     Console.WriteLine("Flood fill test passed on a random image. ({0})", i);
                 }
             }

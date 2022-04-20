@@ -58,11 +58,13 @@ namespace Spaghetti_Labeling
             int width = matrix[0].Count;
             int height = matrix.Count;
             Bitmap bm = new Bitmap(width, height);
+            int numberOfLabels = NormalizeLabels();
             for (int y = 0; y < height; y++) {
                 for (int x = 0; x < width; x++) {
-                    int r = matrix[y][x] % 256;
-                    int g = (matrix[y][x] / 256) % 256;
-                    int b = (matrix[y][x] / (256*256)) % 256;
+                    int adjustedLabel = GetAdjustedLabel(matrix[y][x], numberOfLabels);
+                    int r = adjustedLabel % 256;
+                    int g = (adjustedLabel / 256) % 256;
+                    int b = (adjustedLabel / (256*256)) % 256;
                     Color c = Color.FromArgb(0, r, g, b);
                     bm.SetPixel(x, y, c);
                 }
@@ -70,6 +72,58 @@ namespace Spaghetti_Labeling
             bm.Save(path, System.Drawing.Imaging.ImageFormat.Bmp);
         }
 
+        private int GetAdjustedLabel(int curLabel, int numberOfLabels) {
+            // Adjusts a label to look nicer when saved as an RGB image
+            if (curLabel == 0) {
+                return 0;
+            }
+            const int maxLabel = 256*256*256 - 1;
+            if (numberOfLabels > maxLabel) {
+                throw new ApplicationException("Too many labels");
+            }
+            int adjustmentCoefficient = maxLabel / numberOfLabels;
+            return curLabel * adjustmentCoefficient;
+        }
+
+        public int NormalizeLabels() {
+            /* Replaces labels in a labeled image such that when iterating through pixels 
+            from top left to bottom right, the first encountered label is 1, second 2, 
+            third 3 etc. Returns the total number of components.
+            */
+
+            // Implementation is similar to flood fill CCL
+            int width = matrix[0].Count;
+            int height = matrix.Count;
+            List<List<int>> newMatrix = ImageProcessor.InitMatrixWithZeroes(width, height);
+            int newHighestLabel = 0;
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    if (matrix[y][x] != 0 && newMatrix[y][x] == 0) {
+                        newHighestLabel++;
+                        int curInputLabel = matrix[y][x];
+                        Queue<(int, int)> q = new Queue<(int, int)>();
+                        q.Enqueue((y, x));
+                        while (q.Count != 0) {
+                            (int yFlood, int xFlood) = q.Dequeue();
+                            if (xFlood >= 0 && xFlood < width && yFlood >= 0 && yFlood < height &&
+                                    matrix[yFlood][xFlood] == curInputLabel && newMatrix[yFlood][xFlood] == 0) {
+                                newMatrix[yFlood][xFlood] = newHighestLabel;
+                                q.Enqueue((yFlood - 1, xFlood - 1));
+                                q.Enqueue((yFlood - 1, xFlood));
+                                q.Enqueue((yFlood - 1, xFlood + 1));
+                                q.Enqueue((yFlood, xFlood - 1));
+                                q.Enqueue((yFlood, xFlood + 1));
+                                q.Enqueue((yFlood + 1, xFlood - 1));
+                                q.Enqueue((yFlood + 1, xFlood));
+                                q.Enqueue((yFlood + 1, xFlood + 1));
+                            }
+                        }
+                    }
+                }
+            }
+            this.matrix = newMatrix;
+            return newHighestLabel;
+        }
         public void SaveAsBinary(string path) {
             // Saves this image as a binary image
             int width = matrix[0].Count;
